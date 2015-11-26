@@ -1,26 +1,75 @@
 
-from math import cos, pi
+from math import cos, pi, fabs, sqrt
 from decimal import Decimal
 
 EARTH_RADIUS = Decimal('3958.8')
+EARTH_CIRCUMFERENCE = EARTH_RADIUS * 2 * Decimal(pi)
+MILES_PER_DEGREE_LAT = EARTH_CIRCUMFERENCE / Decimal(360)
+
+PRECISION = Decimal('0.001')
+
+def _quantize(x):
+
+    return x.quantize(PRECISION)
 
 def distance_between_positions(
         point_1_lat,
         point_1_long,
         point_2_lat,
         point_2_long,):
-
     '''
 Approximately, at 40 lat, each longit degree is about 52miles/deg.
     And approx, at 41 lat, the rate is about 51miles/deg.
 
 Also, the cross-sectional radius at degree x, Rcosx
 
-w/ earth radius, R = 3958.8 mi
 '''
 
+#    point_1_lat = Decimal(point_1_lat)
+#    point_1_long = Decimal(point_1_long)
+#    point_2_lat = Decimal(point_2_lat)
+#    point_2_long = Decimal(point_2_long)
+
+    d_betw_longitude_degrees = distance_betw_longitude_degrees(
+        point_1_lat,
+        point_1_long,
+        point_2_long)
+
+    d_betw_latitude_degrees = distance_betw_lat_degrees(
+            point_1_lat, 
+            point_2_lat)
+
+    d_diagonal = Decimal(sqrt(
+            d_betw_latitude_degrees**2 +
+            d_betw_longitude_degrees**2))
+
+    return _quantize(d_diagonal)
+
+def distance_betw_lat_degrees(lat_1_degree, lat_2_degree):
+    ''' Orthogonal distance between two consecutive latitude degrees,
+    is eath circumference divided by 360.
+    '''
+    difference = Decimal(fabs(lat_1_degree - lat_2_degree))
+
+    distance_in_miles = MILES_PER_DEGREE_LAT * difference 
+    return distance_in_miles
+
+def distance_betw_longitude_degrees(
+        latitude,
+        longitude_1_degree,
+        longitude_2_degree):
+    ''' Approximate distance at short distances.  '''
+    miles_per_degree = miles_per_long_degree_at_lat_degree(latitude)
+
+    difference = Decimal(fabs(longitude_1_degree - longitude_2_degree))
+
+    distance_in_miles = miles_per_degree * difference 
+
+    return distance_in_miles
+
+
 def deg_to_rad(deg):
-    rad = pi * deg / 180
+    rad = Decimal(pi) * deg / 180
     return rad
 
 
