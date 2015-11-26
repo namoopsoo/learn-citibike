@@ -27,6 +27,12 @@ START_STATION_LATITUDE_COL = 'start station latitude'
 START_STATION_LONGITUDE_COL = 'start station longitude'
 END_STATION_LATITUDE_COL = 'end station latitude'
 END_STATION_LONGITUDE_COL = 'end station longitude'
+TRIP_DURATION_COL = "tripduration"
+
+# New Columns
+DISTANCE_TRAVELED_COL_NAME = 'distance travelled'
+SPEED_COL_NAME = 'speed'
+
 
 DATAS_DIR = 'data'
 TRIPS_FILE = DATAS_DIR + '/' + '201510-citibike-tripdata.csv'
@@ -66,15 +72,35 @@ def calc_distance_travelled_col(df):
 
     return distances
 
+def calc_speeds(df):
+
+    values = df.as_matrix(columns=[
+        DISTANCE_TRAVELED_COL_NAME,
+        TRIP_DURATION_COL])
+
+    speeds = []
+
+    for row in values:
+        speed = row[0]/row[1]
+
+        speeds.append(speed)
+    
+    return speeds
+
 def append_travel_stats(df):
 
-    distance_traveled_col_name = 'distance travelled'
-    speed_col_name = 'speed'
 
     dist_travelled = calc_distance_travelled_col(df)
 
-    df[distance_traveled_col_name] = pd.Series()
+    df[DISTANCE_TRAVELED_COL_NAME] = pd.Series(dist_travelled)
 
+    travel_speeds = calc_speeds(df)
+
+    df[SPEED_COL_NAME] = pd.Series(travel_speeds)
+
+
+    import ipdb; ipdb.set_trace()
+    df.to_csv('foo.csv')
 
     return df 
 
