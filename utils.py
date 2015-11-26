@@ -2,9 +2,9 @@
 from math import cos, pi, fabs, sqrt
 from decimal import Decimal
 
-EARTH_RADIUS = Decimal('3958.8')
-EARTH_CIRCUMFERENCE = EARTH_RADIUS * 2 * Decimal(pi)
-MILES_PER_DEGREE_LAT = EARTH_CIRCUMFERENCE / Decimal(360)
+EARTH_RADIUS = 3958.8
+EARTH_CIRCUMFERENCE = EARTH_RADIUS * 2 * pi
+MILES_PER_DEGREE_LAT = EARTH_CIRCUMFERENCE / 360
 
 PRECISION = Decimal('0.001')
 
@@ -39,17 +39,17 @@ Also, the cross-sectional radius at degree x, Rcosx
             point_1_lat, 
             point_2_lat)
 
-    d_diagonal = Decimal(sqrt(
+    d_diagonal = sqrt(
             d_betw_latitude_degrees**2 +
-            d_betw_longitude_degrees**2))
+            d_betw_longitude_degrees**2)
 
-    return _quantize(d_diagonal)
+    return d_diagonal
 
 def distance_betw_lat_degrees(lat_1_degree, lat_2_degree):
     ''' Orthogonal distance between two consecutive latitude degrees,
     is eath circumference divided by 360.
     '''
-    difference = Decimal(fabs(lat_1_degree - lat_2_degree))
+    difference = fabs(lat_1_degree - lat_2_degree)
 
     distance_in_miles = MILES_PER_DEGREE_LAT * difference 
     return distance_in_miles
@@ -61,7 +61,7 @@ def distance_betw_longitude_degrees(
     ''' Approximate distance at short distances.  '''
     miles_per_degree = miles_per_long_degree_at_lat_degree(latitude)
 
-    difference = Decimal(fabs(longitude_1_degree - longitude_2_degree))
+    difference = fabs(longitude_1_degree - longitude_2_degree)
 
     distance_in_miles = miles_per_degree * difference 
 
@@ -69,7 +69,7 @@ def distance_betw_longitude_degrees(
 
 
 def deg_to_rad(deg):
-    rad = Decimal(pi) * deg / 180
+    rad = pi * deg / 180
     return rad
 
 
@@ -77,12 +77,12 @@ def miles_per_long_degree_at_lat_degree(degree_latitude):
 
     degree_latitude_rads = deg_to_rad(degree_latitude)
 
-    radius_at_degree = EARTH_RADIUS*Decimal(cos(degree_latitude_rads))
+    radius_at_degree = EARTH_RADIUS*cos(degree_latitude_rads)
 
-    circumference = 2*Decimal(pi)*radius_at_degree
+    circumference = 2*pi*radius_at_degree
 
-    miles_per_long_degree = circumference/Decimal(360)
+    miles_per_long_degree = circumference/360
 
-    return miles_per_long_degree.quantize(Decimal('0.001'))
+    return miles_per_long_degree
 
 

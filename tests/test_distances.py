@@ -10,11 +10,11 @@ from tests import test_distances
 test_distances.test_distance_1()
     '''
 
-    p1_latitude = Decimal(40.74972)
-    p1_longitude = Decimal(-74.00295)
+    p1_latitude = 40.74972
+    p1_longitude = -74.00295
 
-    p2_latitude = Decimal(40.74735)
-    p2_longitude = Decimal(-73.99724)
+    p2_latitude = 40.74735
+    p2_longitude = -73.99724
 
     distance = distance_between_positions(
             p1_latitude, p1_longitude,

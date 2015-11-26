@@ -41,14 +41,30 @@ def load_data():
     return smaller_df 
 
 def calc_distance_travelled_col(df):
+    '''
 
-
-    distance = distance_between_positions(
+    TODO... apply in dataframe notation.
             df[START_STATION_LATITUDE_COL],
             df[START_STATION_LONGITUDE_COL],
             df[END_STATION_LATITUDE_COL],
             df[END_STATION_LONGITUDE_COL],
-            )
+
+    '''
+
+    values = df.as_matrix(columns=[
+        START_STATION_LATITUDE_COL,
+        START_STATION_LONGITUDE_COL,
+        END_STATION_LATITUDE_COL,
+        END_STATION_LONGITUDE_COL])
+
+    distances = []
+
+    for row in values:
+        distance = distance_between_positions(*row)
+
+        distances.append(distance)
+
+    return distances
 
 def append_travel_stats(df):
 
@@ -63,8 +79,8 @@ def append_travel_stats(df):
     return df 
 
 if __name__ == '__main__':
-    import ipdb; ipdb.set_trace()
     df = load_data()
 
+    import ipdb; ipdb.set_trace()
     df = append_travel_stats(df)
 
