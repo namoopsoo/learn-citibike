@@ -23,28 +23,16 @@ Name: 0, dtype: object
 import pandas as pd
 
 
-START_STATION_LATITUDE_COL = 'start station latitude'
-START_STATION_LONGITUDE_COL = 'start station longitude'
-END_STATION_LATITUDE_COL = 'end station latitude'
-END_STATION_LONGITUDE_COL = 'end station longitude'
-TRIP_DURATION_COL = "tripduration"
-
-# New Columns
-DISTANCE_TRAVELED_COL_NAME = 'distance travelled'
-SPEED_COL_NAME = 'speed'
-
-
-DATAS_DIR = 'data'
-TRIPS_FILE = DATAS_DIR + '/' + '201510-citibike-tripdata.csv'
-
 from utils import distance_between_positions
+import settings as s
 
-def load_data():
-    df = pd.read_csv(TRIPS_FILE)
+def load_data(source_file=s.TRIPS_FILE):
+    df = pd.read_csv(source_file)
 
-    smaller_df = df[:20]
+    # df = df[:20]
+    df = df[df[s.USER_TYPE_COL] == s.USER_TYPE_SUBSCRIBER]
 
-    return smaller_df 
+    return df
 
 def calc_distance_travelled_col(df):
     '''
@@ -58,10 +46,10 @@ def calc_distance_travelled_col(df):
     '''
 
     values = df.as_matrix(columns=[
-        START_STATION_LATITUDE_COL,
-        START_STATION_LONGITUDE_COL,
-        END_STATION_LATITUDE_COL,
-        END_STATION_LONGITUDE_COL])
+        s.START_STATION_LATITUDE_COL,
+        s.START_STATION_LONGITUDE_COL,
+        s.END_STATION_LATITUDE_COL,
+        s.END_STATION_LONGITUDE_COL])
 
     distances = []
 
@@ -73,40 +61,57 @@ def calc_distance_travelled_col(df):
     return distances
 
 def calc_speeds(df):
+    '''
+    miles/hour = X miles/seconds * 60sec/min * 60min/hour    
 
+    '''
     values = df.as_matrix(columns=[
-        DISTANCE_TRAVELED_COL_NAME,
-        TRIP_DURATION_COL])
+        s.DISTANCE_TRAVELED_COL_NAME,
+        s.TRIP_DURATION_COL])
 
     speeds = []
 
     for row in values:
-        speed = row[0]/row[1]
+        speed = 60*60*row[0]/row[1]
 
         speeds.append(speed)
     
     return speeds
 
 def append_travel_stats(df):
+    
+    recalculate_dict = {
+            s.DISTANCE_TRAVELED_COL_NAME: False,
+            s.SPEED_COL_NAME: True, 
+            s.AGE_COL_NAME: False,
+            }
 
+    if recalculate_dict[s.DISTANCE_TRAVELED_COL_NAME]:
+        dist_travelled = calc_distance_travelled_col(df)
+        df[s.DISTANCE_TRAVELED_COL_NAME] = pd.Series(dist_travelled)
 
-    dist_travelled = calc_distance_travelled_col(df)
+    if recalculate_dict[s.SPEED_COL_NAME]:
+        travel_speeds = calc_speeds(df)
+        df[s.SPEED_COL_NAME] = pd.Series(travel_speeds)
 
-    df[DISTANCE_TRAVELED_COL_NAME] = pd.Series(dist_travelled)
+    if recalculate_dict[s.AGE_COL_NAME]:
+        df[s.AGE_COL_NAME] = 2015 - df[s.BIRTH_YEAR_COL]
 
-    travel_speeds = calc_speeds(df)
+    return df
 
-    df[SPEED_COL_NAME] = pd.Series(travel_speeds)
-
-
-    import ipdb; ipdb.set_trace()
-    df.to_csv('foo.csv')
-
-    return df 
 
 if __name__ == '__main__':
-    df = load_data()
+    df = load_data('foo.csv')
 
     import ipdb; ipdb.set_trace()
     df = append_travel_stats(df)
+
+    import ipdb; ipdb.set_trace()
+    pass
+
+    df.to_csv('foo.csv')
+
+    plot_age_speed(df)
+
+    plot_distance_trip_time(df)
 

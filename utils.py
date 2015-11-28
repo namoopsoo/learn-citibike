@@ -8,6 +8,8 @@ MILES_PER_DEGREE_LAT = EARTH_CIRCUMFERENCE / 360
 
 PRECISION = Decimal('0.001')
 
+
+
 def _quantize(x):
 
     return x.quantize(PRECISION)
