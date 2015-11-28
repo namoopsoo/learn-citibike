@@ -76,6 +76,69 @@ def plot_age_speed_histogram(df):
     filename = '%s/p.%s.jpg' % (s.PLOTS_DIR, now.strftime('%m-%d-%YT%H%M%S'))
     plt.savefig(filename)
 
+
+def plot_age_speed_relative_histogram(df):
+    '''
+    overlay speed histograms over several buckets,
+    '''
+    age_buckets = [
+            [15, 19],
+            [20, 24],
+            [25, 29],
+            [30, 34],
+            [35, 39],
+            [40, 49],
+            [50, 59],
+            [60, 69],
+            [70, 500],
+            ]
+
+    df2 = df.copy(deep=True)
+    # df2 = pd.DataFrame(index=df.age)
+
+    new_cols = []
+
+    for left, right in age_buckets:
+        new_col_name = 'speeds_%sto%s' % (left, right)
+        df2[new_col_name] = df2[(df2.age >= left) & (df2.age <= right)]['speed'].round(decimals=1)
+
+        new_cols.append(new_col_name)
+    
+    import ipdb; ipdb.set_trace()
+    plt.figure()
+    # df.speed.hist(color='k', alpha=0.5, bins=20, figsize=(6, 4))
+
+    # df2.hist(column=new_cols, alpha=0.5)
+
+    df3 = df2[new_cols]
+
+    # df3.plot(kind='hist', alpha=0.5, bins=100)
+    # data = df3[:20].as_matrix().transpose()
+    # data = [col.dropna(in_place=True) for col in df3].as_matrix()
+    data = [df3[col].dropna() for col in df3]
+
+    # one col...
+    # pp plt.hist(df3['speeds_15to19'].dropna().as_matrix(), bins=10, normed=True, histtype='step', label='speeds_15to19', alpha=0.5)
+
+
+    num_bins = 200 
+    n, bins, patches = plt.hist(data, num_bins, normed=1, 
+            alpha=0.5, histtype='step', label=new_cols,
+            #range=[0, 30] # get rid of outliers beyond range.
+            )
+    # histtype : {'bar', 'barstacked', 'step', 'stepfilled'}
+
+    title = 'Histogram of speeds'
+    num_rows = df3.shape[0]
+    plt.xlabel('Speed')
+    plt.ylabel('Probability')
+    plt.title(_make_title(title, num_rows))
+
+    now = datetime.datetime.now()
+    filename = '%s/p.%s.jpg' % (s.PLOTS_DIR, now.strftime('%m-%d-%YT%H%M%S'))
+    plt.savefig(filename)
+
+
 def plot_age_histogram(df):
 
     plt.figure()
@@ -112,6 +175,8 @@ def plot_distance_trip_time(df):
 if __name__ == '__main__':
     df = pd.read_csv('speeds_small.csv')
     import ipdb; ipdb.set_trace()
+
+    plot_age_speed_relative_histogram(df)
 
     plot_age_speed_histogram(df)
     plot_distance_trip_time(df)
