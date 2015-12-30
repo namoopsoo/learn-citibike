@@ -109,13 +109,15 @@ def append_travel_stats(df):
         df[s.AGE_COL_NAME] = 2015 - df[s.BIRTH_YEAR_COL]
 
     if recalculate_dict[s.START_TIME_BUCKET]:
-        pass
-
-
-        df[] = calculate_start_time_buckets
+        df[s.START_TIME_BUCKET] = calculate_start_time_buckets(df)
 
 
     return df
+
+def calculate_start_time_buckets(df):
+
+
+    get_start_time_bucket()
 
 def predict_destination():
     '''
@@ -143,6 +145,7 @@ def predict_destination():
 
 
     '''
+    pass
 
 if __name__ == '__main__':
     df = load_data('foo.csv')

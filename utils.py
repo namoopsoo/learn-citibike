@@ -100,9 +100,14 @@ For 24x7 = 168 hours in a week, starting from Monday midnight,
 
     '''
 
-    # what day of week?
-    date = strptime
-
-    datetime.datetime.strptime(str(start_time), "%m/%d/%Y %H:%M:%S")
+    # What day of week?
+    d = datetime.datetime.strptime(str(start_time), "%m/%d/%Y %H:%M:%S")
+    weekday = d.weekday()  # Monday is 0
     
+    hour = d.hour
+
+    # Delta from the closest Monday...
+    delta = 24*weekday + hour
+
+    return delta
 
