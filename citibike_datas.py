@@ -18,6 +18,16 @@ birth year                               1973
 gender                                      1
 Name: 0, dtype: object
 
+# 
+Predictive power of time, age, gender and start location? 
+    For the, 
+        destination,
+        trip duration,
+        speed
+
+... Maybe use more data ?
+
+
 '''
 
 import pandas as pd
@@ -82,8 +92,9 @@ def append_travel_stats(df):
     
     recalculate_dict = {
             s.DISTANCE_TRAVELED_COL_NAME: False,
-            s.SPEED_COL_NAME: True, 
+            s.SPEED_COL_NAME: False, 
             s.AGE_COL_NAME: False,
+            s.START_TIME_BUCKET: True,
             }
 
     if recalculate_dict[s.DISTANCE_TRAVELED_COL_NAME]:
@@ -97,8 +108,41 @@ def append_travel_stats(df):
     if recalculate_dict[s.AGE_COL_NAME]:
         df[s.AGE_COL_NAME] = 2015 - df[s.BIRTH_YEAR_COL]
 
+    if recalculate_dict[s.START_TIME_BUCKET]:
+        pass
+
+
+        df[] = calculate_start_time_buckets
+
+
     return df
 
+def predict_destination():
+    '''
+    Given start time bucket (hour), age, gender and start location, 
+        how many outputs are there, for the, 
+            destination,
+            trip duration,
+            speed
+
+    selecting the input conditions, use 'end station id', as the output,
+        see which inputs are the most influential.
+
+    (* Consider gridifying the start locations too based on neighborhoods.)
+
+    NEXT STEPS:
+    - create new dependent columns in the data, for, 
+        (a) start time bucket , using utils.py:get_start_time_bucket()
+    - Look at the value counts of the destinations for a given 
+        (start time bucket, age, gender, start location),
+
+        So for (start=Monday 0AM-1AM, 31year, F, 33rd&2Ave loc),
+
+        how many destinations are there? And how does that compare to the total 
+        number of possible destinations?
+
+
+    '''
 
 if __name__ == '__main__':
     df = load_data('foo.csv')

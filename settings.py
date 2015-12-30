@@ -8,11 +8,13 @@ TRIP_DURATION_COL = "tripduration"
 BIRTH_YEAR_COL = "birth year"
 USER_TYPE_COL = "usertype"
 USER_TYPE_SUBSCRIBER = "Subscriber"
+START_TIME = "starttime"
 
 # New Columns
 DISTANCE_TRAVELED_COL_NAME = 'distance travelled'
 SPEED_COL_NAME = 'speed'
 AGE_COL_NAME = 'age'
+START_TIME_BUCKET = "starttime_bucket"
 
 
 DATAS_DIR = 'data'

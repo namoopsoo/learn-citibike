@@ -2,6 +2,8 @@
 from math import cos, pi, fabs, sqrt
 from decimal import Decimal
 
+import datetime
+
 EARTH_RADIUS = 3958.8
 EARTH_CIRCUMFERENCE = EARTH_RADIUS * 2 * pi
 MILES_PER_DEGREE_LAT = EARTH_CIRCUMFERENCE / 360
@@ -87,4 +89,20 @@ def miles_per_long_degree_at_lat_degree(degree_latitude):
 
     return miles_per_long_degree
 
+def get_start_time_bucket(start_time):
+    '''
+For 24x7 = 168 hours in a week, starting from Monday midnight,
+    assign buckets,  0 through 167
+
+    Monday, 00:00:00 to 00:59:59, => 0
+    Monday, 01:00:00 to 01:59:59, => 1
+
+
+    '''
+
+    # what day of week?
+    date = strptime
+
+    datetime.datetime.strptime(str(start_time), "%m/%d/%Y %H:%M:%S")
+    
 

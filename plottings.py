@@ -138,6 +138,8 @@ def plot_age_speed_relative_histogram(df):
     filename = '%s/p.%s.jpg' % (s.PLOTS_DIR, now.strftime('%m-%d-%YT%H%M%S'))
     plt.savefig(filename)
 
+def speed_and_time_of_day(df):
+
 
 def plot_age_histogram(df):
 
