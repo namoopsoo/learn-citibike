@@ -33,7 +33,7 @@ Predictive power of time, age, gender and start location?
 import pandas as pd
 
 
-from utils import distance_between_positions
+from utils import distance_between_positions, get_start_time_bucket
 import settings as s
 
 def load_data(source_file=s.TRIPS_FILE):
@@ -108,16 +108,29 @@ def append_travel_stats(df):
     if recalculate_dict[s.AGE_COL_NAME]:
         df[s.AGE_COL_NAME] = 2015 - df[s.BIRTH_YEAR_COL]
 
-    if recalculate_dict[s.START_TIME_BUCKET]:
-        df[s.START_TIME_BUCKET] = calculate_start_time_buckets(df)
+    import ipdb; ipdb.set_trace()
 
+    if recalculate_dict[s.START_TIME_BUCKET]:
+        time_buckets = calculate_start_time_buckets(df)
+        df[s.START_TIME_BUCKET] = pd.Series(time_buckets)
 
     return df
 
 def calculate_start_time_buckets(df):
 
+    values = df.as_matrix(columns=[
+        s.START_TIME])
 
-    get_start_time_bucket()
+    start_time_buckets = []
+
+    for row in values:
+        buck = get_start_time_bucket(row[0])
+        start_time_buckets.append(buck)
+
+    
+    return start_time_buckets
+
+
 
 def predict_destination():
     '''
