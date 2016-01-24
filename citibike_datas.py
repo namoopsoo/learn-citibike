@@ -131,8 +131,22 @@ def calculate_start_time_buckets(df):
     return start_time_buckets
 
 
+def how_good_is_a_route(route):
+    ''' Given the departures from the station at start of route,
+    and arrivals to stations at end of route, based on their busy-ness,
+    how good is a given route compared to others.
+    '''
+    pass
 
-def predict_destination():
+def get_total_number_destinations(df):
+
+    stations_counts = df[settings.END_STATION_NAME].value_counts()
+
+    num_destinations = stations_counts.shape[0]
+
+    return num_destinations
+
+def predict_destination(df):
     '''
     Given start time bucket (hour), age, gender and start location, 
         how many outputs are there, for the, 
@@ -155,10 +169,61 @@ def predict_destination():
 
         how many destinations are there? And how does that compare to the total 
         number of possible destinations?
-
+        
+        - need a group by for that 4-tuple, 
 
     '''
-    pass
+
+
+    # How many people are there in each 4-tuple bucket?
+    #   => meaning, for the different source conditions, how many unique trips,
+    #   were being made. But since this data is taken over a month period,
+    #   , the very rare buckets may mean very rare starting conditions in general,
+    #   for which there is not much predictive opportunity. 
+    #       
+    source_grpby = df.groupby([
+        settings.START_STATION_NAME, 
+        settings.START_TIME_BUCKET, 
+        settings.AGE_COL_NAME,
+        settings.GENDER, 
+        ], 
+        #, as_index=False
+        )
+
+    # count the (start time bucket, age, gender, start location) ..
+    group_sizes = source_grpby.sizes()
+    group_sizes.to_csv('unique_starting_conditions.012416T1804.csv')
+    
+
+    how_many_groups = source_grpby.size().shape
+    # df.groupby(['start station name', 'starttime_bucket', 'age', 'gender']).size().shape
+    # (703276,)
+
+
+    df.groupby([
+        settings.START_STATION_NAME, 
+        settings.END_STATION_NAME, ]).size().shape[0]
+    # .... 96382  many combinations...
+
+
+    # And what about when taking destinations into account as well ?
+    #   - Can we identify commuters? What would be a good visualization for seeing 
+    #   if the same people are making these trips?
+    #
+    #
+    trips_grpby = df.groupby([
+        settings.START_STATION_NAME, 
+        settings.END_STATION_NAME, 
+        settings.START_TIME_BUCKET, 
+        settings.AGE_COL_NAME,
+        settings.GENDER, 
+        ], )
+    how_many_groups = trips_grpby.size().shape
+    # ...  
+    #   => Given that for 10/2015, there are 1065766 trips,
+    #   and 955606 distinct kinds of trips, for the people making these trips.
+
+
 
 if __name__ == '__main__':
     df = load_data('foo.csv')
@@ -168,6 +233,8 @@ if __name__ == '__main__':
 
     import ipdb; ipdb.set_trace()
     pass
+
+    predict_destination(df)
 
     df.to_csv('foo.csv')
 
