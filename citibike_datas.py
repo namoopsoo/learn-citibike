@@ -31,15 +31,20 @@ Predictive power of time, age, gender and start location?
 '''
 
 import pandas as pd
-
+ 
 
 from utils import distance_between_positions, get_start_time_bucket
+from classify import (prepare_datas,
+        build_classifier, run_predictions)
+# from plottings import (plot_age_speed, plot_distance_trip_time)
 import settings as s
 
-def load_data(source_file=s.TRIPS_FILE):
+def load_data(source_file=s.TRIPS_FILE, num_rows=None):
     df = pd.read_csv(source_file)
 
-    # df = df[:20]
+    if num_rows:
+        df = df[:num_rows]
+
     df = df[df[s.USER_TYPE_COL] == s.USER_TYPE_SUBSCRIBER]
 
     return df
@@ -139,12 +144,41 @@ def how_good_is_a_route(route):
     pass
 
 def get_total_number_destinations(df):
+    ''' How many destination stations are there in the given dataset.
 
-    stations_counts = df[settings.END_STATION_NAME].value_counts()
+    '''
+
+    stations_counts = df[s.END_STATION_NAME].value_counts()
 
     num_destinations = stations_counts.shape[0]
 
     return num_destinations
+
+def build_classifier_to_predict_destination_station(df):
+    '''
+
+    '''
+
+    # Extract only the relevant data columns,
+    #     start time bucket (hour), age, gender and start location, 
+    pass
+
+    datas = prepare_datas(df, features=[
+        s.START_STATION_ID, 
+        s.START_TIME_BUCKET, 
+        s.AGE_COL_NAME,
+        s.GENDER,], label_col=s.END_STATION_ID)
+
+    # also need to account for filling in missing data in the holdout set.
+
+    classifier = build_classifier()
+
+
+    classifier.fit(datas['X_train'], datas['y_train'])
+
+    run_predictions(classifier, datas['X_train'], datas['y_train'])
+    run_predictions(classifier, datas['X_holdout'], datas['y_holdout'])
+
 
 def predict_destination(df):
     '''
@@ -173,7 +207,13 @@ def predict_destination(df):
         - need a group by for that 4-tuple, 
 
     '''
+    import ipdb; ipdb.set_trace()
 
+
+    build_classifier_to_predict_destination_station(df)
+
+
+def analyze_trip_destination_stats(df):
 
     # How many people are there in each 4-tuple bucket?
     #   => meaning, for the different source conditions, how many unique trips,
@@ -182,10 +222,10 @@ def predict_destination(df):
     #   for which there is not much predictive opportunity. 
     #       
     source_grpby = df.groupby([
-        settings.START_STATION_NAME, 
-        settings.START_TIME_BUCKET, 
-        settings.AGE_COL_NAME,
-        settings.GENDER, 
+        s.START_STATION_NAME, 
+        s.START_TIME_BUCKET, 
+        s.AGE_COL_NAME,
+        s.GENDER, 
         ], 
         #, as_index=False
         )
@@ -201,8 +241,8 @@ def predict_destination(df):
 
 
     df.groupby([
-        settings.START_STATION_NAME, 
-        settings.END_STATION_NAME, ]).size().shape[0]
+        s.START_STATION_NAME, 
+        s.END_STATION_NAME, ]).size().shape[0]
     # .... 96382  many combinations...
 
 
@@ -212,11 +252,11 @@ def predict_destination(df):
     #
     #
     trips_grpby = df.groupby([
-        settings.START_STATION_NAME, 
-        settings.END_STATION_NAME, 
-        settings.START_TIME_BUCKET, 
-        settings.AGE_COL_NAME,
-        settings.GENDER, 
+        s.START_STATION_NAME, 
+        s.END_STATION_NAME, 
+        s.START_TIME_BUCKET, 
+        s.AGE_COL_NAME,
+        s.GENDER, 
         ], )
     how_many_groups = trips_grpby.size().shape
     # ...  
@@ -226,13 +266,14 @@ def predict_destination(df):
 
 
 if __name__ == '__main__':
-    df = load_data('foo.csv')
+    df = load_data('foo.csv', num_rows=2000)
 
     import ipdb; ipdb.set_trace()
     df = append_travel_stats(df)
 
     import ipdb; ipdb.set_trace()
     pass
+
 
     predict_destination(df)
 

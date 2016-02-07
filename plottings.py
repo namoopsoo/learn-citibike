@@ -139,7 +139,7 @@ def plot_age_speed_relative_histogram(df):
     plt.savefig(filename)
 
 def speed_and_time_of_day(df):
-
+    pass
 
 def plot_age_histogram(df):
 

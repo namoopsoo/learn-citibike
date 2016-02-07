@@ -3,9 +3,11 @@
 START_STATION_LATITUDE_COL = 'start station latitude'
 START_STATION_LONGITUDE_COL = 'start station longitude'
 START_STATION_NAME = 'start station name'
+START_STATION_ID = 'start station id'
 END_STATION_LATITUDE_COL = 'end station latitude'
 END_STATION_LONGITUDE_COL = 'end station longitude'
 END_STATION_NAME = 'end station name'
+END_STATION_ID = 'end station id'
 TRIP_DURATION_COL = "tripduration"
 BIRTH_YEAR_COL = "birth year"
 GENDER = 'gender'
