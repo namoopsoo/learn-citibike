@@ -40,6 +40,8 @@ from classify import (prepare_datas,
 import settings as s
 
 def load_data(source_file=s.TRIPS_FILE, num_rows=None):
+    ''' Load subscriber data.
+    '''
     df = pd.read_csv(source_file)
 
     if num_rows:
