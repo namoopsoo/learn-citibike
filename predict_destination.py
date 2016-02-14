@@ -31,6 +31,7 @@ Out[40]: (2, 15)
 
 
     # this group by ends up giving me end station counts...
+    #       .......but not unique of course.... so need to do that 
     df.groupby([
         s.START_STATION_NAME, 
     ]).count()[s.END_STATION_NAME]
