@@ -6,6 +6,7 @@ def separate_by_source_stations(df):
     '''
 
 given df, determine the sources, and filter for each,
+
 from predict_destination import separate_by_source_stations
 df = load_data('foo.csv', num_rows=2000)
 
@@ -18,18 +19,20 @@ Out[40]: (2, 15)
     '''
     import ipdb; ipdb.set_trace()
 
-    # source (a.k.a. start) station ids.
-    sources = df[s.START_STATION_ID].value_counts().to_dict()
-
+    ###############################################################
     frames_by_source = {}
+    # Group by source station name
+    grpby = df.groupby([s.START_STATION_NAME,])
 
-    for source in sources:
-        frames_by_source[source] = df[df[s.START_STATION_ID] == source]
+    source_station_names = grpby.groups.keys()
+    for start_station in source_station_names:
+        # Get DataFrame for each group.
+        frames_by_source[start_station] = grpby.get_group(start_station)
 
 
-    sources_variety_df = pd.DataFrame({s.START_STATION_ID: sources})
 
 
+    ###############################################################
     # this group by ends up giving me end station counts...
     #       .......but not unique of course.... so need to do that 
     df.groupby([
@@ -107,7 +110,84 @@ Name: end station name, dtype: int64
 
     '''
 
+    ###############################################################
+    # Also getting interesting potential meta engineered features.
+    gpby = df.groupby([
+        s.START_STATION_NAME, 
+    ])
+    some_stats = gpby.describe()[['birth year', 'tripduration']]
 
-    return frames_by_source
+
+
+    ###############################################################
+    # Also count up the unique destination (end) stations for each
+    grpby = df.groupby([s.START_STATION_NAME,])
+    grouped_end_station = grpby[s.END_STATION_NAME]
+
+    # This produces the sorted num of times that for each start station, a trip was taken,
+    #   to the corresponding end station. 
+    #
+    #   => This is probably a more sophisticated intermediary measure,
+    #   for 
+    grouped_end_station.value_counts().to_csv('results/start_end_station_counts.021516.csv')
+    '''
+    In [151]: grouped_end_station.value_counts()[:10]
+Out[151]: 
+start station name                          
+1 Ave & E 15 St     E 23 St & 1 Ave             242
+                    E 15 St & 3 Ave             240
+                    E 25 St & 1 Ave             192
+                    1 Ave & E 30 St             166
+                    E 20 St & FDR Drive         141
+                    E 27 St & 1 Ave             130
+                    E 33 St & 2 Ave             122
+                    E 17 St & Broadway          111
+                    Washington Pl & Broadway    108
+                    Broadway & E 14 St           97
+dtype: int64
+
+    '''
+
+
+
+
+    ###############################################################
+    # Maybe the situation is better phrased as, for what source stations, 
+    #   do we have enough sparseness that predicting the end station is meaningful?
+    #   - And what are the predictive features for doing this prediction?
+
+
+def neighborhood_grouping(df):
+
+    # look at the min/max long lat, to determine the box edges.
+    '''
+    In [158]: df.describe()[['end station latitude', 'end station longitude']]
+Out[158]: 
+       end station latitude  end station longitude
+count        1212277.000000         1212277.000000
+mean              40.737799             -73.987498
+std                0.021743               0.015490
+min               40.646768             -74.046305
+25%               40.722174             -73.998393
+50%               40.739126             -73.989151
+75%               40.752996             -73.978059
+max               40.787209             -73.929891
+
+
+    => min/max....
+    
+       end station latitude  end station longitude
+min               40.646768             -74.046305
+max               40.787209             -73.929891
+
+    So given a choice of n neighborhoods, we can split this up among the data.
+
+    Maybe make use of the groupby with a function feature.
+
+    '''
+    pass
+
+
+
 
 
