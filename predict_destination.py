@@ -1,5 +1,9 @@
 
 import pandas as pd
+
+from classify import (prepare_datas,
+        build_classifier, run_predictions)
+
 import settings as s
 
 def separate_by_source_stations(df):
@@ -29,7 +33,10 @@ Out[40]: (2, 15)
         # Get DataFrame for each group.
         frames_by_source[start_station] = grpby.get_group(start_station)
 
+    return frames_by_source
 
+
+def investigate_source_station_groupbys(df):
 
 
     ###############################################################
@@ -186,6 +193,9 @@ max               40.787209             -73.929891
 
     '''
     pass
+
+
+def destination_predictions_with_separate_source_classifiers(df):
 
 
 

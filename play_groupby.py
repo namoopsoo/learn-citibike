@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-df = pd.DataFrame({'A' : ['foo', 'bar', 'foo', 'bar',
+df2 = pd.DataFrame({'A' : ['foo', 'bar', 'foo', 'bar',
                           'foo', 'bar', 'foo', 'foo'],
                    'B' : ['one', 'one', 'two', 'three',
                           'two', 'two', 'one', 'three'],
@@ -10,7 +10,7 @@ df = pd.DataFrame({'A' : ['foo', 'bar', 'foo', 'bar',
                    'D' : np.random.randn(8)})
 
 
-grp = df.groupby(['A'])
+grp = df2.groupby(['A'])
 grp.size() # => bar 3, and foo 5
 
 

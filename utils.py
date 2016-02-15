@@ -111,3 +111,17 @@ For 24x7 = 168 hours in a week, starting from Monday midnight,
 
     return delta
 
+
+def which_col_have_nulls(df):
+    have_nulls = []
+
+    for col in df.columns:
+        if df[col].isnull().any():
+
+            have_nulls.append(col)
+
+    return have_nulls
+
+
+
+

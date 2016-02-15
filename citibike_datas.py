@@ -98,9 +98,9 @@ def calc_speeds(df):
 def append_travel_stats(df):
     
     recalculate_dict = {
-            s.DISTANCE_TRAVELED_COL_NAME: False,
-            s.SPEED_COL_NAME: False, 
-            s.AGE_COL_NAME: False,
+            s.DISTANCE_TRAVELED_COL_NAME: True,
+            s.SPEED_COL_NAME: True, 
+            s.AGE_COL_NAME: True,
             s.START_TIME_BUCKET: True,
             }
 
@@ -159,11 +159,20 @@ def get_total_number_destinations(df):
 def build_classifier_to_predict_destination_station(df):
     '''
 
+from citibike_datas import (build_classifier_to_predict_destination_station,
+                        load_data, append_travel_stats,)
+df = load_data('data/201510-citibike-tripdata.annotated.csv')
+df = load_data('data/201510-citibike-tripdata.csv', num_rows=3000)
+df1 = append_travel_stats(df)
+
+build_classifier_to_predict_destination_station(df1)
+
     '''
 
     # Extract only the relevant data columns,
     #     start time bucket (hour), age, gender and start location, 
     pass
+    import ipdb; ipdb.set_trace()
 
     datas = prepare_datas(df, features=[
         s.START_STATION_ID, 
@@ -174,12 +183,13 @@ def build_classifier_to_predict_destination_station(df):
     # also need to account for filling in missing data in the holdout set.
 
     classifier = build_classifier()
-
-
     classifier.fit(datas['X_train'], datas['y_train'])
 
-    run_predictions(classifier, datas['X_train'], datas['y_train'])
-    run_predictions(classifier, datas['X_holdout'], datas['y_holdout'])
+    y_predictions = run_predictions(classifier, datas['X_train'], datas['y_train'])
+    classif_metrics = run_metrics_on_predictions(datas['y_train'], y_predictions)
+
+    y_predictions = run_predictions(classifier, datas['X_holdout'], datas['y_holdout'])
+    classif_metrics = run_metrics_on_predictions(datas['y_holdout'], y_predictions)
 
 
 def predict_destination(df):

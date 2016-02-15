@@ -68,9 +68,13 @@ def build_classifier():
 
 def run_predictions(classifier, X, y):
 
-
     y_predictions = classifier.predict(X, y)
+    return y_predictions
 
 
+def run_metrics_on_predictions(y_true, y_predictions):
+
+    my_metrics = [accuracy_score, f1_score, 
+        roc_curve, recall_score, precision_score]
 
 
