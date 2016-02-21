@@ -4,6 +4,8 @@ from decimal import Decimal
 
 import datetime
 
+import settings as s
+
 EARTH_RADIUS = 3958.8
 EARTH_CIRCUMFERENCE = EARTH_RADIUS * 2 * pi
 MILES_PER_DEGREE_LAT = EARTH_CIRCUMFERENCE / 360
@@ -112,13 +114,37 @@ For 24x7 = 168 hours in a week, starting from Monday midnight,
     return delta
 
 
+def calc_speeds(df):
+    '''
+    miles/hour = X miles/seconds * 60sec/min * 60min/hour    
+
+    '''
+    values = df.as_matrix(columns=[
+        s.DISTANCE_TRAVELED_COL_NAME,
+        s.TRIP_DURATION_COL])
+
+    speeds = []
+
+    for row in values:
+        speed = 60*60*row[0]/row[1]
+
+        speeds.append(speed)
+    
+    return speeds
+
+
 def which_col_have_nulls(df):
     have_nulls = []
 
     for col in df.columns:
         if df[col].isnull().any():
+            how_many_null = df[col][df[col].isnull()].shape[0]
+            num_rows = df.shape[0]
+            assert how_many_null <= num_rows
 
-            have_nulls.append(col)
+            percent_null = int(Decimal(100*how_many_null)/Decimal(num_rows))
+
+            have_nulls.append((col, percent_null))
 
     return have_nulls
 

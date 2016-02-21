@@ -35,107 +35,11 @@ import pandas as pd
 
 from utils import distance_between_positions, get_start_time_bucket
 from classify import (prepare_datas,
-        build_classifier, run_predictions)
+        build_classifier, run_predictions, run_metrics_on_predictions)
 # from plottings import (plot_age_speed, plot_distance_trip_time)
+
+from pipeline_data import append_travel_stats, load_data
 import settings as s
-
-def load_data(source_file=s.TRIPS_FILE, num_rows=None):
-    ''' Load subscriber data.
-    '''
-    df = pd.read_csv(source_file)
-
-    if num_rows:
-        df = df[:num_rows]
-
-    df = df[df[s.USER_TYPE_COL] == s.USER_TYPE_SUBSCRIBER]
-
-    return df
-
-def calc_distance_travelled_col(df):
-    '''
-
-    TODO... apply in dataframe notation.
-            df[START_STATION_LATITUDE_COL],
-            df[START_STATION_LONGITUDE_COL],
-            df[END_STATION_LATITUDE_COL],
-            df[END_STATION_LONGITUDE_COL],
-
-    '''
-
-    values = df.as_matrix(columns=[
-        s.START_STATION_LATITUDE_COL,
-        s.START_STATION_LONGITUDE_COL,
-        s.END_STATION_LATITUDE_COL,
-        s.END_STATION_LONGITUDE_COL])
-
-    distances = []
-
-    for row in values:
-        distance = distance_between_positions(*row)
-
-        distances.append(distance)
-
-    return distances
-
-def calc_speeds(df):
-    '''
-    miles/hour = X miles/seconds * 60sec/min * 60min/hour    
-
-    '''
-    values = df.as_matrix(columns=[
-        s.DISTANCE_TRAVELED_COL_NAME,
-        s.TRIP_DURATION_COL])
-
-    speeds = []
-
-    for row in values:
-        speed = 60*60*row[0]/row[1]
-
-        speeds.append(speed)
-    
-    return speeds
-
-def append_travel_stats(df):
-    
-    recalculate_dict = {
-            s.DISTANCE_TRAVELED_COL_NAME: True,
-            s.SPEED_COL_NAME: True, 
-            s.AGE_COL_NAME: True,
-            s.START_TIME_BUCKET: True,
-            }
-
-    if recalculate_dict[s.DISTANCE_TRAVELED_COL_NAME]:
-        dist_travelled = calc_distance_travelled_col(df)
-        df[s.DISTANCE_TRAVELED_COL_NAME] = pd.Series(dist_travelled)
-
-    if recalculate_dict[s.SPEED_COL_NAME]:
-        travel_speeds = calc_speeds(df)
-        df[s.SPEED_COL_NAME] = pd.Series(travel_speeds)
-
-    if recalculate_dict[s.AGE_COL_NAME]:
-        df[s.AGE_COL_NAME] = 2015 - df[s.BIRTH_YEAR_COL]
-
-    import ipdb; ipdb.set_trace()
-
-    if recalculate_dict[s.START_TIME_BUCKET]:
-        time_buckets = calculate_start_time_buckets(df)
-        df[s.START_TIME_BUCKET] = pd.Series(time_buckets)
-
-    return df
-
-def calculate_start_time_buckets(df):
-
-    values = df.as_matrix(columns=[
-        s.START_TIME])
-
-    start_time_buckets = []
-
-    for row in values:
-        buck = get_start_time_bucket(row[0])
-        start_time_buckets.append(buck)
-
-    
-    return start_time_buckets
 
 
 def how_good_is_a_route(route):

@@ -1,7 +1,7 @@
 
 
 import numpy as np
-
+from collections import OrderedDict 
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import (LogisticRegression,
     RandomizedLogisticRegression)
@@ -77,4 +77,12 @@ def run_metrics_on_predictions(y_true, y_predictions):
     my_metrics = [accuracy_score, f1_score, 
         roc_curve, recall_score, precision_score]
 
+    results = OrderedDict()
+
+    for metrik in my_metrics:
+        result = metrik(y_true, y_predictions)
+
+        results[metrik.__name__] = result
+
+    return results
 
