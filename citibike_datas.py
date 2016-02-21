@@ -62,14 +62,11 @@ def get_total_number_destinations(df):
 
 def build_classifier_to_predict_destination_station(df):
     '''
-
 from citibike_datas import (build_classifier_to_predict_destination_station,
                         load_data, append_travel_stats,)
-df = load_data('data/201510-citibike-tripdata.annotated.csv')
-df = load_data('data/201510-citibike-tripdata.csv', num_rows=3000)
-df1 = append_travel_stats(df)
+df = load_data('data/201510-citibike-tripdata.csv.annotated.mini.02212016T1641.csv')
 
-build_classifier_to_predict_destination_station(df1)
+build_classifier_to_predict_destination_station(df)
 
     '''
 
@@ -89,11 +86,14 @@ build_classifier_to_predict_destination_station(df1)
     classifier = build_classifier()
     classifier.fit(datas['X_train'], datas['y_train'])
 
-    y_predictions = run_predictions(classifier, datas['X_train'], datas['y_train'])
+    y_predictions = run_predictions(classifier, datas['X_train'])
     classif_metrics = run_metrics_on_predictions(datas['y_train'], y_predictions)
 
-    y_predictions = run_predictions(classifier, datas['X_holdout'], datas['y_holdout'])
+    y_predictions = run_predictions(classifier, datas['X_holdout'])
     classif_metrics = run_metrics_on_predictions(datas['y_holdout'], y_predictions)
+
+    import ipdb; ipdb.set_trace()
+    pass
 
 
 def predict_destination(df):

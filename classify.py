@@ -64,13 +64,9 @@ def build_classifier():
 
     return clf
 
-
-
-def run_predictions(classifier, X, y):
-
-    y_predictions = classifier.predict(X, y)
+def run_predictions(classifier, X):
+    y_predictions = classifier.predict(X)
     return y_predictions
-
 
 def run_metrics_on_predictions(y_true, y_predictions):
 
