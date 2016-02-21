@@ -2,7 +2,8 @@
 import pandas as pd
 import datetime
 from utils import calc_speeds
-from utils import distance_between_positions, get_start_time_bucket
+from utils import (distance_between_positions, get_start_time_bucket, 
+                which_col_have_nulls)
 
 import settings as s
 
@@ -17,10 +18,19 @@ def load_data(source_file=s.TRIPS_FILE, num_rows=None):
 
     df = df[df[s.USER_TYPE_COL] == s.USER_TYPE_SUBSCRIBER]
 
-    # Re index w/o gaps. Otherwise taking out non subscribers ruins the index.
-    df.index = range(df.shape[0])
+    df_unnulled = remove_rows_with_nulls(df)
+    df_re_index = re_index(df_unnulled)
 
+    return df_re_index
+
+def re_index(df):
+    '''Re index w/o gaps in index '''
+    df.index = range(df.shape[0])
     return df
+
+def remove_rows_with_nulls(df):
+    unnulled = df.dropna()
+    return unnulled
 
 def calc_distance_travelled_col(df):
     '''
