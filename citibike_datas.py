@@ -31,7 +31,7 @@ Predictive power of time, age, gender and start location?
 '''
 
 import pandas as pd
- 
+from collections import OrderedDict 
 
 from utils import distance_between_positions, get_start_time_bucket
 from classify import (prepare_datas,
@@ -62,8 +62,8 @@ def get_total_number_destinations(df):
 
 def build_classifier_to_predict_destination_station(df):
     '''
-from citibike_datas import (build_classifier_to_predict_destination_station,
-                        load_data, append_travel_stats,)
+from citibike_datas import (build_classifier_to_predict_destination_station)
+
 df = load_data('data/201510-citibike-tripdata.csv.annotated.mini.02212016T1641.csv')
 
 build_classifier_to_predict_destination_station(df)
@@ -73,7 +73,6 @@ build_classifier_to_predict_destination_station(df)
     # Extract only the relevant data columns,
     #     start time bucket (hour), age, gender and start location, 
     pass
-    import ipdb; ipdb.set_trace()
 
     datas = prepare_datas(df, features=[
         s.START_STATION_ID, 
@@ -83,17 +82,20 @@ build_classifier_to_predict_destination_station(df)
 
     # also need to account for filling in missing data in the holdout set.
 
+    results = OrderedDict()
+
     classifier = build_classifier()
     classifier.fit(datas['X_train'], datas['y_train'])
 
     y_predictions = run_predictions(classifier, datas['X_train'])
     classif_metrics = run_metrics_on_predictions(datas['y_train'], y_predictions)
+    results['training'] = classif_metrics
 
     y_predictions = run_predictions(classifier, datas['X_holdout'])
     classif_metrics = run_metrics_on_predictions(datas['y_holdout'], y_predictions)
+    results['holdout'] = classif_metrics
 
-    import ipdb; ipdb.set_trace()
-    pass
+    return results
 
 
 def predict_destination(df):

@@ -196,6 +196,9 @@ max               40.787209             -73.929891
 
 
 def destination_predictions_with_separate_source_classifiers(df):
+    '''
+    Compare basic results
+    '''
 
 
     pass

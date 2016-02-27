@@ -76,9 +76,12 @@ def run_metrics_on_predictions(y_true, y_predictions):
     results = OrderedDict()
 
     for metrik in my_metrics:
-        result = metrik(y_true, y_predictions)
+        try:
+            result = metrik(y_true, y_predictions)
 
-        results[metrik.__name__] = result
+            results[metrik.__name__] = result
+        except ValueError as e:
+            print 'couldnt run metrik ', metrik, ' => ', e
 
     return results
 
