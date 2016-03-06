@@ -1,5 +1,6 @@
 
 import pandas as pd
+import json
 import datetime
 from utils import calc_speeds
 from utils import (distance_between_positions, get_start_time_bucket, 
@@ -83,6 +84,8 @@ create_annotated_dataset(dataset_name='201510-citibike-tripdata.csv')
     print 'done'
 
 def append_travel_stats(df):
+    ''' Annotate regular citibike trip dataframe with derived features.
+    '''
     
     recalculate_dict = {
             s.DISTANCE_TRAVELED_COL_NAME: True,

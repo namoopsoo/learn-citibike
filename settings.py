@@ -1,5 +1,7 @@
 
 
+from secret_settings import *
+
 START_STATION_LATITUDE_COL = 'start station latitude'
 START_STATION_LONGITUDE_COL = 'start station longitude'
 START_STATION_NAME = 'start station name'
@@ -26,4 +28,5 @@ DATAS_DIR = 'data'
 TRIPS_FILE = DATAS_DIR + '/' + '201510-citibike-tripdata.csv'
 
 PLOTS_DIR = 'plots'
+
 
