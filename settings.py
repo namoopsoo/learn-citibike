@@ -29,4 +29,8 @@ TRIPS_FILE = DATAS_DIR + '/' + '201510-citibike-tripdata.csv'
 
 PLOTS_DIR = 'plots'
 
+REDIS_SERVER = 'localhost'
+REDIS_PORT = 6379
+REDIS_DB = 3
+REDIS_TIMEOUT = 3
 
