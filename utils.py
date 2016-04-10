@@ -134,6 +134,8 @@ def calc_speeds(df):
 
 
 def which_col_have_nulls(df):
+    ''' Return list of cols in df with have at least one null.
+    '''
     have_nulls = []
 
     for col in df.columns:

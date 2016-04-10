@@ -10,16 +10,34 @@ from sklearn.cross_validation import train_test_split
 from sklearn.metrics import (auc, accuracy_score, f1_score, 
         roc_curve, recall_score, precision_score)
 
+from sklearn.preprocessing import LabelEncoder
 
-def prepare_datas(df, features=None, label_col=None):
+
+
+def prepare_datas(df, features=None, feature_encoding=None,
+        label_col=None):
     '''
 ipdb> pp classifier.fit(np.array(datas['X_train']), 
                     np.array(datas['y_train'][u'end station id']))
 
     '''
 
+
+    if feature_encoding:
+        label_encoders = {}
+
+        for feature in feature_encoding:
+            if feature not in df.columns:
+                continue
+
+            label_encoders[feature] = LabelEncoder()
+
+            df[feature] = label_encoders[feature].fit_transform(
+                            df[feature])
+
     if features:
         X = df[features]
+
     else:
         X = df[df.columns[:-1]]
 
@@ -28,11 +46,11 @@ ipdb> pp classifier.fit(np.array(datas['X_train']),
     else:
         y = df[df.columns[-1]]
 
-
     X_train, X_holdout, y_train, y_holdout = train_test_split(
             X, y, test_size=0.2)
 
     out = {
+            # All data
             'X': np.array(X),
             'y': np.array(y),
             'X_train': np.array(X_train), 

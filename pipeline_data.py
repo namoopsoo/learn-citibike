@@ -25,7 +25,11 @@ def load_data(source_file=s.TRIPS_FILE, num_rows=None):
     return df_re_index
 
 def re_index(df):
-    '''Re index w/o gaps in index '''
+    '''Re index w/o gaps in index.
+
+    Reindexing is really important, because without this, future operations,
+    on the df, will unknowingly not apply() operations to all rows.
+    '''
     df.index = range(df.shape[0])
     return df
 
@@ -134,5 +138,14 @@ def calculate_start_time_buckets(df):
 
     
     return start_time_buckets
+
+def add_geocoding_station_data(df):
+    ''' Enrich input dataframe with station geolocation data.
+
+
+    '''
+
+    station_dataset = 'data/stations_geoloc_data.03262016T1349.csv'
+    station_df = pd.read_csv(station_dataset)
 
 

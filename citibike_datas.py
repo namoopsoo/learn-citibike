@@ -60,25 +60,38 @@ def get_total_number_destinations(df):
 
     return num_destinations
 
-def build_classifier_to_predict_destination_station(df):
+def build_classifier_to_predict_destination_station(df, definition):
     '''
 from citibike_datas import (build_classifier_to_predict_destination_station)
 
+
+definition = {
+    'features': [
+        s.START_STATION_ID,
+        s.START_TIME_BUCKET,
+        s.AGE_COL_NAME,
+        s.GENDER,],
+    'feature_encoding': {
+        # 'borough': 1,
+    }
+    'label_col': s.END_STATION_ID,
+}
+
+
 df = load_data('data/201510-citibike-tripdata.csv.annotated.mini.02212016T1641.csv')
 
-build_classifier_to_predict_destination_station(df)
+results = build_classifier_to_predict_destination_station(df, 
+definition)
 
     '''
 
     # Extract only the relevant data columns,
-    #     start time bucket (hour), age, gender and start location, 
+    #     start time bucket (hour), age, gender and start location,
     pass
 
-    datas = prepare_datas(df, features=[
-        s.START_STATION_ID, 
-        s.START_TIME_BUCKET, 
-        s.AGE_COL_NAME,
-        s.GENDER,], label_col=s.END_STATION_ID)
+    datas = prepare_datas(df, features=definition['features'],
+            feature_encoding=definition['feature_encoding'],
+            label_col=definition['label_col'])
 
     # also need to account for filling in missing data in the holdout set.
 
