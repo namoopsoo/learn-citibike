@@ -148,4 +148,17 @@ def add_geocoding_station_data(df):
     station_dataset = 'data/stations_geoloc_data.03262016T1349.csv'
     station_df = pd.read_csv(station_dataset)
 
+def choose_end_station_label_column(df, label_column):
+    '''Annotate citibike df, to use only one label column.
+    
+    Toss out other end_station columns other than the one chosen.'''
+    dump_cols = set(s.ALL_END_STATION_COLS)
+    if label_column in dump_cols:
+        dump_cols.discard(label_column)
+    
+    annotated_df = df.drop(dump_cols, axis=1)
+    return annotated_df
+    
+    
+    
 

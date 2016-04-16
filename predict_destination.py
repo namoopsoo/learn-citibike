@@ -204,3 +204,40 @@ def destination_predictions_with_separate_source_classifiers(df):
     pass
 
 
+def experiment_with_different_destination_cols(df):
+    cols = [s.END_STATION_NAME, s.END_STATION_ID, s.NEW_END_POSTAL_CODE,
+        s.NEW_END_BOROUGH, s.NEW_END_NEIGHBORHOOD]
+
+    features = [
+        s.START_STATION_ID,
+        s.START_TIME_BUCKET,
+        s.AGE_COL_NAME,
+        s.GENDER,] + s.NEW_START_STATION_COLS
+    all_results = {}
+    
+    for label_column in [s.END_STATION_ID, s.NEW_END_POSTAL_CODE,
+                        s.NEW_END_NEIGHBORHOOD, s.NEW_END_BOROUGH]: 
+        definition = {
+            'features': features,
+            'feature_encoding': {
+                s.NEW_END_STATE: 1, s.NEW_END_BOROUGH: 1,
+                s.NEW_END_NEIGHBORHOOD: 1, s.NEW_END_STATION_NAME: 1,
+                s.NEW_START_STATE: 1,
+                s.NEW_START_BOROUGH: 1,
+                s.NEW_START_NEIGHBORHOOD: 1,
+                s.NEW_START_STATION_NAME: 1
+            },
+            'label_col': label_column,
+        }
+        annotated_df = choose_end_station_label_column(df, label_column)
+        results = build_classifier_to_predict_destination_station(annotated_df,
+                                                                 definition)
+        print 'results ', pprint(results)
+        
+        all_results[label_column] = results
+    return all_results
+
+
+
+
+
