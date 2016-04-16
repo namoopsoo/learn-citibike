@@ -29,7 +29,7 @@ Predictive power of time, age, gender and start location?
 
 
 '''
-
+import numpy as np
 import pandas as pd
 from collections import OrderedDict 
 
