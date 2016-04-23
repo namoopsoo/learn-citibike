@@ -160,5 +160,34 @@ def choose_end_station_label_column(df, label_column):
     return annotated_df
     
     
+def make_geoloc_df():
+    ''' Build of stations dataframe.
+
+    File with a list of station intersections like,
+    [
+    "1 Ave & E 15 St", 
+    "1 Ave & E 18 St", 
+    "1 Ave & E 30 St", 
+    "1 Ave & E 44 St", 
+    "1 Ave & E 62 St", 
+    "1 Ave & E 68 St", 
+    "1 Ave & E 78 St", 
+    ...]
+    '''
+    stations_json_filename = 'data/start_stations_103115.json'
+    stations = json.load(open(stations_json_filename))
+
+    stations_df = get_station_geoloc_data(stations_json_filename)
+
+    # stations_df.to_excel('data/stations_geoloc_030516.xls')
+    stations_geoloc_data_filename = 'data/stations_geoloc_data.{}.csv'.format(
+        datetime.datetime.now().strftime('%m%d%YT%H%M'))
+    stations_geoloc_data_filename
+    stations_df.to_csv(stations_geoloc_data_filename)
+
+    for i in stations_df.head().index:
+        address = stations_df.iloc[i]['station_name']
+        print i, address
+
     
 
