@@ -1,5 +1,5 @@
 
-
+import pandas as pd
 
 
 def _make_column_rename_dict(columns, prefix):
@@ -11,6 +11,10 @@ def _make_column_rename_dict(columns, prefix):
 
 
 def annotate_df_with_geoloc(df, station_df):
+    ''' Given a df with both the 'start station name' and 'end station name'
+    columns, join with the station_df to also include the geolocation 
+    columns, including the start and end postal code, neighborhood and others.
+    '''
 
     #
     station_df_columns = [u'station_name', u'postal_code', u'sublocality',
@@ -37,3 +41,4 @@ def annotate_df_with_geoloc(df, station_df):
 
     
     return step2_df
+

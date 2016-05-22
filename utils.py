@@ -1,6 +1,7 @@
 
 from math import cos, pi, fabs, sqrt
 from decimal import Decimal
+import numpy as np
 
 import datetime
 
@@ -150,6 +151,12 @@ def which_col_have_nulls(df):
 
     return have_nulls
 
+
+def dump_np_array(X, basename):
+
+    filename = datetime.datetime.now().strftime('data/' + basename + '.%m%d%YT%H%M.csv')
+
+    np.savetxt(filename, X, delimiter=",")
 
 
 

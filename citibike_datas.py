@@ -34,7 +34,7 @@ import pandas as pd
 from collections import OrderedDict 
 
 from utils import distance_between_positions, get_start_time_bucket
-from classify import (prepare_datas,
+from classify import (prepare_datas, grid_search_params,
         build_classifier, run_predictions, run_metrics_on_predictions)
 # from plottings import (plot_age_speed, plot_distance_trip_time)
 
@@ -73,8 +73,10 @@ definition = {
         s.GENDER,],
     'feature_encoding': {
         # 'borough': 1,
-    }
+    },
+    'feature_standard_scaling': 1
     'label_col': s.END_STATION_ID,
+    'classification: 'lr', #  'lr' | 'sgd'
 }
 
 
@@ -91,22 +93,26 @@ definition)
 
     datas = prepare_datas(df, features=definition['features'],
             feature_encoding=definition['feature_encoding'],
+            feature_standard_scaling=definition['feature_standard_scaling'],
             label_col=definition['label_col'])
 
     # also need to account for filling in missing data in the holdout set.
 
     results = OrderedDict()
 
-    classifier = build_classifier()
+    best_params = grid_search_params(datas)
+
+
+    classifier = build_classifier(definition)
     classifier.fit(datas['X_train'], datas['y_train'])
 
     y_predictions = run_predictions(classifier, datas['X_train'])
     classif_metrics = run_metrics_on_predictions(datas['y_train'], y_predictions)
     results['training'] = classif_metrics
 
-    y_predictions = run_predictions(classifier, datas['X_holdout'])
-    classif_metrics = run_metrics_on_predictions(datas['y_holdout'], y_predictions)
-    results['holdout'] = classif_metrics
+    y_predictions = run_predictions(classifier, datas['X_test'])
+    classif_metrics = run_metrics_on_predictions(datas['y_test'], y_predictions)
+    results['test'] = classif_metrics
 
     return results
 
