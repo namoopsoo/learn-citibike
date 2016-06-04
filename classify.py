@@ -91,6 +91,8 @@ ipdb> pp classifier.fit(np.array(datas['X_train']),
     return out
 
 def grid_search_params(data):
+    ''' Find best params for given data, for SGDClassifier
+    '''
 
     classifier = SGDClassifier(n_iter=10**2)
 
@@ -103,12 +105,16 @@ def grid_search_params(data):
     return best_params
 
     
-def build_classifier(definition):
+def build_classifier(definition, datas):
 
     if definition['classification'] == 'lr':
         classifier = LogisticRegression(C=1.5)
     elif definition['classification'] == 'sgd':
         classifier = SGDClassifier(alpha=0.0001, n_iter = 10**2)
+    elif definition['classification'] == 'sgd_grid':
+
+        best_params = grid_search_params(datas)
+        classifier = SGDClassifier(n_iter = 10**2, **best_params)
 
 
     rlr_feature_selection = RandomizedLogisticRegression(
