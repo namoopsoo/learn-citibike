@@ -6,6 +6,10 @@ from utils import calc_speeds
 from utils import (distance_between_positions, get_start_time_bucket, 
                 which_col_have_nulls)
 
+from annotate_geolocation import annotate_df_with_geoloc
+
+from get_station_geolocation_data import get_station_geoloc_data
+
 import settings as s
 
 
@@ -63,10 +67,12 @@ def calc_distance_travelled_col(df):
 
     return distances
 
-def create_annotated_dataset(dataset_name, preview_too=True):
+def create_annotated_dataset(dataset_name, preview_too=True, size=None):
     '''
 from pipeline_data import create_annotated_dataset
-create_annotated_dataset(dataset_name='201510-citibike-tripdata.csv')
+
+import pipeline_data as pl
+pl.create_annotated_dataset ('201509-citibike-tripdata.csv', size=10000, preview_too=False)
 
     '''
     if preview_too:
@@ -78,14 +84,23 @@ create_annotated_dataset(dataset_name='201510-citibike-tripdata.csv')
                     timestamp))
 
     print 'working on full dataset now...'
-    df = load_data('data/%s' % dataset_name)
+    df = load_data('data/%s' % dataset_name, num_rows=size)
     annotated_df = append_travel_stats(df)
+
+    station_dataset = 'data/stations_geoloc_data.03262016T1349.csv'
+    station_df = pd.read_csv(station_dataset)
+
+    next_df = annotate_df_with_geoloc(annotated_df, station_df)
+
+    if not size:
+        size = next_df.shape[0]
+
     timestamp = datetime.datetime.now().strftime('%m%d%YT%H%M')
     annotated_df.to_csv(
-            'data/%s.annotated.%s.csv' % (dataset_name, 
+            'data/%s.annotated.%s.%s.csv' % (dataset_name, 
+                size,
                 timestamp))
 
-    print 'done'
 
 def append_travel_stats(df):
     ''' Annotate regular citibike trip dataframe with derived features.
@@ -175,7 +190,7 @@ def make_geoloc_df():
     ...]
     '''
     stations_json_filename = 'data/start_stations_103115.json'
-    stations = json.load(open(stations_json_filename))
+    stations_json_filename = 'data/start_stations_060416.json'
 
     stations_df = get_station_geoloc_data(stations_json_filename)
 
@@ -190,4 +205,3 @@ def make_geoloc_df():
         print i, address
 
     
-
