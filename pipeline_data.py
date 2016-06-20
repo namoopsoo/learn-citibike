@@ -19,7 +19,12 @@ def load_data(source_file=s.TRIPS_FILE, num_rows=None):
     df = pd.read_csv(source_file)
 
     if num_rows:
-        df = df[:num_rows]
+
+        if num_rows > df.shape[0]:
+            raise Exception, 'source df too small %s for num_rows=%s' % (
+                    df.shape[0], num_rows)
+
+        df = df.sample(n=num_rows)
 
     df = df[df[s.USER_TYPE_COL] == s.USER_TYPE_SUBSCRIBER]
 
@@ -83,7 +88,6 @@ pl.create_annotated_dataset ('201509-citibike-tripdata.csv', size=10000, preview
                 'data/%s.annotated.mini.%s.csv' % (dataset_name, 
                     timestamp))
 
-    print 'working on full dataset now...'
     df = load_data('data/%s' % dataset_name, num_rows=size)
     annotated_df = append_travel_stats(df)
 
@@ -96,10 +100,12 @@ pl.create_annotated_dataset ('201509-citibike-tripdata.csv', size=10000, preview
         size = next_df.shape[0]
 
     timestamp = datetime.datetime.now().strftime('%m%d%YT%H%M')
-    annotated_df.to_csv(
-            'data/%s.annotated.%s.%s.csv' % (dataset_name, 
-                size,
-                timestamp))
+
+    dataset_filename = '%s.annotated.%s.%s.csv' % (dataset_name, 
+            size, timestamp)
+    next_df.to_csv('data/%s' % dataset_filename)
+
+    return dataset_filename
 
 
 def append_travel_stats(df):
