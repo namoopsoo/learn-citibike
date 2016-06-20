@@ -100,10 +100,7 @@ definition)
 
     results = OrderedDict()
 
-    best_params = grid_search_params(datas)
-
-
-    classifier = build_classifier(definition)
+    classifier = build_classifier(definition, datas)
     classifier.fit(datas['X_train'], datas['y_train'])
 
     y_predictions = run_predictions(classifier, datas['X_train'])
@@ -114,7 +111,7 @@ definition)
     classif_metrics = run_metrics_on_predictions(datas['y_test'], y_predictions)
     results['test'] = classif_metrics
 
-    return results
+    return classifier, results
 
 
 def predict_destination(df):
