@@ -60,7 +60,9 @@ def get_total_number_destinations(df):
 
     return num_destinations
 
-def build_classifier_to_predict_destination_station(df, definition):
+def build_classifier_to_predict_destination_station(definition, df,
+        holdout_df=None,
+        ):
     '''
 from citibike_datas import (build_classifier_to_predict_destination_station)
 
@@ -91,7 +93,9 @@ definition)
     #     start time bucket (hour), age, gender and start location,
     pass
 
-    datas = prepare_datas(df, features=definition['features'],
+    datas = prepare_datas(df,
+            holdout_df,
+            features=definition['features'],
             feature_encoding=definition['feature_encoding'],
             feature_standard_scaling=definition['feature_standard_scaling'],
             label_col=definition['label_col'])

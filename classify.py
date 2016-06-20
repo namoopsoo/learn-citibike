@@ -20,17 +20,39 @@ from pipeline_data import (remove_rows_with_nulls,
 
 from utils import dump_np_array
 
-def prepare_datas(df, features=None, feature_encoding=None,
+def replace_unknown(values, dtype):
+    def replacer(v):
+        if v not in values:
+            if dtype == str:
+                return '-1'
+            elif dtype == float:
+                return -1
+        else:
+            return v
+
+    return replacer
+
+def prepare_datas(df, holdout_df=None, features=None, feature_encoding=None,
         feature_standard_scaling=None,
         label_col=None):
     '''
 ipdb> pp classifier.fit(np.array(datas['X_train']), 
                     np.array(datas['y_train'][u'end station id']))
+
+preparing a holdout set:
+    - reuse the label encoders from the training, but for the holdout set,
+    need to check if values are not in the encoding set, then need to replace w/ -1 .
     '''
     # Remove nulls...
     df_unnulled = remove_rows_with_nulls(df)
     df_re_index = re_index(df_unnulled)
     df = df_re_index
+
+    # Remove nulls from holdout too
+    if holdout_df is not None:
+        holdout_df_unnulled = remove_rows_with_nulls(holdout_df)
+        holdout_df_re_index = re_index(holdout_df_unnulled)
+        holdout_df = holdout_df_re_index
 
     if feature_encoding:
         label_encoders = {}
@@ -41,8 +63,25 @@ ipdb> pp classifier.fit(np.array(datas['X_train']),
 
             label_encoders[feature] = LabelEncoder()
 
-            df[feature] = label_encoders[feature].fit_transform(
+            df[feature] = label_encoders[feature].fit(
+                            np.concatentate([df[feature], np.array([-1])])
+                            )
+            df[feature] = label_encoders[feature].transform(
                             df[feature])
+
+            # Encode holdout df features too
+            if holdout_df is not None:
+                pass
+                if feature not in holdout_df.columns:
+                    continue
+
+                # Need to encode any unknown value as -1.
+                # So first need to do a map for any values not known, map them to be -1.
+                replacer = replace_unknown(label_encoders[feature].classes_, dtype)
+                holdout_df[feature] = holdout_df[feature].apply(replacer)
+
+                holdout_df[feature] = label_encoders[feature].fit_transform(
+                            holdout_df[feature])
 
     if features:
         X = df[features]
