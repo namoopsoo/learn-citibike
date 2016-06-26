@@ -20,6 +20,58 @@ from pipeline_data import (remove_rows_with_nulls,
 
 from utils import dump_np_array
 
+def encode_holdout_df(holdout_df, label_encoders, feature_encoding):
+    '''
+
+    Replace any values which are not known, w/ a -1. 
+    The label encoders have all mapped -1 or '-1' to 0, so this will avoid the
+        ValueError which would otherwise come up when faced with values
+        which were not previously seen by the label encoders.
+    '''
+    holdout_copy = holdout_df.copy()
+    for feature in feature_encoding:
+        if feature not in holdout_copy.columns:
+            continue
+
+        # what is the dtype
+        if holdout_copy[feature].dtype == int:
+            dtype = float
+        elif holdout_copy[feature].dtype == np.object:
+            dtype = str
+
+        # Need to encode any unknown value as -1.
+        # So first need to do a map for any values not known, map them to be -1.
+        replacer = replace_unknown(label_encoders[feature].classes_, dtype)
+        holdout_copy[feature] = holdout_copy[feature].apply(replacer)
+
+        holdout_copy[feature] = label_encoders[feature].fit_transform(
+                    holdout_copy[feature])
+
+    return holdout_copy
+
+
+def build_label_encoders_from_df(df, feature_encoding):
+    #
+    label_encoders = {}
+
+    dfcopy = df.copy()
+
+    for feature in feature_encoding:
+        if feature not in dfcopy.columns:
+            continue
+
+        label_encoders[feature] = LabelEncoder()
+
+        label_encoders[feature].fit(
+                        np.concatenate([dfcopy[feature], np.array([-1])])
+                        )
+        dfcopy[feature] = label_encoders[feature].transform(
+                        dfcopy[feature])
+
+    return dfcopy, label_encoders
+
+
+
 def replace_unknown(values, dtype):
     def replacer(v):
         if v not in values:
@@ -55,33 +107,14 @@ preparing a holdout set:
         holdout_df = holdout_df_re_index
 
     if feature_encoding:
+
         label_encoders = {}
+        dfcopy, label_encoders = build_label_encoders_from_df(df, feature_encoding)
+        df = dfcopy
 
-        for feature in feature_encoding:
-            if feature not in df.columns:
-                continue
+        if holdout_df is not None:
+            holdout_df = encode_holdout_df(holdout_df, label_encoders, feature_encoding)
 
-            label_encoders[feature] = LabelEncoder()
-
-            df[feature] = label_encoders[feature].fit(
-                            np.concatentate([df[feature], np.array([-1])])
-                            )
-            df[feature] = label_encoders[feature].transform(
-                            df[feature])
-
-            # Encode holdout df features too
-            if holdout_df is not None:
-                pass
-                if feature not in holdout_df.columns:
-                    continue
-
-                # Need to encode any unknown value as -1.
-                # So first need to do a map for any values not known, map them to be -1.
-                replacer = replace_unknown(label_encoders[feature].classes_, dtype)
-                holdout_df[feature] = holdout_df[feature].apply(replacer)
-
-                holdout_df[feature] = label_encoders[feature].fit_transform(
-                            holdout_df[feature])
 
     if features:
         X = df[features]
