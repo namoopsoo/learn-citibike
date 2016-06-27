@@ -60,3 +60,6 @@ REDIS_PORT = 6379
 REDIS_DB = 3
 REDIS_TIMEOUT = 3
 
+CLASSIFICATION_RESULTS_KEY = 'classification_results_key'
+
+

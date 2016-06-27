@@ -20,6 +20,18 @@ from pipeline_data import (remove_rows_with_nulls,
 
 from utils import dump_np_array
 
+def what_is_dtype(s):
+    if s.dtype == int:
+        dtype = float
+    elif s.dtype == float:
+        dtype = float
+    elif s.dtype == np.object:
+        dtype = str
+    else:
+        raise Exception, 'what is the dtype' + str(s.dtype)
+
+    return dtype
+
 def encode_holdout_df(holdout_df, label_encoders, feature_encoding):
     '''
 
@@ -33,18 +45,14 @@ def encode_holdout_df(holdout_df, label_encoders, feature_encoding):
         if feature not in holdout_copy.columns:
             continue
 
-        # what is the dtype
-        if holdout_copy[feature].dtype == int:
-            dtype = float
-        elif holdout_copy[feature].dtype == np.object:
-            dtype = str
+        dtype = what_is_dtype(holdout_copy[feature])
 
         # Need to encode any unknown value as -1.
         # So first need to do a map for any values not known, map them to be -1.
         replacer = replace_unknown(label_encoders[feature].classes_, dtype)
         holdout_copy[feature] = holdout_copy[feature].apply(replacer)
 
-        holdout_copy[feature] = label_encoders[feature].fit_transform(
+        holdout_copy[feature] = label_encoders[feature].transform(
                     holdout_copy[feature])
 
     return holdout_copy
@@ -62,8 +70,16 @@ def build_label_encoders_from_df(df, feature_encoding):
 
         label_encoders[feature] = LabelEncoder()
 
+        dtype = what_is_dtype(dfcopy[feature])
+        if dtype == int:
+            missing_val = -1 
+        elif dtype == str:
+            missing_val = '-1'
+        else:
+            raise Exception, 'unknown dtype' + str(dtype)
+
         label_encoders[feature].fit(
-                        np.concatenate([dfcopy[feature], np.array([-1])])
+                        np.concatenate([dfcopy[feature], np.array([missing_val])])
                         )
         dfcopy[feature] = label_encoders[feature].transform(
                         dfcopy[feature])
@@ -107,7 +123,6 @@ preparing a holdout set:
         holdout_df = holdout_df_re_index
 
     if feature_encoding:
-
         label_encoders = {}
         dfcopy, label_encoders = build_label_encoders_from_df(df, feature_encoding)
         df = dfcopy
@@ -119,17 +134,27 @@ preparing a holdout set:
     if features:
         X = df[features]
 
+        if holdout_df is not None:
+            X_holdout = holdout_df[features]
     else:
         X = df[df.columns[:-1]]
 
+        if holdout_df is not None:
+            X_holdout = holdout_df[holdout_df.columns[:-1]]
+
     if label_col:
         y = df[label_col]
+
+        if holdout_df is not None:
+            y_holdout = holdout_df[label_col]
     else:
         y = df[df.columns[-1]]
 
+        if holdout_df is not None:
+            y_holdout = holdout_df[holdout_df.columns[-1]]
+
     X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2)
-
 
     if feature_standard_scaling:
         # Train 
@@ -140,11 +165,19 @@ preparing a holdout set:
         # TODO: same scaler or different scaler on whole X?
         #   probably on whole X, and then that scaler needs to be
         #   stored away for transforming new input vectors which come in to be predicted.
-        X_full = StandardScaler().fit_transform(X)
+        scaler_full = StandardScaler().fit(X)
+        X_full = scaler_full.transform(X)
+
+        # 
+        if holdout_df is not None:
+            X_holdout_scaled = scaler_full.transform(X_holdout)
     else:
         X_train_out = X_train
         X_test_out = X_test
         X_full = X
+
+        if holdout_df is not None:
+            X_holdout_scaled = X_holdout
        
     dump_np_array(X_full, 'dump')
 
@@ -159,6 +192,12 @@ preparing a holdout set:
             'y_train': np.array(y_train), 
             'y_test': np.array(y_test),
             }
+
+    if holdout_df is not None:
+        out.update({
+            'X_holdout': np.array(X_holdout_scaled),
+            'y_holdout': np.array(y_holdout)
+            })
 
     return out
 

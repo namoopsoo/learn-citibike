@@ -31,6 +31,9 @@ Predictive power of time, age, gender and start location?
 '''
 import numpy as np
 import pandas as pd
+import itertools
+import datetime
+from copy import deepcopy
 from collections import OrderedDict 
 
 from utils import distance_between_positions, get_start_time_bucket
@@ -38,7 +41,8 @@ from classify import (prepare_datas, grid_search_params,
         build_classifier, run_predictions, run_metrics_on_predictions)
 # from plottings import (plot_age_speed, plot_distance_trip_time)
 
-from pipeline_data import append_travel_stats, load_data
+from pipeline_data import (append_travel_stats, load_data, choose_end_station_label_column)
+from data_store import push_classification_result
 import settings as s
 
 
@@ -115,7 +119,95 @@ definition)
     classif_metrics = run_metrics_on_predictions(datas['y_test'], y_predictions)
     results['test'] = classif_metrics
 
+
+    if holdout_df is not None:
+        y_holdout_predictions = run_predictions(classifier, datas['X_holdout'])
+        classif_metrics = run_metrics_on_predictions(datas['y_holdout'], y_holdout_predictions)
+        results['holdout'] = classif_metrics
+
+
     return classifier, results
+
+
+def experiment_with_sgd(datasets, holdout_df=None):
+    '''Annotate end station id data using new geolocation meta data and run classification.
+    
+    Geocoding data brings in zip codes, borough names (a.k.a. sub localities) 
+    and neighborhoods. Given that there are 5 boroughs, this makes the classification
+    task much more narrow and focused.
+    '''
+    cols = [s.END_STATION_NAME, s.END_STATION_ID, s.NEW_END_POSTAL_CODE,
+        s.NEW_END_BOROUGH, s.NEW_END_NEIGHBORHOOD]
+
+    features = [
+        s.START_STATION_ID,
+        s.START_TIME_BUCKET,
+        s.AGE_COL_NAME,
+        s.GENDER,] + s.NEW_START_STATION_COLS
+    all_results = []
+    
+    base_definition = {
+        'features': features,
+        'feature_encoding': {
+            s.NEW_END_STATE: 1, s.NEW_END_BOROUGH: 1,
+            s.NEW_END_NEIGHBORHOOD: 1, s.NEW_END_STATION_NAME: 1,
+            s.NEW_START_STATE: 1,
+            s.NEW_START_BOROUGH: 1,
+            s.NEW_START_NEIGHBORHOOD: 1,
+            s.NEW_START_STATION_NAME: 1
+        },
+    }
+
+    num = 0
+    for dataset_detail, feature_scaling, label_column, classification in itertools.product(
+            datasets,
+            [1], [
+                    #s.NEW_END_BOROUGH, s.NEW_END_POSTAL_CODE,
+                        s.NEW_END_NEIGHBORHOOD, ],
+            [
+            # 'sgd_grid', 
+             'lr',
+            # 'sgd'
+            ]):
+        dataset_filename = dataset_detail['name']
+        df = load_data('data/' + dataset_filename)
+        
+        delta_definition = {
+            'dataset_name': dataset_detail['name'],
+            'dataset_size': dataset_detail['size'],
+            'feature_standard_scaling': feature_scaling,
+            'label_col': label_column,
+            'classification': classification,
+        }
+        print 'starting num ', num, delta_definition
+        
+        definition = deepcopy(base_definition)
+        definition.update(delta_definition)
+
+        annotated_df = choose_end_station_label_column(df, label_column)
+        if holdout_df is not None:
+            holdout_df_annotated = choose_end_station_label_column(
+                    holdout_df, label_column)
+        else:
+            holdout_df_annotated = None
+        
+        clf, results = build_classifier_to_predict_destination_station(
+                                                                definition,
+                                                                annotated_df,
+                                                                holdout_df_annotated,
+                                                                )
+        meta = {'date': datetime.datetime.now().strftime('%m%d%YT%H%MZEST')}
+
+        all_results.append([meta, delta_definition, results])
+        num += 1
+
+        full_result = {'meta': meta,
+                       'delta_definition': delta_definition,
+                       'results': results,
+                       'definition': definition,}
+        push_classification_result(full_result)
+        
+    return all_results
 
 
 def predict_destination(df):
