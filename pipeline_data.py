@@ -72,7 +72,9 @@ def calc_distance_travelled_col(df):
 
     return distances
 
-def create_annotated_dataset(dataset_name, preview_too=True, size=None):
+def create_annotated_dataset(dataset_name=None,
+        dataset_df=None,
+        preview_too=True, size=None):
     '''
 from pipeline_data import create_annotated_dataset
 
@@ -80,15 +82,20 @@ import pipeline_data as pl
 pl.create_annotated_dataset ('201509-citibike-tripdata.csv', size=10000, preview_too=False)
 
     '''
-    if preview_too:
-        df_mini = load_data('data/%s' % dataset_name, num_rows=10000)
-        annotated_df_mini = append_travel_stats(df_mini)
-        timestamp = datetime.datetime.now().strftime('%m%d%YT%H%M')
-        annotated_df_mini.to_csv(
-                'data/%s.annotated.mini.%s.csv' % (dataset_name, 
-                    timestamp))
+#    if preview_too:
+#        df_mini = load_data('data/%s' % dataset_name, num_rows=10000)
+#        annotated_df_mini = append_travel_stats(df_mini)
+#        timestamp = datetime.datetime.now().strftime('%m%d%YT%H%M')
+#        annotated_df_mini.to_csv(
+#                'data/%s.annotated.mini.%s.csv' % (dataset_name, 
+#                    timestamp))
+    if dataset_name:
+        df = load_data('data/%s' % dataset_name, num_rows=size)
+    elif dataset_df is not None:
+        df = dataset_df.sample(n=size)
+    else:
+        raise Exception, 'need a source'
 
-    df = load_data('data/%s' % dataset_name, num_rows=size)
     annotated_df = append_travel_stats(df)
 
     station_dataset = 'data/stations_geoloc_data.03262016T1349.csv'
@@ -211,3 +218,60 @@ def make_geoloc_df():
         print i, address
 
     
+def create_datasets_from_sizes(dataset_source_df, sizes, dry_run=True):
+    datasets = []
+
+    for size in sizes:
+
+        if dry_run:
+            name = 'd.%s.csv' % size
+        else:
+            name = create_annotated_dataset(
+                    dataset_df=dataset_source_df, 
+                    size=size, preview_too=False)
+
+        definition = {'size': size, 'name': name}
+        datasets.append(definition)
+    return datasets
+
+def make_new_datasets(dataset_source_df, dry_run=True):
+    # dataset_source = '201509_10-citibike-tripdata.csv'
+
+    sizes = []
+    for i in range(1, 11):
+        sizes.append(i*10**5)
+
+    datasets = create_datasets_from_sizes(dataset_source_df,
+            sizes, dry_run)
+    return datasets
+    
+
+def prepare_training_and_holdout_datasets(dataset_source):
+    full_df = load_data(dataset_source)
+
+    holdout_df = full_df.sample(n=100000)
+
+    # take out the holdout rows.
+    full_df.drop(holdout_df.index, inplace=True, axis=0)
+
+    # And make annotated from that holdout.
+    annotated_holdout_filename = create_annotated_dataset(
+            dataset_df=holdout_df)
+
+    train_datasets = make_new_datasets(full_df)
+
+    all_datasets = {
+            'holdout_dataset': annotated_holdout_filename,
+            'train_datasets': train_datasets}
+
+    return all_datasets
+
+
+def run_this_08142016():
+
+    dataset_source = 'data/201509_10-citibike-tripdata.csv'
+    all_datasets = prepare_training_and_holdout_datasets(dataset_source)
+
+    print all_datasets
+
+
