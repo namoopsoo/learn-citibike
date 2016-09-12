@@ -165,9 +165,9 @@ def experiment_with_sgd(datasets, holdout_df=None):
                     #s.NEW_END_BOROUGH, s.NEW_END_POSTAL_CODE,
                         s.NEW_END_NEIGHBORHOOD, ],
             [
-            # 'sgd_grid', 
-             'lr',
-            # 'sgd'
+                'sgd_grid', 
+                'lr',
+                'sgd',
             ]):
         dataset_filename = dataset_detail['name']
         df = load_data('data/' + dataset_filename)

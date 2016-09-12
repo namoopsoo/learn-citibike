@@ -92,6 +92,8 @@ pl.create_annotated_dataset ('201509-citibike-tripdata.csv', size=10000, preview
     if dataset_name:
         df = load_data('data/%s' % dataset_name, num_rows=size)
     elif dataset_df is not None:
+        # FIXME >.. if size is None, then dont need to sample,
+        #   since other wise the default will be n=1
         df = dataset_df.sample(n=size)
     else:
         raise Exception, 'need a source'
