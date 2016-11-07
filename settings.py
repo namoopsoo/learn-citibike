@@ -1,6 +1,5 @@
 
 
-from secret_settings import *
 
 START_STATION_LATITUDE_COL = 'start station latitude'
 START_STATION_LONGITUDE_COL = 'start station longitude'
@@ -62,4 +61,6 @@ REDIS_TIMEOUT = 3
 
 CLASSIFICATION_RESULTS_KEY = 'classification_results_key'
 
+
+from secret_settings import *
 

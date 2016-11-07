@@ -44,6 +44,7 @@ from classify import (prepare_datas, grid_search_params,
 from pipeline_data import (append_travel_stats, load_data, choose_end_station_label_column)
 from data_store import push_classification_result
 import settings as s
+from os import path
 
 
 def how_good_is_a_route(route):
@@ -80,13 +81,13 @@ definition = {
     'feature_encoding': {
         # 'borough': 1,
     },
-    'feature_standard_scaling': 1
-    'label_col': s.END_STATION_ID,
-    'classification: 'lr', #  'lr' | 'sgd'
+    'feature_standard_scaling': 1,
+    'label_col': s.NEW_END_NEIGHBORHOOD,
+    'classification': 'lr', #  'lr' | 'sgd'
 }
 
 
-df = load_data('data/201510-citibike-tripdata.csv.annotated.mini.02212016T1641.csv')
+df = load_data(path.join(s.DATAS_DIR, '201510-citibike-tripdata.csv.annotated.mini.02212016T1641.csv'))
 
 results = build_classifier_to_predict_destination_station(df, 
 definition)
@@ -170,7 +171,7 @@ def experiment_with_sgd(datasets, holdout_df=None):
                 'sgd',
             ]):
         dataset_filename = dataset_detail['name']
-        df = load_data('data/' + dataset_filename)
+        df = load_data(path.join(s.DATAS_DIR, dataset_filename))
         
         delta_definition = {
             'dataset_name': dataset_detail['name'],
@@ -296,7 +297,7 @@ def analyze_trip_destination_stats(df):
 
 
 if __name__ == '__main__':
-    df = load_data('foo.csv', num_rows=2000)
+    df = load_data(path.join(s.DATAS_DIR, 'foo.csv'), num_rows=2000)
 
     import ipdb; ipdb.set_trace()
     df = append_travel_stats(df)

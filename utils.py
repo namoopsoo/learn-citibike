@@ -6,6 +6,7 @@ import numpy as np
 import datetime
 
 import settings as s
+from os import path
 
 EARTH_RADIUS = 3958.8
 EARTH_CIRCUMFERENCE = EARTH_RADIUS * 2 * pi
@@ -154,7 +155,8 @@ def which_col_have_nulls(df):
 
 def dump_np_array(X, basename):
 
-    filename = datetime.datetime.now().strftime('data/' + basename + '.%m%d%YT%H%M.csv')
+    filename = datetime.datetime.now().strftime(
+            path.join(s.DATAS_DIR, basename + '.%m%d%YT%H%M.csv'))
 
     np.savetxt(filename, X, delimiter=",")
 

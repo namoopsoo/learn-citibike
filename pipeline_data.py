@@ -1,5 +1,6 @@
 
 import pandas as pd
+from os import path
 import json
 import datetime
 from utils import calc_speeds
@@ -82,15 +83,8 @@ import pipeline_data as pl
 pl.create_annotated_dataset ('201509-citibike-tripdata.csv', size=10000, preview_too=False)
 
     '''
-#    if preview_too:
-#        df_mini = load_data('data/%s' % dataset_name, num_rows=10000)
-#        annotated_df_mini = append_travel_stats(df_mini)
-#        timestamp = datetime.datetime.now().strftime('%m%d%YT%H%M')
-#        annotated_df_mini.to_csv(
-#                'data/%s.annotated.mini.%s.csv' % (dataset_name, 
-#                    timestamp))
     if dataset_name:
-        df = load_data('data/%s' % dataset_name, num_rows=size)
+        df = load_data(path.join(s.DATAS_DIR, dataset_name), num_rows=size)
     elif dataset_df is not None:
         # FIXME >.. if size is None, then dont need to sample,
         #   since other wise the default will be n=1
@@ -100,7 +94,7 @@ pl.create_annotated_dataset ('201509-citibike-tripdata.csv', size=10000, preview
 
     annotated_df = append_travel_stats(df)
 
-    station_dataset = 'data/stations_geoloc_data.03262016T1349.csv'
+    station_dataset = path.join(s.DATAS_DIR, 'stations_geoloc_data.03262016T1349.csv')
     station_df = pd.read_csv(station_dataset)
 
     next_df = annotate_df_with_geoloc(annotated_df, station_df)
@@ -112,7 +106,7 @@ pl.create_annotated_dataset ('201509-citibike-tripdata.csv', size=10000, preview
 
     dataset_filename = '%s.annotated.%s.%s.csv' % (dataset_name, 
             size, timestamp)
-    next_df.to_csv('data/%s' % dataset_filename)
+    next_df.to_csv(path.join(s.DATAS_DIR, dataset_filename))
 
     return dataset_filename
 
@@ -172,10 +166,9 @@ def calculate_start_time_buckets(df):
 def add_geocoding_station_data(df):
     ''' Enrich input dataframe with station geolocation data.
 
-
     '''
 
-    station_dataset = 'data/stations_geoloc_data.03262016T1349.csv'
+    station_dataset = path.join(s.DATAS_DIR, 'stations_geoloc_data.03262016T1349.csv')
     station_df = pd.read_csv(station_dataset)
 
 def choose_end_station_label_column(df, label_column):
@@ -204,14 +197,15 @@ def make_geoloc_df():
     "1 Ave & E 78 St", 
     ...]
     '''
-    stations_json_filename = 'data/start_stations_103115.json'
-    stations_json_filename = 'data/start_stations_060416.json'
+    stations_json_filename = path.join(s.DATAS_DIR, 'start_stations_103115.json')
+    stations_json_filename = path.join(s.DATAS_DIR, 'start_stations_060416.json')
 
     stations_df = get_station_geoloc_data(stations_json_filename)
 
     # stations_df.to_excel('data/stations_geoloc_030516.xls')
-    stations_geoloc_data_filename = 'data/stations_geoloc_data.{}.csv'.format(
-        datetime.datetime.now().strftime('%m%d%YT%H%M'))
+    stations_geoloc_data_filename = path.join(s.DATAS_DIR,
+            'stations_geoloc_data.{}.csv'.format(
+                datetime.datetime.now().strftime('%m%d%YT%H%M')))
     stations_geoloc_data_filename
     stations_df.to_csv(stations_geoloc_data_filename)
 
@@ -271,7 +265,7 @@ def prepare_training_and_holdout_datasets(dataset_source):
 
 def run_this_08142016():
 
-    dataset_source = 'data/201509_10-citibike-tripdata.csv'
+    dataset_source = path.join(s.DATAS_DIR, '201509_10-citibike-tripdata.csv')
     all_datasets = prepare_training_and_holdout_datasets(dataset_source)
 
     print all_datasets
