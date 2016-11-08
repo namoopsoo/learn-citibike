@@ -270,4 +270,17 @@ def run_this_08142016():
 
     print all_datasets
 
+def geolocation_binarization_draft(df):
+    file1 = '201509-citibike-tripdata.csv'
+    df = load_data(path.join(s.DATAS_DIR, dataset_filename))
+    df1 = df.sample(n=100)
+    le = LabelEncoder()
+    le.fit(df1['start_neighborhood'])
+
+    starts = le.transform(df1['start_neighborhood']) 
+    starts_arr = np.array([[val] for val in starts])
+    ohe = OneHotEncoder()
+    ohe.fit(starts_arr)
+
+
 
