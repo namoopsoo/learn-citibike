@@ -31,6 +31,9 @@ Predictive power of time, age, gender and start location?
 '''
 import numpy as np
 import pandas as pd
+import itertools
+import datetime
+from copy import deepcopy
 from collections import OrderedDict 
 
 from utils import distance_between_positions, get_start_time_bucket
@@ -38,8 +41,10 @@ from classify import (prepare_datas, grid_search_params,
         build_classifier, run_predictions, run_metrics_on_predictions)
 # from plottings import (plot_age_speed, plot_distance_trip_time)
 
-from pipeline_data import append_travel_stats, load_data
+from pipeline_data import (append_travel_stats, load_data, choose_end_station_label_column)
+from data_store import push_classification_result
 import settings as s
+from os import path
 
 
 def how_good_is_a_route(route):
@@ -60,7 +65,9 @@ def get_total_number_destinations(df):
 
     return num_destinations
 
-def build_classifier_to_predict_destination_station(df, definition):
+def build_classifier_to_predict_destination_station(definition, df,
+        holdout_df=None,
+        ):
     '''
 from citibike_datas import (build_classifier_to_predict_destination_station)
 
@@ -74,13 +81,13 @@ definition = {
     'feature_encoding': {
         # 'borough': 1,
     },
-    'feature_standard_scaling': 1
-    'label_col': s.END_STATION_ID,
-    'classification: 'lr', #  'lr' | 'sgd'
+    'feature_standard_scaling': 1,
+    'label_col': s.NEW_END_NEIGHBORHOOD,
+    'classification': 'lr', #  'lr' | 'sgd'
 }
 
 
-df = load_data('data/201510-citibike-tripdata.csv.annotated.mini.02212016T1641.csv')
+df = load_data(path.join(s.DATAS_DIR, '201510-citibike-tripdata.csv.annotated.mini.02212016T1641.csv'))
 
 results = build_classifier_to_predict_destination_station(df, 
 definition)
@@ -91,7 +98,9 @@ definition)
     #     start time bucket (hour), age, gender and start location,
     pass
 
-    datas = prepare_datas(df, features=definition['features'],
+    datas = prepare_datas(df,
+            holdout_df,
+            features=definition['features'],
             feature_encoding=definition['feature_encoding'],
             feature_standard_scaling=definition['feature_standard_scaling'],
             label_col=definition['label_col'])
@@ -111,7 +120,95 @@ definition)
     classif_metrics = run_metrics_on_predictions(datas['y_test'], y_predictions)
     results['test'] = classif_metrics
 
+
+    if holdout_df is not None:
+        y_holdout_predictions = run_predictions(classifier, datas['X_holdout'])
+        classif_metrics = run_metrics_on_predictions(datas['y_holdout'], y_holdout_predictions)
+        results['holdout'] = classif_metrics
+
+
     return classifier, results
+
+
+def experiment_with_sgd(datasets, holdout_df=None):
+    '''Annotate end station id data using new geolocation meta data and run classification.
+    
+    Geocoding data brings in zip codes, borough names (a.k.a. sub localities) 
+    and neighborhoods. Given that there are 5 boroughs, this makes the classification
+    task much more narrow and focused.
+    '''
+    cols = [s.END_STATION_NAME, s.END_STATION_ID, s.NEW_END_POSTAL_CODE,
+        s.NEW_END_BOROUGH, s.NEW_END_NEIGHBORHOOD]
+
+    features = [
+        s.START_STATION_ID,
+        s.START_TIME_BUCKET,
+        s.AGE_COL_NAME,
+        s.GENDER,] + s.NEW_START_STATION_COLS
+    all_results = []
+    
+    base_definition = {
+        'features': features,
+        'feature_encoding': {
+            s.NEW_END_STATE: 1, s.NEW_END_BOROUGH: 1,
+            s.NEW_END_NEIGHBORHOOD: 1, s.NEW_END_STATION_NAME: 1,
+            s.NEW_START_STATE: 1,
+            s.NEW_START_BOROUGH: 1,
+            s.NEW_START_NEIGHBORHOOD: 1,
+            s.NEW_START_STATION_NAME: 1
+        },
+    }
+
+    num = 0
+    for dataset_detail, feature_scaling, label_column, classification in itertools.product(
+            datasets,
+            [1], [
+                    #s.NEW_END_BOROUGH, s.NEW_END_POSTAL_CODE,
+                        s.NEW_END_NEIGHBORHOOD, ],
+            [
+                'sgd_grid', 
+                'lr',
+                'sgd',
+            ]):
+        dataset_filename = dataset_detail['name']
+        df = load_data(path.join(s.DATAS_DIR, dataset_filename))
+        
+        delta_definition = {
+            'dataset_name': dataset_detail['name'],
+            'dataset_size': dataset_detail['size'],
+            'feature_standard_scaling': feature_scaling,
+            'label_col': label_column,
+            'classification': classification,
+        }
+        print 'starting num ', num, delta_definition
+        
+        definition = deepcopy(base_definition)
+        definition.update(delta_definition)
+
+        annotated_df = choose_end_station_label_column(df, label_column)
+        if holdout_df is not None:
+            holdout_df_annotated = choose_end_station_label_column(
+                    holdout_df, label_column)
+        else:
+            holdout_df_annotated = None
+        
+        clf, results = build_classifier_to_predict_destination_station(
+                                                                definition,
+                                                                annotated_df,
+                                                                holdout_df_annotated,
+                                                                )
+        meta = {'date': datetime.datetime.now().strftime('%m%d%YT%H%MZEST')}
+
+        all_results.append([meta, delta_definition, results])
+        num += 1
+
+        full_result = {'meta': meta,
+                       'delta_definition': delta_definition,
+                       'results': results,
+                       'definition': definition,}
+        push_classification_result(full_result)
+        
+    return all_results
 
 
 def predict_destination(df):
@@ -200,7 +297,7 @@ def analyze_trip_destination_stats(df):
 
 
 if __name__ == '__main__':
-    df = load_data('foo.csv', num_rows=2000)
+    df = load_data(path.join(s.DATAS_DIR, 'foo.csv'), num_rows=2000)
 
     import ipdb; ipdb.set_trace()
     df = append_travel_stats(df)
