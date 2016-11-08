@@ -1,12 +1,13 @@
 
 import pandas as pd
+import numpy as np
 from os import path
 import json
 import datetime
 from utils import calc_speeds
 from utils import (distance_between_positions, get_start_time_bucket, 
                 which_col_have_nulls)
-
+from sklearn.preprocessing import OneHotEncoder
 from annotate_geolocation import annotate_df_with_geoloc
 
 from get_station_geolocation_data import get_station_geoloc_data
@@ -270,17 +271,30 @@ def run_this_08142016():
 
     print all_datasets
 
-def geolocation_binarization_draft(df):
-    file1 = '201509-citibike-tripdata.csv'
-    df = load_data(path.join(s.DATAS_DIR, dataset_filename))
-    df1 = df.sample(n=100)
-    le = LabelEncoder()
-    le.fit(df1['start_neighborhood'])
+def feature_binarization(df, one_hot_encoding):
+    '''
+    Create a new df which has encoded the columns specified in one_hot_encoding dict.
 
-    starts = le.transform(df1['start_neighborhood']) 
-    starts_arr = np.array([[val] for val in starts])
-    ohe = OneHotEncoder()
-    ohe.fit(starts_arr)
+    EXPECTING: df values are already went through LabelEncode() . i.e. no strings.
+    '''
+    oh_encoders = {}
 
+    for col in one_hot_encoding:
+        col_arr = np.array([[val] for val in df[col]])
 
+        oh_encoders[col] = OneHotEncoder()
+        out = oh_encoders[col].fit_transform(col_arr)
+
+        # Give the output columnar df same index, for easy concatenation.
+        hot_encoded = pd.DataFrame(out.toarray(), index=df.index)
+
+        # Delete that original col.
+        df.drop(col, axis=1, inplace=True)
+
+        # attach new columns to original df...
+        df_hot = pd.concat([df, hot_encoded], axis=1)
+
+        df = df_hot
+
+    return df
 
