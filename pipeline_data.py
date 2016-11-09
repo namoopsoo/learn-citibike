@@ -89,7 +89,10 @@ pl.create_annotated_dataset ('201509-citibike-tripdata.csv', size=10000, preview
     elif dataset_df is not None:
         # FIXME >.. if size is None, then dont need to sample,
         #   since other wise the default will be n=1
+        if size is None:
+            size = dataset_df.shape[0]
         df = dataset_df.sample(n=size)
+        df = re_index(df)
     else:
         raise Exception, 'need a source'
 
@@ -129,6 +132,7 @@ def append_travel_stats(df):
         dist_travelled = calc_distance_travelled_col(df)
         df[s.DISTANCE_TRAVELED_COL_NAME] = pd.Series(dist_travelled)
 
+        # FIXME ... if shape of df is 1 row, then the assertion fails
         assert not which_col_have_nulls(df)
 
     if recalculate_dict[s.SPEED_COL_NAME]:
@@ -243,19 +247,29 @@ def make_new_datasets(dataset_source_df, dry_run=True):
     return datasets
     
 
-def prepare_training_and_holdout_datasets(dataset_source):
+def prepare_training_and_holdout_datasets(dataset_source_name):
+    '''
+    NOTE: this func expects an annotated and de-nulled file.
+    '''
+    dataset_source = path.join(s.DATAS_DIR, dataset_source_name)
     full_df = load_data(dataset_source)
 
-    holdout_df = full_df.sample(n=100000)
+    holdout_size = 100000
+    holdout_df = full_df.sample(n=holdout_size)
 
-    # take out the holdout rows.
+    # Do i need to be reindexing here ? 
+    holdout_df = re_index(holdout_df)
+
+    # Take out the holdout rows.
     full_df.drop(holdout_df.index, inplace=True, axis=0)
+    full_df = re_index(full_df)
 
     # And make annotated from that holdout.
     annotated_holdout_filename = create_annotated_dataset(
-            dataset_df=holdout_df)
+            dataset_df=holdout_df, size=holdout_size)
 
-    train_datasets = make_new_datasets(full_df)
+    # TODO: why didnt this func need resampling when annotating datasets? 
+    train_datasets = make_new_datasets(full_df, dry_run=False)
 
     all_datasets = {
             'holdout_dataset': annotated_holdout_filename,
