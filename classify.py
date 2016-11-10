@@ -156,7 +156,7 @@ preparing a holdout set:
         if X_holdout is not None:
             X_holdout = feature_binarization(X_holdout, one_hot_encoding)
 
-    # FIXME ... use the appropriate LabelEncoder here.
+    # FIXME ... use the appropriate LabelEncoder here. Unless already done by the t_t_split()
     if label_col:
         y = df[label_col]
 

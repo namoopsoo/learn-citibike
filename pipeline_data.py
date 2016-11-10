@@ -89,8 +89,10 @@ pl.create_annotated_dataset ('201509-citibike-tripdata.csv', size=10000, preview
     elif dataset_df is not None:
         # FIXME >.. if size is None, then dont need to sample,
         #   since other wise the default will be n=1
+        min_size = dataset_df.shape[0]
         if size is None:
-            size = dataset_df.shape[0]
+            size = min_size
+        size = min(size, min_size)
         df = dataset_df.sample(n=size)
         df = re_index(df)
     else:

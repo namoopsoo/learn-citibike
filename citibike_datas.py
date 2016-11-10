@@ -41,7 +41,8 @@ from classify import (prepare_datas, grid_search_params,
         build_classifier, run_predictions, run_metrics_on_predictions)
 # from plottings import (plot_age_speed, plot_distance_trip_time)
 
-from pipeline_data import (append_travel_stats, load_data, choose_end_station_label_column)
+from pipeline_data import (append_travel_stats, load_data, choose_end_station_label_column,
+        prepare_training_and_holdout_datasets)
 from data_store import push_classification_result
 import settings as s
 from os import path
@@ -93,17 +94,21 @@ results = build_classifier_to_predict_destination_station(df,
 definition)
 
     '''
-
     # Extract only the relevant data columns,
     #     start time bucket (hour), age, gender and start location,
-    pass
+
+    datas_definition = {k: definition[k] for k in definition.keys()
+            if k in ['features', 'feature_encoding',
+                'feature_standard_scaling', 'label_col', 'one_hot_encoding'
+                ]}
 
     datas = prepare_datas(df,
             holdout_df,
-            features=definition['features'],
-            feature_encoding=definition['feature_encoding'],
-            feature_standard_scaling=definition['feature_standard_scaling'],
-            label_col=definition['label_col'])
+            # features=definition['features'],
+            # feature_encoding=definition['feature_encoding'],
+            # feature_standard_scaling=definition['feature_standard_scaling'],
+            # label_col=definition['label_col'],
+            **datas_definition)
 
     # also need to account for filling in missing data in the holdout set.
 
@@ -211,7 +216,19 @@ def experiment_with_sgd(datasets, holdout_df=None):
     return all_results
 
 
-def experiment_with_binarizing_start_station(datasets, holdout_df=None):
+def experiment_with_binarizing_start_station():
+
+    # Make some datasets to experimenet with.
+    file2 = '201509-citibike-tripdata.csv'
+    all_datasets = prepare_training_and_holdout_datasets(file2)
+    holdout_df_name = all_datasets['holdout_dataset']
+
+    holdout_df = load_data(path.join(s.DATAS_DIR, holdout_df_name))
+    datasets = all_datasets['train_datasets']
+    _helper_experiment_with_binarizing_start_station(datasets, holdout_df)
+
+def _helper_experiment_with_binarizing_start_station(datasets, holdout_df=None):
+
 
     cols = [s.END_STATION_NAME, s.END_STATION_ID, s.NEW_END_POSTAL_CODE,
         s.NEW_END_BOROUGH, s.NEW_END_NEIGHBORHOOD]
@@ -239,15 +256,18 @@ def experiment_with_binarizing_start_station(datasets, holdout_df=None):
     }
 
     num = 0
-    for dataset_detail, feature_scaling, label_column, classification in itertools.product(
+    for dataset_detail, feature_scaling, one_hot_encoding, label_column, classification in itertools.product(
             datasets,
             [1], [
+                {s.NEW_START_NEIGHBORHOOD: 1,},
+                None
+                ], [
                     #s.NEW_END_BOROUGH, s.NEW_END_POSTAL_CODE,
                         s.NEW_END_NEIGHBORHOOD, ],
             [
-                'sgd_grid', 
-                'lr',
+                #'sgd_grid', 
                 'sgd',
+                'lr',
             ]):
         dataset_filename = dataset_detail['name']
         df = load_data(path.join(s.DATAS_DIR, dataset_filename))
@@ -256,6 +276,7 @@ def experiment_with_binarizing_start_station(datasets, holdout_df=None):
             'dataset_name': dataset_detail['name'],
             'dataset_size': dataset_detail['size'],
             'feature_standard_scaling': feature_scaling,
+            'one_hot_encoding': one_hot_encoding,
             'label_col': label_column,
             'classification': classification,
         }
