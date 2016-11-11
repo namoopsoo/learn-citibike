@@ -104,10 +104,6 @@ definition)
 
     datas = prepare_datas(df,
             holdout_df,
-            # features=definition['features'],
-            # feature_encoding=definition['feature_encoding'],
-            # feature_standard_scaling=definition['feature_standard_scaling'],
-            # label_col=definition['label_col'],
             **datas_definition)
 
     # also need to account for filling in missing data in the holdout set.
@@ -217,7 +213,6 @@ def experiment_with_sgd(datasets, holdout_df=None):
 
 
 def experiment_with_binarizing_start_station():
-
     # Make some datasets to experimenet with.
     file2 = '201509-citibike-tripdata.csv'
     all_datasets = prepare_training_and_holdout_datasets(file2)
@@ -394,67 +389,6 @@ def analyze_trip_destination_stats(df):
     # ...  
     #   => Given that for 10/2015, there are 1065766 trips,
     #   and 955606 distinct kinds of trips, for the people making these trips.
-
-def foo_binarize_foo():
-    '''
-    from pipeline_data import feature_binarization
-file1 = '201509-citibike-tripdata.csv.annotated.1048431.11072016T1739.csv'
-import pipeline_data as pl
-from os import path
-import settings as s
-s.DATAS_DIR
-df = load_data(path.join(s.DATAS_DIR, file1))
-from pipeline_data import load_data, create_annotated_dataset
-df = load_data(path.join(s.DATAS_DIR, file1))
-one_hot_encoding = {
-            s.NEW_START_NEIGHBORHOOD: 1}
-feature_encoding = {
-            s.NEW_END_STATE: 1, s.NEW_END_BOROUGH: 1,
-            s.NEW_END_NEIGHBORHOOD: 1, s.NEW_END_STATION_NAME: 1,
-            s.NEW_START_STATE: 1,
-            s.NEW_START_BOROUGH: 1,
-            s.NEW_START_NEIGHBORHOOD: 1,
-            s.NEW_START_STATION_NAME: 1}
-features = [
-        s.START_STATION_ID,
-        s.START_TIME_BUCKET,
-        s.AGE_COL_NAME,
-        s.GENDER,] + s.NEW_START_STATION_COLS
-df1 = df.sample(n=100)
-X = df1[features]
-X1 = df1[features]
-from classify import build_label_encoders_from_df
-X1, label_encoders = build_label_encoders_from_df(X1, feature_encoding)
-X2 = feature_binarization(X1, one_hot_encoding)
-X1.shape, X2.shape
-type(X1)
-X2.to_csv('/Users/michal/Downloads/bla_20161108.1.csv')
-df1[s.NEW_END_NEIGHBORHOOD][:4]
-from classify import (prepare_datas)
-definition = {
-    'features': features,
-    'feature_encoding': {
-        s.NEW_END_STATE: 1, s.NEW_END_BOROUGH: 1,
-        s.NEW_END_NEIGHBORHOOD: 1, s.NEW_END_STATION_NAME: 1,
-        s.NEW_START_STATE: 1,
-        s.NEW_START_BOROUGH: 1,
-        s.NEW_START_NEIGHBORHOOD: 1,
-        s.NEW_START_STATION_NAME: 1
-    },
-    'one_hot_encoding': {
-        s.NEW_START_NEIGHBORHOOD: 1,
-        },
-}
-datas = prepare_datas(df,None, definition['features'],
-definition['feature_encoding'],1, s.NEW_END_NEIGHBORHOOD)
-
-datas = prepare_datas(df,None, definition['features'],
-definition['feature_encoding'],1, s.NEW_END_NEIGHBORHOOD)
-datas.keys()
-datas['y'][:5]
-datas['y_train'][:5]
-datas['y_test'][:5]
-    '''
 
 
 if __name__ == '__main__':
