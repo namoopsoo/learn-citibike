@@ -1,12 +1,13 @@
 
 import pandas as pd
+import numpy as np
 from os import path
 import json
 import datetime
 from utils import calc_speeds
 from utils import (distance_between_positions, get_start_time_bucket, 
                 which_col_have_nulls)
-
+from sklearn.preprocessing import OneHotEncoder
 from annotate_geolocation import annotate_df_with_geoloc
 
 from get_station_geolocation_data import get_station_geoloc_data
@@ -73,7 +74,7 @@ def calc_distance_travelled_col(df):
 
     return distances
 
-def create_annotated_dataset(dataset_name=None,
+def create_annotated_dataset(identifier=None, dataset_name=None,
         dataset_df=None,
         preview_too=True, size=None):
     '''
@@ -88,7 +89,12 @@ pl.create_annotated_dataset ('201509-citibike-tripdata.csv', size=10000, preview
     elif dataset_df is not None:
         # FIXME >.. if size is None, then dont need to sample,
         #   since other wise the default will be n=1
+        min_size = dataset_df.shape[0]
+        if size is None:
+            size = min_size
+        size = min(size, min_size)
         df = dataset_df.sample(n=size)
+        df = re_index(df)
     else:
         raise Exception, 'need a source'
 
@@ -104,8 +110,8 @@ pl.create_annotated_dataset ('201509-citibike-tripdata.csv', size=10000, preview
 
     timestamp = datetime.datetime.now().strftime('%m%d%YT%H%M')
 
-    dataset_filename = '%s.annotated.%s.%s.csv' % (dataset_name, 
-            size, timestamp)
+    dataset_filename = '%s.annotated.%s.%s.%s.csv' % (dataset_name, 
+            identifier, size, timestamp)
     next_df.to_csv(path.join(s.DATAS_DIR, dataset_filename))
 
     return dataset_filename
@@ -128,6 +134,7 @@ def append_travel_stats(df):
         dist_travelled = calc_distance_travelled_col(df)
         df[s.DISTANCE_TRAVELED_COL_NAME] = pd.Series(dist_travelled)
 
+        # FIXME ... if shape of df is 1 row, then the assertion fails
         assert not which_col_have_nulls(df)
 
     if recalculate_dict[s.SPEED_COL_NAME]:
@@ -218,11 +225,11 @@ def create_datasets_from_sizes(dataset_source_df, sizes, dry_run=True):
     datasets = []
 
     for size in sizes:
-
         if dry_run:
             name = 'd.%s.csv' % size
         else:
             name = create_annotated_dataset(
+                    identifier='test',
                     dataset_df=dataset_source_df, 
                     size=size, preview_too=False)
 
@@ -234,7 +241,7 @@ def make_new_datasets(dataset_source_df, dry_run=True):
     # dataset_source = '201509_10-citibike-tripdata.csv'
 
     sizes = []
-    for i in range(1, 11):
+    for i in range(1, 12, 2):
         sizes.append(i*10**5)
 
     datasets = create_datasets_from_sizes(dataset_source_df,
@@ -242,19 +249,30 @@ def make_new_datasets(dataset_source_df, dry_run=True):
     return datasets
     
 
-def prepare_training_and_holdout_datasets(dataset_source):
+def prepare_training_and_holdout_datasets(dataset_source_name):
+    '''
+    NOTE: this func expects an annotated and de-nulled file.
+    '''
+    dataset_source = path.join(s.DATAS_DIR, dataset_source_name)
     full_df = load_data(dataset_source)
 
-    holdout_df = full_df.sample(n=100000)
+    holdout_size = 100000
+    holdout_df = full_df.sample(n=holdout_size)
 
-    # take out the holdout rows.
+    # Do i need to be reindexing here ? 
+    holdout_df = re_index(holdout_df)
+
+    # Take out the holdout rows.
     full_df.drop(holdout_df.index, inplace=True, axis=0)
+    full_df = re_index(full_df)
 
     # And make annotated from that holdout.
     annotated_holdout_filename = create_annotated_dataset(
-            dataset_df=holdout_df)
+            identifier='holdout',
+            dataset_df=holdout_df, size=holdout_size)
 
-    train_datasets = make_new_datasets(full_df)
+    # TODO: why didnt this func need resampling when annotating datasets? 
+    train_datasets = make_new_datasets(full_df, dry_run=False)
 
     all_datasets = {
             'holdout_dataset': annotated_holdout_filename,
@@ -270,4 +288,46 @@ def run_this_08142016():
 
     print all_datasets
 
+
+def make_one_hot_encoders(df, one_hot_encoding):
+    oh_encoders = {}
+    for col in one_hot_encoding:
+        col_arr = np.array([[val] for val in df[col]])
+
+        oh_encoders[col] = OneHotEncoder()
+        oh_encoders[col].fit(col_arr)
+
+    return oh_encoders
+
+
+def feature_binarization(df, oh_encoders):
+    '''
+    Create a new df which has encoded the columns specified in one_hot_encoding dict.
+
+    EXPECTING: df values are already went through LabelEncode() . i.e. no strings.
+    '''
+    # oh_encoders = {}
+    # TODO... new col names with base of original to support more than one such encoding.
+
+    for col in oh_encoders:
+        col_arr = np.array([[val] for val in df[col]])
+
+        # oh_encoders[col] = OneHotEncoder()
+        out = oh_encoders[col].transform(col_arr)
+
+        # Give the output columnar df same index, for easy concatenation.
+        num_new_cols = out.shape[1]
+        hot_encoded = pd.DataFrame(out.toarray(), index=df.index,
+                columns=['{}_{}'.format(col, i)
+                    for i in range(num_new_cols)])
+
+        # Delete that original col.
+        df.drop(col, axis=1, inplace=True)
+
+        # attach new columns to original df...
+        df_hot = pd.concat([df, hot_encoded], axis=1)
+
+        df = df_hot
+
+    return df
 

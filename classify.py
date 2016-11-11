@@ -15,7 +15,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.grid_search import GridSearchCV
 
 from pipeline_data import (remove_rows_with_nulls,
-        re_index)
+        re_index, feature_binarization, make_one_hot_encoders)
 
 
 from utils import dump_np_array
@@ -78,6 +78,9 @@ def build_label_encoders_from_df(df, feature_encoding):
         else:
             raise Exception, 'unknown dtype' + str(dtype)
 
+        # The missing value is fit as the last value in the label encoder. 
+        #   So then when a new value is encountered afterwards, it is changed
+        #   into the missing value.
         label_encoders[feature].fit(
                         np.concatenate([dfcopy[feature], np.array([missing_val])])
                         )
@@ -102,7 +105,7 @@ def replace_unknown(values, dtype):
 
 def prepare_datas(df, holdout_df=None, features=None, feature_encoding=None,
         feature_standard_scaling=None,
-        label_col=None):
+        label_col=None, one_hot_encoding=None):
     '''
 ipdb> pp classifier.fit(np.array(datas['X_train']), 
                     np.array(datas['y_train'][u'end station id']))
@@ -124,12 +127,13 @@ preparing a holdout set:
 
     if feature_encoding:
         label_encoders = {}
+
+        # Get the encoed dataframe.
         dfcopy, label_encoders = build_label_encoders_from_df(df, feature_encoding)
         df = dfcopy
 
         if holdout_df is not None:
             holdout_df = encode_holdout_df(holdout_df, label_encoders, feature_encoding)
-
 
     if features:
         X = df[features]
@@ -142,6 +146,18 @@ preparing a holdout set:
         if holdout_df is not None:
             X_holdout = holdout_df[holdout_df.columns[:-1]]
 
+    # One hot here.
+    if one_hot_encoding:
+        # For each input feature being encoded, we want the new columns concatenated
+        #   into the output.
+        oh_encoders = make_one_hot_encoders(X, one_hot_encoding)
+        X = feature_binarization(X, oh_encoders)
+
+        if X_holdout is not None:
+            # X_holdout = feature_binarization(X_holdout, one_hot_encoding)
+            X_holdout = feature_binarization(X_holdout, oh_encoders)
+
+    # FIXME ... use the appropriate LabelEncoder here. Unless already done by the t_t_split()
     if label_col:
         y = df[label_col]
 
