@@ -222,13 +222,15 @@ def experiment_with_binarizing_start_station():
     file2 = '201509-citibike-tripdata.csv'
     all_datasets = prepare_training_and_holdout_datasets(file2)
     holdout_df_name = all_datasets['holdout_dataset']
-
-    holdout_df = load_data(path.join(s.DATAS_DIR, holdout_df_name))
     datasets = all_datasets['train_datasets']
-    _helper_experiment_with_binarizing_start_station(datasets, holdout_df)
+    print 'all_datasets', all_datasets
+    _helper_experiment_with_binarizing_start_station(datasets, holdout_df_name)
 
-def _helper_experiment_with_binarizing_start_station(datasets, holdout_df=None):
-
+def _helper_experiment_with_binarizing_start_station(datasets, holdout_df_name=None):
+    if holdout_df_name:
+        holdout_df = load_data(path.join(s.DATAS_DIR, holdout_df_name))
+    else:
+        holdout_df = None
 
     cols = [s.END_STATION_NAME, s.END_STATION_ID, s.NEW_END_POSTAL_CODE,
         s.NEW_END_BOROUGH, s.NEW_END_NEIGHBORHOOD]
@@ -250,23 +252,25 @@ def _helper_experiment_with_binarizing_start_station(datasets, holdout_df=None):
             s.NEW_START_NEIGHBORHOOD: 1,
             s.NEW_START_STATION_NAME: 1
         },
-        'one_hot_encoding': {
-            s.NEW_START_NEIGHBORHOOD: 1,
-            },
+        'one_hot_encoding': None,
     }
 
     num = 0
     for dataset_detail, feature_scaling, one_hot_encoding, label_column, classification in itertools.product(
             datasets,
             [1], [
-                {s.NEW_START_NEIGHBORHOOD: 1,},
-                None
+                # {s.NEW_START_NEIGHBORHOOD: 1,},
+                {
+                    s.NEW_START_NEIGHBORHOOD: 1, 
+                    s.START_STATION_ID: 1,
+                    },
+                # None
                 ], [
                     #s.NEW_END_BOROUGH, s.NEW_END_POSTAL_CODE,
-                        s.NEW_END_NEIGHBORHOOD, ],
+                        s.NEW_END_NEIGHBORHOOD,],
             [
                 #'sgd_grid', 
-                'sgd',
+                # 'sgd',
                 'lr',
             ]):
         dataset_filename = dataset_detail['name']

@@ -15,7 +15,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.grid_search import GridSearchCV
 
 from pipeline_data import (remove_rows_with_nulls,
-        re_index, feature_binarization)
+        re_index, feature_binarization, make_one_hot_encoders)
 
 
 from utils import dump_np_array
@@ -135,7 +135,6 @@ preparing a holdout set:
         if holdout_df is not None:
             holdout_df = encode_holdout_df(holdout_df, label_encoders, feature_encoding)
 
-
     if features:
         X = df[features]
 
@@ -151,10 +150,12 @@ preparing a holdout set:
     if one_hot_encoding:
         # For each input feature being encoded, we want the new columns concatenated
         #   into the output.
-        X = feature_binarization(X, one_hot_encoding)
+        oh_encoders = make_one_hot_encoders(X, one_hot_encoding)
+        X = feature_binarization(X, oh_encoders)
 
         if X_holdout is not None:
-            X_holdout = feature_binarization(X_holdout, one_hot_encoding)
+            # X_holdout = feature_binarization(X_holdout, one_hot_encoding)
+            X_holdout = feature_binarization(X_holdout, oh_encoders)
 
     # FIXME ... use the appropriate LabelEncoder here. Unless already done by the t_t_split()
     if label_col:

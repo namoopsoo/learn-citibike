@@ -61,7 +61,7 @@ def _df_from_results(results_list):
             value = result['accuracy_score']
             row_dict.update({key_: value})
 
-        result_meta = result.get('meta', {})
+        result_meta = row.get('meta', {})
         result_date = result_meta.get('date', '')
         row_dict.update({'result_date': result_date})
         
