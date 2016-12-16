@@ -21,6 +21,7 @@ DISTANCE_TRAVELED_COL_NAME = 'distance travelled'
 SPEED_COL_NAME = 'speed'
 AGE_COL_NAME = 'age'
 START_TIME_BUCKET = "starttime_bucket"
+START_TIME_CLUSTER = "starttime_cluster"
 
 
 NEW_START_POSTAL_CODE = 'start_postal_code'

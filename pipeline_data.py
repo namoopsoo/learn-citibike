@@ -154,7 +154,42 @@ def append_travel_stats(df):
 
         assert not which_col_have_nulls(df)
 
+    # Start_time_bucket cluster
+    mapper_source = path.join(s.RESULTS_DIR, 'starttime_clustering/out1.json') 
+    mapping_dict = json.load(open(mapper_source))
+    mapper = make_starttime_cluster_mapper(df, mapping_dict)
+
+    df[s.START_TIME_CLUSTER] = df[s.START_TIME_BUCKET].apply(mapper)
+
     return df
+
+def make_starttime_cluster_mapper(df, mapping_dict):
+    all_possible_buckets = range(24*7)
+
+    unfilled_keys = list(
+            set(all_possible_buckets) - set(mapping_dict.keys()))
+
+    missing_dict = {k: -1 for k in unfilled_keys}
+    assert set(unfilled_keys) & set(mapping_dict.keys()) == set()
+    mapping_dict.update(missing_dict)
+    #def mapper(k):
+    #    return mapping_dict[k]
+    mapper = lambda k: mapping_dict[k]
+
+    return mapper
+
+def make_simple_starttime_cluster_map():
+
+    raw_filename = path.join(s.RESULTS_DIR, 'starttime_clustering/out1.csv') 
+    mapper_filename = path.join(s.RESULTS_DIR, 'starttime_clustering/out1.json') 
+
+    raw_df = pd.read_csv(raw_filename)
+    simple_starttime_cluster_map = {
+            raw_df.ix[i, 'starttime_bucket']:raw_df.ix[i, 'kmeans_2'] for i in raw_df.index}
+
+    # Then may want to keep the map as a json for easier consumption.
+    json_out = path.join(s.RESULTS_DIR, 'starttime_clustering/out1.json')
+    json.dump(simple_starttime_cluster_map, open(json_out, 'w'))
 
 def calculate_start_time_buckets(df):
 
@@ -298,6 +333,80 @@ def make_one_hot_encoders(df, one_hot_encoding):
         oh_encoders[col].fit(col_arr)
 
     return oh_encoders
+
+
+def find_start_time_clusters(df):
+    start_time = 'starttime'
+    start_time_bucket = 'starttime_bucket'
+
+    # Use some hand picked clusters for now
+
+    mapping = {
+            []: 0,
+            }
+
+def hmmmm():
+
+    le = LabelEncoder()
+    '''
+    # start with a full df.
+
+In [41]: df.loc[91000:91010]
+Out[41]: 
+       starttime_bucket end_neighborhood  end_neighborhood_id
+91000               113     Clinton Hill                    7
+91001               107     Clinton Hill                    7
+91002                12     Clinton Hill                    7
+91003               147     Clinton Hill                    7
+91004               156     Clinton Hill                    7
+91005               115     Clinton Hill                    7
+91006                41     Clinton Hill                    7
+91007                89     Clinton Hill                    7
+91008                42     Clinton Hill                    7
+91009               109     Clinton Hill                    7
+91010               133     Clinton Hill                    7
+
+In [42]: kmeans = KMeans(n_clusters=2, random_state=0)
+
+In [47]: df1.head()
+Out[47]: 
+   starttime_bucket  end_neighborhood_id
+0                19                   19
+1                42                   19
+2               107                   19
+3               110                   19
+4               135                   19
+
+In [48]: 
+
+In [48]: kmeans.fit(df1)
+Out[48]: 
+KMeans(copy_x=True, init='k-means++', max_iter=300, n_clusters=2, n_init=10,
+    n_jobs=1, precompute_distances='auto', random_state=0, tol=0.0001,
+    verbose=0)
+
+In [49]: df1.shape
+Out[49]: (93978, 2)
+
+In [50]: kmeans.labels_.shape
+Out[50]: (93978,)
+
+In [51]: kmeans.labels_[:5]
+Out[51]: array([1, 1, 0, 0, 0], dtype=int32)
+
+In [52]: df['kmeans_2'] = kmeans.labels_
+
+
+In [53]: df.columns
+Out[53]: 
+Index([u'starttime_bucket', u'end_neighborhood', u'end_neighborhood_id',
+       u'kmeans_2'],
+      dtype='object')
+
+In [54]: df.to_csv('data/results/starttime_clustering/out1.csv')
+
+
+    '''
 
 
 def feature_binarization(df, oh_encoders):
