@@ -283,3 +283,41 @@ def run_metrics_on_predictions(y_true, y_predictions):
 
     return results
 
+
+def predict_ranked(clf, X):
+    '''
+    in this case, clf is most likely a Pipeline()
+
+    in a specific case where the 0th step is a classifier,
+    LogisticRegression() for example, then 
+
+    clf.steps[0][1].classes_ , will produce the classes known by the classifier,
+
+    In [57]: clf.steps[0][1].classes_
+    Out[57]: 
+    array([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17,
+           18, 19, 20, 21, 22, 23, 24, 25, 26, 27])
+    
+
+
+    '''
+
+    y_preds_probs = clf.predict_proba(X)
+
+    num_classes = y_preds_probs.shape[1]
+    # The classes are numbered from 1 not 0!
+    num_rows, num_cols = y_preds_probs.shape
+
+    A_marked = [[(j + 1, y_preds_probs[i,j]) for j in range(num_cols)]
+            for i in range(num_rows)]
+
+
+    A_sorted = np.array([sorted(A_marked[i], key=lambda x:x[1],
+        reverse=True)
+        for i in range(num_rows)])
+
+    A_unmarked = A_sorted[:,:,:1].reshape(num_rows, num_cols)
+
+    return A_unmarked
+
+

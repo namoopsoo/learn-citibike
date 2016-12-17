@@ -237,11 +237,11 @@ def create_datasets_from_sizes(dataset_source_df, sizes, dry_run=True):
         datasets.append(definition)
     return datasets
 
-def make_new_datasets(dataset_source_df, dry_run=True):
+def make_new_datasets(dataset_source_df, max_multiplier=12, dry_run=True):
     # dataset_source = '201509_10-citibike-tripdata.csv'
 
     sizes = []
-    for i in range(1, 12, 2):
+    for i in range(1, max_multiplier, 2):
         sizes.append(i*10**5)
 
     datasets = create_datasets_from_sizes(dataset_source_df,
@@ -249,7 +249,8 @@ def make_new_datasets(dataset_source_df, dry_run=True):
     return datasets
     
 
-def prepare_training_and_holdout_datasets(dataset_source_name):
+def prepare_training_and_holdout_datasets(dataset_source_name,
+        max_multiplier):
     '''
     NOTE: this func expects an annotated and de-nulled file.
     '''
@@ -272,7 +273,8 @@ def prepare_training_and_holdout_datasets(dataset_source_name):
             dataset_df=holdout_df, size=holdout_size)
 
     # TODO: why didnt this func need resampling when annotating datasets? 
-    train_datasets = make_new_datasets(full_df, dry_run=False)
+    train_datasets = make_new_datasets(full_df,
+            max_multiplier=max_multiplier, dry_run=False)
 
     all_datasets = {
             'holdout_dataset': annotated_holdout_filename,

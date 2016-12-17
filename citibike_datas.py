@@ -215,7 +215,8 @@ def experiment_with_sgd(datasets, holdout_df=None):
 def experiment_with_binarizing_start_station():
     # Make some datasets to experimenet with.
     file2 = '201509-citibike-tripdata.csv'
-    all_datasets = prepare_training_and_holdout_datasets(file2)
+    all_datasets = prepare_training_and_holdout_datasets(file2,
+            max_multiplier=12)
     holdout_df_name = all_datasets['holdout_dataset']
     datasets = all_datasets['train_datasets']
     print 'all_datasets', all_datasets
