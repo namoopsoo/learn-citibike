@@ -113,18 +113,24 @@ definition)
     classifier = build_classifier(definition, datas)
     classifier.fit(datas['X_train'], datas['y_train'])
 
-    y_predictions = run_predictions(classifier, datas['X_train'])
-    classif_metrics = run_metrics_on_predictions(datas['y_train'], y_predictions)
+    y_predictions, y_ranked_predictions = run_predictions(
+            classifier, datas['X_train'])
+    classif_metrics = run_metrics_on_predictions(datas['y_train'],
+            y_predictions, y_ranked_predictions)
     results['training'] = classif_metrics
 
-    y_predictions = run_predictions(classifier, datas['X_test'])
-    classif_metrics = run_metrics_on_predictions(datas['y_test'], y_predictions)
+    y_predictions, y_ranked_predictions = run_predictions(
+            classifier, datas['X_test'])
+    classif_metrics = run_metrics_on_predictions(datas['y_test'],
+            y_predictions, y_ranked_predictions)
     results['test'] = classif_metrics
 
 
     if holdout_df is not None:
-        y_holdout_predictions = run_predictions(classifier, datas['X_holdout'])
-        classif_metrics = run_metrics_on_predictions(datas['y_holdout'], y_holdout_predictions)
+        y_holdout_predictions, y_holdout_ranked_predictions = run_predictions(
+            classifier, datas['X_holdout'])
+        classif_metrics = run_metrics_on_predictions(datas['y_holdout'],
+                y_holdout_predictions, y_holdout_ranked_predictions)
         results['holdout'] = classif_metrics
 
 

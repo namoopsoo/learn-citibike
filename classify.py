@@ -264,9 +264,35 @@ def build_classifier(definition, datas):
 
 def run_predictions(classifier, X):
     y_predictions = classifier.predict(X)
-    return y_predictions
 
-def run_metrics_on_predictions(y_true, y_predictions):
+    y_ranked_predictions = predict_ranked(classifier, X)
+
+    return y_predictions, y_ranked_predictions 
+
+def k_rank_accuracy(y_true, y_ranked_predictions, k=1):
+    '''
+    Returns the ratio of k-rank correct predictions,
+    such k-rank correct is correct if a prediction is in the top-k ranked predictions.
+
+
+    If k given is greater than number of classes, then set to that
+    (Although that is expected to give a k rank accuracy of 1.)
+    '''
+    num_samples = y_true.shape[0]
+    k = min(k, num_samples)
+    correct = [
+            y_true[i] in y_ranked_predictions[i][:k]
+            for i in range(num_samples)
+            ]
+
+    k_accuracy = sum(correct)*1.0/num_samples
+
+    return k_accuracy
+
+    
+
+def run_metrics_on_predictions(y_true, y_predictions,
+        y_ranked_predictions):
 
     my_metrics = [accuracy_score, f1_score, 
         roc_curve, recall_score, precision_score]
@@ -281,8 +307,12 @@ def run_metrics_on_predictions(y_true, y_predictions):
         except ValueError as e:
             print 'couldnt run metrik ', metrik, ' => ', e
 
-    return results
+    # Additional home grown metric...
+    for k in [2, 3, 4, 5]:
+        result = k_rank_accuracy(y_true, y_ranked_predictions, k)
+        results['accuracy_k_{}'.format(k)] = result
 
+    return results
 
 def predict_ranked(clf, X):
     '''
