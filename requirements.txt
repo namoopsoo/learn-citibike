@@ -1,0 +1,7 @@
+requests==2.18.4
+hiredis==0.2.0
+redis==2.10.6
+ipython==5.5.0
+ipdb==0.10.3
+numpy==1.13.1
+pandas==0.20.3

@@ -71,30 +71,26 @@ def get_geocoding_results(address, overwrite_cache=False):
     '''
    
     # look up on redis first
-    GEO_RAW_RESULTS = 'geolocation_raw_results'
-    cached_response = redis_client.hget(GEO_RAW_RESULTS, address)
+    cached_response = redis_client.hget(s.GEO_RAW_RESULTS, address)
 
     if cached_response and not overwrite_cache:
         print 'using cache for ', address
         geocoding_result = json.loads(cached_response)
     else:
-        try:
-            address_encoded = address.replace(' ', '+')
-            # Use good encoding so intersection addresses with "&"
-            #    don't add incorrect param separation into querystring
-            address_encoded = urllib2.quote(address)
-            url = 'https://maps.googleapis.com/maps/api/geocode/json?key={}&address={}'.format(
-                s.GOOGLE_GEO_API_KEY,
-                address_encoded)
-    
-            response = requests.get(url=url)
-            if not '20' in str(response.status_code):
-                return None
-            else:
-                geocoding_result = json.loads(response.text)
-                redis_client.hset(GEO_RAW_RESULTS, address, response.text)
-        except:
+        address_encoded = address.replace(' ', '+')
+        # Use good encoding so intersection addresses with "&"
+        #    don't add incorrect param separation into querystring
+        address_encoded = urllib2.quote(address)
+        url = 'https://maps.googleapis.com/maps/api/geocode/json?key={}&address={}'.format(
+            s.GOOGLE_GEO_API_KEY,
+            address_encoded)
+
+        response = requests.get(url=url)
+        if not '20' in str(response.status_code):
             return None
+        else:
+            geocoding_result = json.loads(response.text)
+            redis_client.hset(s.GEO_RAW_RESULTS, address, response.text)
     
     results = _parse_geocoding_result(geocoding_result)
     return results
@@ -104,9 +100,9 @@ def get_station_geoloc_data(stations_json_filename):
     '''
     Get geoloc data for stations in input json.
 
-Example:
-address = '2 Ave & E 58 St, NY'
-location_results = get_geocoding_results(address)
+    Example:
+    address = '2 Ave & E 58 St, NY'
+    location_results = get_geocoding_results(address)
 
     '''
     stations = json.load(open(stations_json_filename))

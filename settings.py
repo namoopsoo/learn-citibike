@@ -1,4 +1,5 @@
 
+GEO_RAW_RESULTS = 'geolocation_raw_results'
 
 
 START_STATION_LATITUDE_COL = 'start station latitude'
