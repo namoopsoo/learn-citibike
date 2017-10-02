@@ -49,7 +49,25 @@ def annotate_df_with_geoloc(df, station_df, noisy_nonmatches=False):
 
     step2_df.rename(columns=step2_rename_dict, inplace=True)
 
-
-    
     return step2_df
+
+
+def make_dead_simple_df(annotated_df):
+
+    df = annotated_df.copy()
+
+    out_columns = ['start_sublocality', 'end_sublocality']
+
+    filtered_df = df[out_columns].dropna()
+
+
+    # Simple encoding
+    simple_encoding_map = {'Brooklyn': 1, 'Manhattan': 2, 'Queens': 3}
+
+    for col in out_columns:
+        filtered_df[col] = filtered_df[col].apply(lambda x: simple_encoding_map[x])
+            
+    return filtered_df
+
+
 

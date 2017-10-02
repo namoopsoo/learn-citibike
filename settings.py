@@ -50,7 +50,7 @@ ALL_END_STATION_COLS = NEW_END_STATION_COLS + [
 
 
 
-DATAS_DIR = 'data'
+DATAS_DIR = 'datas'
 TRIPS_FILE = DATAS_DIR + '/' + '201510-citibike-tripdata.csv'
 
 PLOTS_DIR = 'plots'
