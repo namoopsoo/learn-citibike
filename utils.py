@@ -14,6 +14,7 @@ MILES_PER_DEGREE_LAT = EARTH_CIRCUMFERENCE / 360
 
 PRECISION = Decimal('0.001')
 
+STARTTIME_REGEX = "%m/%d/%Y %H:%M:%S"
 
 
 def _quantize(x):
@@ -93,6 +94,7 @@ def miles_per_long_degree_at_lat_degree(degree_latitude):
 
     return miles_per_long_degree
 
+
 def get_start_time_bucket(start_time):
     '''
 For 24x7 = 168 hours in a week, starting from Monday midnight,
@@ -100,12 +102,10 @@ For 24x7 = 168 hours in a week, starting from Monday midnight,
 
     Monday, 00:00:00 to 00:59:59, => 0
     Monday, 01:00:00 to 01:59:59, => 1
-
-
     '''
 
     # What day of week?
-    d = datetime.datetime.strptime(str(start_time), "%m/%d/%Y %H:%M:%S")
+    d = datetime.datetime.strptime(str(start_time), STARTTIME_REGEX)
     weekday = d.weekday()  # Monday is 0
     
     hour = d.hour
@@ -114,6 +114,18 @@ For 24x7 = 168 hours in a week, starting from Monday midnight,
     delta = 24*weekday + hour
 
     return delta
+
+
+def get_start_day(start_time):
+    d = datetime.datetime.strptime(str(start_time), STARTTIME_REGEX)
+    weekday = d.weekday()  # Monday is 0
+    return weekday    
+
+
+def get_start_hour(start_time):
+    d = datetime.datetime.strptime(str(start_time), STARTTIME_REGEX)
+    hour = d.hour
+    return hour
 
 
 def calc_speeds(df):

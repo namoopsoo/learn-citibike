@@ -6,7 +6,10 @@ from sklearn.pipeline import Pipeline
 from sklearn.linear_model import (LogisticRegression,
     RandomizedLogisticRegression, SGDClassifier)
 from sklearn.ensemble import RandomForestClassifier
+
+# FIXME depracation. Use model_selection instead.
 from sklearn.cross_validation import train_test_split
+
 from sklearn.metrics import (auc, accuracy_score, f1_score, 
         roc_curve, recall_score, precision_score)
 
@@ -282,4 +285,10 @@ def run_metrics_on_predictions(y_true, y_predictions):
             print 'couldnt run metrik ', metrik, ' => ', e
 
     return results
+
+
+def simple_split(df):
+    train_df, holdout_df = train_test_split(df, test_size=0.2)
+    return train_df, holdout_df
+    
 
