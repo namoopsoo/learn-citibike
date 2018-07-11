@@ -2,6 +2,9 @@
 import pandas as pd
 import numpy as np
 
+import classify
+import settings as s
+
 def _make_column_rename_dict(columns, prefix):
     '''Apply prefix and make a dict that can be used with 
     pd.DataFrame.rename() func
@@ -49,7 +52,62 @@ def annotate_df_with_geoloc(df, station_df, noisy_nonmatches=False):
 
     step2_df.rename(columns=step2_rename_dict, inplace=True)
 
-
-    
     return step2_df
+
+
+def make_dead_simple_df(annotated_df):
+    '''
+    Take a simple geo annotated df, and select the output cols for train/test.
+
+    In this case simple geo is just the input/output borough aka sublocality.
+    '''
+
+    df = annotated_df.copy()
+
+    out_columns = ['start_sublocality', 'end_sublocality']
+
+    filtered_df = df[out_columns].dropna()
+
+
+    # Simple encoding
+    simple_encoding_map = {'Brooklyn': 1, 'Manhattan': 2, 'Queens': 3}
+    for col in out_columns:
+        filtered_df[col] = filtered_df[col].apply(lambda x: simple_encoding_map[x])
+            
+    return filtered_df
+
+
+def make_medium_simple_df(annotated_df):
+    '''
+    Take a geo and time annotated df, and select the output cols for train/test.
+    '''
+
+    # output label select....
+    # NEW_END_POSTAL_CODE
+    # NEW_END_STATE
+    # NEW_END_BOROUGH
+    # NEW_END_NEIGHBORHOOD
+
+    df = annotated_df.copy()
+
+    out_columns = [s.NEW_START_POSTAL_CODE,
+            s.NEW_START_BOROUGH, s.NEW_START_NEIGHBORHOOD,
+            s.START_DAY, s.START_HOUR,
+            s.AGE_COL_NAME, s.GENDER,] + [s.NEW_END_NEIGHBORHOOD]
+
+    filtered_df = df[out_columns].dropna()
+
+    # Simple encoding
+    feature_encoding = [s.NEW_START_POSTAL_CODE,
+            s.NEW_START_BOROUGH, s.NEW_START_NEIGHBORHOOD] + [s.NEW_END_NEIGHBORHOOD]
+
+
+    dfcopy, label_encoders = classify.build_label_encoders_from_df(
+            filtered_df, feature_encoding)
+
+    # TODO probably need re-indexing?
+
+    return dfcopy
+
+
 

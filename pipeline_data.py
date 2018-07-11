@@ -4,9 +4,8 @@ import numpy as np
 from os import path
 import json
 import datetime
-from utils import calc_speeds
-from utils import (distance_between_positions, get_start_time_bucket, 
-                which_col_have_nulls)
+import utils
+
 from sklearn.preprocessing import OneHotEncoder
 from annotate_geolocation import annotate_df_with_geoloc
 
@@ -68,7 +67,7 @@ def calc_distance_travelled_col(df):
     distances = []
 
     for row in values:
-        distance = distance_between_positions(*row)
+        distance = utils.distance_between_positions(*row)
 
         distances.append(distance)
 
@@ -128,47 +127,58 @@ def append_travel_stats(df):
             s.START_TIME_BUCKET: True,
             }
 
-    assert not which_col_have_nulls(df)
+    assert not utils.which_col_have_nulls(df)
 
     if recalculate_dict[s.DISTANCE_TRAVELED_COL_NAME]:
         dist_travelled = calc_distance_travelled_col(df)
         df[s.DISTANCE_TRAVELED_COL_NAME] = pd.Series(dist_travelled)
 
         # FIXME ... if shape of df is 1 row, then the assertion fails
-        assert not which_col_have_nulls(df)
+        assert not utils.which_col_have_nulls(df)
 
     if recalculate_dict[s.SPEED_COL_NAME]:
-        travel_speeds = calc_speeds(df)
+        travel_speeds = utils.calc_speeds(df)
         df[s.SPEED_COL_NAME] = pd.Series(travel_speeds)
 
-        assert not which_col_have_nulls(df)
+        assert not utils.which_col_have_nulls(df)
 
     if recalculate_dict[s.AGE_COL_NAME]:
         df[s.AGE_COL_NAME] = 2015 - df[s.BIRTH_YEAR_COL]
 
-        assert not which_col_have_nulls(df)
+        assert not utils.which_col_have_nulls(df)
 
     if recalculate_dict[s.START_TIME_BUCKET]:
         time_buckets = calculate_start_time_buckets(df)
         df[s.START_TIME_BUCKET] = pd.Series(time_buckets)
 
-        assert not which_col_have_nulls(df)
+        assert not utils.which_col_have_nulls(df)
 
     return df
 
-def calculate_start_time_buckets(df):
 
+def annotate_age(df):
+    df[s.AGE_COL_NAME] = 2015 - df[s.BIRTH_YEAR_COL]
+    return df
+
+
+def annotate_time_features(df):
+    df[s.START_DAY] = df[s.START_TIME].apply(utils.get_start_day)
+    df[s.START_HOUR] = df[s.START_TIME].apply(utils.get_start_hour)
+    return df
+
+
+def calculate_start_time_buckets(df):
     values = df.as_matrix(columns=[
         s.START_TIME])
 
     start_time_buckets = []
 
     for row in values:
-        buck = get_start_time_bucket(row[0])
+        buck = utils.get_start_time_bucket(row[0])
         start_time_buckets.append(buck)
-
     
     return start_time_buckets
+
 
 def add_geocoding_station_data(df):
     ''' Enrich input dataframe with station geolocation data.
@@ -330,4 +340,5 @@ def feature_binarization(df, oh_encoders):
         df = df_hot
 
     return df
+
 
