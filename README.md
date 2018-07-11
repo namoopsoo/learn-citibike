@@ -1,8 +1,7 @@
 ## Citibike Project: Can your Destination be Predicted
 
 ### Summary
-* Report: https://github.com/namoopsoo/learn-citibike/blob/master/project%20report.ipynb
-* Report: [report](project%20report.ipynb)
+* Report: [here](project%20report.ipynb)
 
 ### Example data
 ```
