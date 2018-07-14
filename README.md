@@ -1,7 +1,14 @@
 ## Citibike Project: Can your Destination be Predicted
 
 ### Summary
-* Report: [here](project%20report.ipynb)
+The full report is [here](project%20report.ipynb), but in summary, this project was a progression of trying to determine how input data on a trip can be used to help understood where people go. At first, using data from a single month inlate 2015, of `804125` many trips, using a simple classifier, with something like `~476` citibike stations, the prediction accuracy was really bad, at roughly `3%`. The realization came that having `476` classes, intuitively, would be a hard probelm to start with, so the next step taken was to pull in the Google Geolocation data on the stations, to try to get earlier wins. 
+
+Switching to sublocalities, a.k.a. boroughs, the prediction accuracy was in the 90s. The accuracy for a neighborhood (_of which there are some 28_) was in the 40s, and so that was the general target chosen for the majority of this project. A few different approaches were taken, detailed in this report. Different sizes of training data were used for comparison. Also different levels of time bucketing preprocessing,  were used as well. Specifically, one hot encoding the starting neighborhood increased the accuracy from around `0.40` to closer to `0.47`. 
+
+The final approach tested during the experimentation, was actually not a change in preprocessing, a change in the learning algorithm, nor in the selection of the data, but in the evaluation metric. Given the classification problem of predicting one of `28` neighborhoods, instead of evaluating accuracy, a so-called _Rank k Accuracy_ was also explored, to see how looking at the top `k=1`, `k=2`, `k=3`, `k=4` and `k=5` predictions could evaluate the performance. The result showed clearly better than incremental improvement, with the rank `k=3` accuracy being around `0.76`, for example. This of course is _cheating!_, but it was interesting to explore this, because in the real world, we do not always require the first choice to be correct. In the example of a search engine, we tend to expect a good answer to our query to be within the top four or five of the results displayed.
+
+### Thoughts for future improvement
+Given the opportunity to flesh out the problem more, I think using more data would be near the top of the list of approaches to try. Experimenting with different sizes of training data did not show any interesting affect on the performance of the classifier, but there are now several more months of data available to play around witih.  In discussing with a few colleagues, seasonality would also be a really good feature to consider. Time bucketing was explored to a limited extent, but the day of the week nor the month of the year was not explored. There may also be many other datasets which can be joined with this one to bolster the information available, including information about the weather or perhaps other demographic attributes available. A more thorough comparison of algorithms should also be considered.
 
 ### Example data
 ```
@@ -71,7 +78,7 @@ simpledf.to_csv(s.DATAS_DIR + '/201510-citibike-tripdata.simple.csv')
 ```python
 import os
 import pandas as pd
- import pipeline_data as pl
+import pipeline_data as pl
 import annotate_geolocation as annotate_geo
 import settings as s
 
