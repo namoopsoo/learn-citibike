@@ -107,7 +107,7 @@ def make_medium_simple_df(annotated_df):
 
     # TODO probably need re-indexing?
 
-    return dfcopy
+    return dfcopy, label_encoders
 
 
 

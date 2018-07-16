@@ -17,10 +17,8 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 
 from sklearn.grid_search import GridSearchCV
 
-from pipeline_data import (remove_rows_with_nulls,
-        re_index, feature_binarization, make_one_hot_encoders)
-
-
+import pipeline_data as pl
+import dfutils as dfu
 from utils import dump_np_array
 
 def what_is_dtype(s):
@@ -62,9 +60,7 @@ def encode_holdout_df(holdout_df, label_encoders, feature_encoding):
 
 
 def build_label_encoders_from_df(df, feature_encoding):
-    #
     label_encoders = {}
-
     dfcopy = df.copy()
 
     for feature in feature_encoding:
@@ -118,14 +114,14 @@ preparing a holdout set:
     need to check if values are not in the encoding set, then need to replace w/ -1 .
     '''
     # Remove nulls...
-    df_unnulled = remove_rows_with_nulls(df)
-    df_re_index = re_index(df_unnulled)
+    df_unnulled = dfu.remove_rows_with_nulls(df)
+    df_re_index = dfu.re_index(df_unnulled)
     df = df_re_index
 
     # Remove nulls from holdout too
     if holdout_df is not None:
-        holdout_df_unnulled = remove_rows_with_nulls(holdout_df)
-        holdout_df_re_index = re_index(holdout_df_unnulled)
+        holdout_df_unnulled = dfu.remove_rows_with_nulls(holdout_df)
+        holdout_df_re_index = dfu.re_index(holdout_df_unnulled)
         holdout_df = holdout_df_re_index
 
     if feature_encoding:
@@ -153,12 +149,12 @@ preparing a holdout set:
     if one_hot_encoding:
         # For each input feature being encoded, we want the new columns concatenated
         #   into the output.
-        oh_encoders = make_one_hot_encoders(X, one_hot_encoding)
-        X = feature_binarization(X, oh_encoders)
+        oh_encoders = pl.make_one_hot_encoders(X, one_hot_encoding)
+        X = pl.feature_binarization(X, oh_encoders)
 
         if X_holdout is not None:
-            # X_holdout = feature_binarization(X_holdout, one_hot_encoding)
-            X_holdout = feature_binarization(X_holdout, oh_encoders)
+            # X_holdout = pl.feature_binarization(X_holdout, one_hot_encoding)
+            X_holdout = pl.feature_binarization(X_holdout, oh_encoders)
 
     # FIXME ... use the appropriate LabelEncoder here. Unless already done by the t_t_split()
     if label_col:
