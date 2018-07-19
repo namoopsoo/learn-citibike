@@ -1,18 +1,16 @@
 import sys
 import pandas as pd
 import numpy as np
+import os
 from os import path
 import json
 import datetime
 import utils
 
 from sklearn.preprocessing import OneHotEncoder
-from annotate_geolocation import annotate_df_with_geoloc
-
+import annotate_geolocation as annotate_geo
 from get_station_geolocation_data import get_station_geoloc_data
-
 import dfutils as dfu
-
 import settings as s
 
 
@@ -92,7 +90,7 @@ pl.create_annotated_dataset ('201509-citibike-tripdata.csv', size=10000, preview
     station_dataset = path.join(s.DATAS_DIR, 'stations_geoloc_data.03262016T1349.csv')
     station_df = pd.read_csv(station_dataset)
 
-    next_df = annotate_df_with_geoloc(annotated_df, station_df)
+    next_df = annotate_geo.annotate_df_with_geoloc(annotated_df, station_df)
 
     if not size:
         size = next_df.shape[0]
@@ -333,5 +331,34 @@ def feature_binarization(df, oh_encoders):
 
 
 
+
+def make_simple_df_from_raw(trainset):
+
+     out_columns = [s.NEW_START_POSTAL_CODE,
+             s.NEW_START_BOROUGH, s.NEW_START_NEIGHBORHOOD,
+             s.START_DAY, s.START_HOUR,
+             s.AGE_COL_NAME, s.GENDER,] + [s.NEW_END_NEIGHBORHOOD]
+ 
+
+    os.getenv('source_dir')
+
+    source_dir = '/Users/michal/LeDropbox/Dropbox/Code/repo/citibike-analysis/data
+    '
+
+    indf = pd.read_csv(os.path.join(source_dir, '201512-citibike-tripdata.csv'))
+
+    next_df = annotate_geo.annotate_df_with_geoloc(indf, stations_df, noisy_nonmatches=False)
+
+
+
+    and_age_df = annotate_age(next_df)
+    more_df = annotate_time_features(and_age_df)
+    simpledf = annotate_geo.make_medium_simple_df(more_df)
+
+    return simpledf
+
+
+def ship_training_data_to_s3():
+    pass
 
 
