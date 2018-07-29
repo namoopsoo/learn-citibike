@@ -18,12 +18,12 @@ ENV PATH /opt/conda/bin:$PATH
 
 RUN conda install python=2.7 numpy scipy scikit-learn pandas py-xgboost-cpu
 RUN conda install ipython
-
+RUN pip install ipdb
 
 
 COPY mypackages /opt/program/mypackages
 WORKDIR /opt/program
-RUN pip install mypackages/bikelearn-0.1.0.tar.gz
+RUN pip install mypackages/bikelearn-0.1.3.tar.gz
 
 
 

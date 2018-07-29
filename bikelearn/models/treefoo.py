@@ -9,15 +9,15 @@ from bikelearn import pipeline_data as pl
 
 
 
-def make_tree_foo(trainset):
+def make_tree_foo(trainset, station_df):
 
     cols = ['start_postal_code', 'start_sublocality', 'start_neighborhood', 'start_day', 'start_hour', 'age', 'gender']
 
 
-    simpledf = pl.make_simple_df_from_raw(trainset)
+    simpledf = pl.make_simple_df_from_raw(trainset, station_df)
 
 
-    train_df, holdout_df = classify.simple_split(simpledf)
+    train_df, holdout_df = classify.simple_split(simpledf, )
 
 
     X_train = np.array(train_df[cols])

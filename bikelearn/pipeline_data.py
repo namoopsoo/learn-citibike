@@ -332,20 +332,17 @@ def feature_binarization(df, oh_encoders):
 
 
 
-def make_simple_df_from_raw(trainset):
+def make_simple_df_from_raw(indf, stations_df):
 
-     out_columns = [s.NEW_START_POSTAL_CODE,
+    out_columns = [s.NEW_START_POSTAL_CODE,
              s.NEW_START_BOROUGH, s.NEW_START_NEIGHBORHOOD,
              s.START_DAY, s.START_HOUR,
              s.AGE_COL_NAME, s.GENDER,] + [s.NEW_END_NEIGHBORHOOD]
  
 
-    os.getenv('source_dir')
+    # source_dir = '/Users/michal/LeDropbox/Dropbox/Code/repo/citibike-analysis/data'
 
-    source_dir = '/Users/michal/LeDropbox/Dropbox/Code/repo/citibike-analysis/data
-    '
-
-    indf = pd.read_csv(os.path.join(source_dir, '201512-citibike-tripdata.csv'))
+    # indf = pd.read_csv(os.path.join(source_dir, '201512-citibike-tripdata.csv'))
 
     next_df = annotate_geo.annotate_df_with_geoloc(indf, stations_df, noisy_nonmatches=False)
 

@@ -5,12 +5,12 @@ from os import path
 
 setup(
     name='bikelearn',
-    version='0.1.0',
+    version='0.1.3',
     description='citibike learn codes',
     url='https://github.com/namoopsoo/learn-citibike',
     author='Michal Piekarczyk',
     packages=find_packages(exclude=['tests']),
-    install_requires=['pandas', 'numpy'], 
+    install_requires=['pandas', 'numpy', 'redis'], 
     )
 
 

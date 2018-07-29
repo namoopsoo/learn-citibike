@@ -1,4 +1,6 @@
 import sys
+import datetime
+import pytz
 import pandas as pd
 
 import classify as cl
@@ -24,7 +26,9 @@ def make_dfs(indf):
 
     train_df, holdout_df = classify.simple_split(simpledf)
     
-
+def get_timestamp():
+    now = datetime.datetime.utcnow().replace(tzinfo=pytz.UTC)
+    return now.strftime('%Y-%m-%dT%H%M%S')
 
 def do(source_file, out_dir):
     print source_file, out_dir
@@ -34,8 +38,13 @@ def do(source_file, out_dir):
 
     train_df, test_df = cl.simple_split(df)
     # put the y in the first col... when saving . 
-
+    ts = get_timestamp()
     pass
+    [df.to_csv(os.path.join(out_dir,
+        '{}.{}.csv'.format(fn, ts)))
+        for df, fn in [[train_df, 'train'],
+            [test_df, 'test']]
+        ]
 
 
 
