@@ -59,17 +59,16 @@ def encode_holdout_df(holdout_df, label_encoders, feature_encoding):
     return holdout_copy
 
 
-def build_label_encoders_from_df(df, feature_encoding):
+def build_label_encoders_from_df(df, feature_encoding_dict):
     label_encoders = {}
     dfcopy = df.copy()
 
-    for feature in feature_encoding:
+    for feature, dtype in feature_encoding_dict.items():
         if feature not in dfcopy.columns:
             continue
 
         label_encoders[feature] = LabelEncoder()
 
-        dtype = what_is_dtype(dfcopy[feature])
         if dtype == int:
             missing_val = -1 
         elif dtype == str:

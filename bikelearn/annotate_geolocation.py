@@ -98,12 +98,14 @@ def make_medium_simple_df(annotated_df):
     filtered_df = df[out_columns].dropna()
 
     # Simple encoding
-    feature_encoding = [s.NEW_START_POSTAL_CODE,
-            s.NEW_START_BOROUGH, s.NEW_START_NEIGHBORHOOD] + [s.NEW_END_NEIGHBORHOOD]
+    feature_encoding_dict = s.FEATURE_ENCODING
 
+    # ..
+    for col, dtype in feature_encoding_dict.items():
+        df[col] = df[col].astype(dtype)
 
     dfcopy, label_encoders = classify.build_label_encoders_from_df(
-            filtered_df, feature_encoding)
+            filtered_df, feature_encoding_dict)
 
     # TODO probably need re-indexing?
 

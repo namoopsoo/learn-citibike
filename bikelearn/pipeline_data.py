@@ -350,7 +350,7 @@ def make_simple_df_from_raw(indf, stations_df):
 
     and_age_df = annotate_age(next_df)
     more_df = annotate_time_features(and_age_df)
-    simpledf = annotate_geo.make_medium_simple_df(more_df)
+    simpledf, label_encoders = annotate_geo.make_medium_simple_df(more_df)
 
     return simpledf
 

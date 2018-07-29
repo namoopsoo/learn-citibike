@@ -1,12 +1,15 @@
 FROM ubuntu:16.04
 
 
+
+
 RUN apt-get -y update && apt-get install -y --no-install-recommends \
          wget \
          #python \
          nginx \
          bzip2 \
          ca-certificates \
+         vim \
     && rm -rf /var/lib/apt/lists/*
 
 # note from https://docs.datascience.com/en/master/appendix-1/dockerfile-basics-and-best-practices-1.html , 
