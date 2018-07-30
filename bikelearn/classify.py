@@ -60,6 +60,8 @@ def encode_holdout_df(holdout_df, label_encoders, feature_encoding):
 
 
 def build_label_encoders_from_df(df, feature_encoding_dict):
+    # NOTE... should unravel the actual encoding done in here though
+    #   for a separate step.
     label_encoders = {}
     dfcopy = df.copy()
 

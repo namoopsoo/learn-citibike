@@ -338,21 +338,29 @@ def make_simple_df_from_raw(indf, stations_df):
              s.NEW_START_BOROUGH, s.NEW_START_NEIGHBORHOOD,
              s.START_DAY, s.START_HOUR,
              s.AGE_COL_NAME, s.GENDER,] + [s.NEW_END_NEIGHBORHOOD]
- 
-
-    # source_dir = '/Users/michal/LeDropbox/Dropbox/Code/repo/citibike-analysis/data'
-
-    # indf = pd.read_csv(os.path.join(source_dir, '201512-citibike-tripdata.csv'))
 
     next_df = annotate_geo.annotate_df_with_geoloc(indf, stations_df, noisy_nonmatches=False)
-
 
 
     and_age_df = annotate_age(next_df)
     more_df = annotate_time_features(and_age_df)
     simpledf, label_encoders = annotate_geo.make_medium_simple_df(more_df)
 
-    return simpledf
+    return simpledf, label_encoders
+
+
+def prepare_test_data_for_predict(indf):
+    out_columns = [s.NEW_START_POSTAL_CODE,
+             s.NEW_START_BOROUGH, s.NEW_START_NEIGHBORHOOD,
+             s.START_DAY, s.START_HOUR,
+             s.AGE_COL_NAME, s.GENDER,] + [s.NEW_END_NEIGHBORHOOD]
+    next_df = annotate_geo.annotate_df_with_geoloc(indf, stations_df, noisy_nonmatches=False)
+
+    and_age_df = annotate_age(next_df)
+    more_df = annotate_time_features(and_age_df)
+
+
+    simpledf = annotate_geo.do_prep(more_df)
 
 
 def ship_training_data_to_s3():
