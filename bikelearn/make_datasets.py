@@ -3,7 +3,7 @@ import datetime
 import pytz
 import pandas as pd
 
-import classify as cl
+import bikelearn.classify as cl
 
 
 import os
@@ -12,19 +12,28 @@ import pipeline_data as pl
 import annotate_geolocation as annotate_geo
 import settings as s
 
-def make_dfs(indf):
+def make_dfs(indf, stations_df):
     stations_df_filename = os.path.join(s.DATAS_DIR, 'start_stations_103115.fuller.csv')
-    stations_df = pd.read_csv(stations_df_filename, index_col=0, dtype={'postal_code': str})
+    # stations_df = pd.read_csv(stations_df_filename, index_col=0, dtype={'postal_code': str})
 
+    train_df, holdout_df = cl.simple_split(indf)
 
-    next_df = annotate_geo.annotate_df_with_geoloc(indf, stations_df, noisy_nonmatches=False)
+    return {'train_df': train_df, 
+            'holdout_df': holdout_df,}
+
+    # hmmm why was i doing this here ... hmmm.. dont think this belongs here.
+    next_df = annotate_geo.annotate_df_with_geoloc(train_df, stations_df, noisy_nonmatches=False)
 
     and_age_df = pl.annotate_age(next_df)
     more_df = pl.annotate_time_features(and_age_df)
 
-    simpledf = annotate_geo.make_medium_simple_df(more_df)
+    simpledf, label_encoders = annotate_geo.make_medium_simple_df(more_df)
 
-    train_df, holdout_df = classify.simple_split(simpledf)
+    # train_df, holdout_df = cl.simple_split(simpledf)
+    return {'train_df': train_df, 
+            'holdout_df': holdout_df,}
+            #'label_encoders': label_encoders}
+
     
 def get_timestamp():
     now = datetime.datetime.utcnow().replace(tzinfo=pytz.UTC)

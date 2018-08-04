@@ -8,10 +8,13 @@ from bikelearn import classify
 from bikelearn import pipeline_data as pl
 
 
-def make_tree_foo(trainset, station_df):
+def make_tree_foo(trainset, stations):
+    assert trainset['fn']
+    assert stations['fn']
     cols = ['start_postal_code', 'start_sublocality', 'start_neighborhood', 'start_day', 'start_hour', 'age', 'gender']
 
-    simpledf, label_encoders = pl.make_simple_df_from_raw(trainset, station_df)
+    simpledf, label_encoders = pl.make_simple_df_from_raw(
+            trainset['trainset'], stations['stations_df'])
     train_df, holdout_df = classify.simple_split(simpledf)
 
     X_train = np.array(train_df[cols])
@@ -29,21 +32,25 @@ def make_tree_foo(trainset, station_df):
     correct = len([[x,y] for x,y in zipped if x == y])
     proportion_correct = correct/y_holdout.shape[0]*1.0
 
-
     bundle = {
+            'train_metadata': {'trainset_fn': trainset['fn'],
+                'stations_df_fn': stations['fn']},
+            'timestamp': pl.make_timestamp(),
             'clf': clf,
             'model_id': 'tree-foo',
-            'bundle_name': 'tree-foo-bundle.pkl',
+            'bundle_name': 'tree-foo-bundle',
             'label_encoders': label_encoders,
             'evaluation': {'holdout_proportion_correct':
                 proportion_correct}
             }
     return bundle
 
+
 def set_model(pickled_bundle):
     pass
 
+
 def do_predict(unpickled_bundle):
-    label_encoders = pass
+    label_encoders = unpickled_bundle['label_encoders']
 
 

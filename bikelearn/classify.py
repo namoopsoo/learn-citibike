@@ -1,5 +1,3 @@
-
-
 import numpy as np
 from collections import OrderedDict 
 from sklearn.pipeline import Pipeline
@@ -20,6 +18,9 @@ from sklearn.grid_search import GridSearchCV
 import pipeline_data as pl
 import dfutils as dfu
 from utils import dump_np_array
+
+import bikelearn.settings as s
+
 
 def what_is_dtype(s):
     if s.dtype == int:
@@ -288,4 +289,21 @@ def simple_split(df):
     train_df, holdout_df = train_test_split(df, test_size=0.2)
     return train_df, holdout_df
     
+
+
+def run_model_predict(bundle, df):
+
+    # label encode...
+    label_encoders = bundle['label_encoders']
+    clf = bundle['clf']
+
+
+    feature_encoding = s.FEATURE_ENCODING # XXX !!! 
+    encoded_df = encode_holdout_df(df, label_encoders, feature_encoding)
+
+    # Then apply the clf predict ...
+    X_test = np.array(df)
+    y_predictions = clf.predict(X_test)
+    return y_predictions
+
 

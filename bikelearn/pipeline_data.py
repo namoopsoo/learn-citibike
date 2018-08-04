@@ -5,6 +5,7 @@ import os
 from os import path
 import json
 import datetime
+import pytz
 import utils
 
 from sklearn.preprocessing import OneHotEncoder
@@ -60,6 +61,11 @@ def calc_distance_travelled_col(df):
         distances.append(distance)
 
     return distances
+
+
+def make_timestamp():
+    return datetime.datetime.utcnow().replace(tzinfo=pytz.UTC).strftime('%Y-%m-%dT%H%M%SZUTC')
+
 
 def create_annotated_dataset(identifier=None, dataset_name=None,
         dataset_df=None,
@@ -330,8 +336,6 @@ def feature_binarization(df, oh_encoders):
     return df
 
 
-
-
 def make_simple_df_from_raw(indf, stations_df):
 
     out_columns = [s.NEW_START_POSTAL_CODE,
@@ -349,7 +353,7 @@ def make_simple_df_from_raw(indf, stations_df):
     return simpledf, label_encoders
 
 
-def prepare_test_data_for_predict(indf):
+def prepare_test_data_for_predict(indf, stations_df):
     out_columns = [s.NEW_START_POSTAL_CODE,
              s.NEW_START_BOROUGH, s.NEW_START_NEIGHBORHOOD,
              s.START_DAY, s.START_HOUR,

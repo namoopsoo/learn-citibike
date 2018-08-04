@@ -44,7 +44,9 @@ def train():
     stations_df = pd.read_csv(stations_fn)
 
     try:
-        bundle = bikemodel.make_tree_foo(trainset, stations_df)
+        bundle = bikemodel.make_tree_foo(
+                {'trainset': trainset, 'fn': fn},
+                {'stations_df': stations_df, 'fn': stations_fn})
     except Exception as e:
         # Write out an error file. This will be returned as the failureReason in the
         # DescribeTrainingJob result.
@@ -82,8 +84,10 @@ def what_are_train_files():
 
 
 def save_model(bundle):
-    output_name = bundle['bundle_name']
-    with open(os.path.join(model_path, output_name), 'w') as out:
+    output_name = '{}.{}.pkl'.format(bundle['bundle_name'],
+            bundle['timestamp'])
+    with open(
+            os.path.join(model_path, output_name), 'w') as out:
         cPickle.dump(bundle, out)
 
 
