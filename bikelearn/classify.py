@@ -290,20 +290,35 @@ def simple_split(df):
     return train_df, holdout_df
     
 
-
-def run_model_predict(bundle, df):
-
-    # label encode...
+def run_model_predict(bundle, df, stations_df):
     label_encoders = bundle['label_encoders']
     clf = bundle['clf']
 
 
+    # XXX FIXME ... one problem here ithink may be that i might be tossing nans... 
+    #  which for test data actually cant do that. 
+
+    prepped_df = pl.prepare_test_data_for_predict(df, stations_df)
+
     feature_encoding = s.FEATURE_ENCODING # XXX !!! 
-    encoded_df = encode_holdout_df(df, label_encoders, feature_encoding)
+    # XXX hmm. but i think the encoding needs to happen after the annotation..
+    encoded_df = encode_holdout_df(prepped_df, label_encoders, feature_encoding)
+
+
+    # X,y...
+    X_out_columns = [s.NEW_START_POSTAL_CODE,
+             s.NEW_START_BOROUGH, s.NEW_START_NEIGHBORHOOD,
+             s.START_DAY, s.START_HOUR,
+             s.AGE_COL_NAME, s.GENDER,]
+    y_col = [s.NEW_END_NEIGHBORHOOD]
+    X_df = encoded_df[X_out_columns]
+    y_df = encoded_df[y_col]
+    y_test = np.array(y_df)
 
     # Then apply the clf predict ...
-    X_test = np.array(df)
+    X_test = np.array(X_df)
     y_predictions = clf.predict(X_test)
-    return y_predictions
+    return y_predictions, y_test
+
 
 

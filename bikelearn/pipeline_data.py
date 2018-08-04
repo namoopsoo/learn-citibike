@@ -366,6 +366,8 @@ def prepare_test_data_for_predict(indf, stations_df):
 
     simpledf = annotate_geo.do_prep(more_df)
 
+    return simpledf[out_columns]
+
 
 def ship_training_data_to_s3():
     pass

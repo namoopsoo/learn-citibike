@@ -15,7 +15,7 @@ def make_tree_foo(trainset, stations):
 
     simpledf, label_encoders = pl.make_simple_df_from_raw(
             trainset['trainset'], stations['stations_df'])
-    train_df, holdout_df = classify.simple_split(simpledf)
+    train_df, validation_df = classify.simple_split(simpledf)
 
     X_train = np.array(train_df[cols])
     y_train = np.array(train_df['end_neighborhood'])
@@ -23,14 +23,14 @@ def make_tree_foo(trainset, stations):
     clf = RandomForestClassifier(max_depth=2, random_state=0)
     clf.fit(X_train, y_train)
 
-    # Quick simple evaluate on holdout as well..
-    X_holdout = np.array(holdout_df[cols])
-    y_holdout = np.array(holdout_df['end_neighborhood'])
+    # Quick simple evaluate on validation as well..
+    X_validation = np.array(validation_df[cols])
+    y_validation = np.array(validation_df['end_neighborhood'])
 
-    y_predictions_holdout = clf.predict(X_holdout)
-    zipped = zip(y_holdout, y_predictions_holdout)
+    y_predictions_validation = clf.predict(X_validation)
+    zipped = zip(y_validation, y_predictions_validation)
     correct = len([[x,y] for x,y in zipped if x == y])
-    proportion_correct = correct/y_holdout.shape[0]*1.0
+    proportion_correct = 1.0*correct/y_validation.shape[0]
 
     bundle = {
             'train_metadata': {'trainset_fn': trainset['fn'],
@@ -40,7 +40,7 @@ def make_tree_foo(trainset, stations):
             'model_id': 'tree-foo',
             'bundle_name': 'tree-foo-bundle',
             'label_encoders': label_encoders,
-            'evaluation': {'holdout_proportion_correct':
+            'evaluation': {'validation_proportion_correct':
                 proportion_correct}
             }
     return bundle

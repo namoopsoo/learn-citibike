@@ -27,7 +27,7 @@ class DuhPipelineTest(unittest.TestCase):
 
 
         holdout_df = datasets['holdout_df']
-        y_preds = blc.run_model_predict(bundle, holdout_df)
+        y_preds = blc.run_model_predict(bundle, holdout_df, stations_df)
 
         pass
 
