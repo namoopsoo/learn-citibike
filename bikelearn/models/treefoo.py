@@ -6,26 +6,32 @@ from sklearn.ensemble import RandomForestClassifier
 
 from bikelearn import classify
 from bikelearn import pipeline_data as pl
+import bikelearn.settings as s
 
 
 def make_tree_foo(trainset, stations):
     assert trainset['fn']
     assert stations['fn']
-    cols = ['start_postal_code', 'start_sublocality', 'start_neighborhood', 'start_day', 'start_hour', 'age', 'gender']
+
+    cols = [s.NEW_START_POSTAL_CODE,
+             s.NEW_START_BOROUGH, s.NEW_START_NEIGHBORHOOD,
+             s.START_DAY, s.START_HOUR,
+             s.AGE_COL_NAME, s.GENDER,
+             s.USER_TYPE_COL]
 
     simpledf, label_encoders = pl.make_simple_df_from_raw(
             trainset['trainset'], stations['stations_df'])
     train_df, validation_df = classify.simple_split(simpledf)
 
     X_train = np.array(train_df[cols])
-    y_train = np.array(train_df['end_neighborhood'])
+    y_train = np.array(train_df[s.NEW_END_NEIGHBORHOOD])
 
     clf = RandomForestClassifier(max_depth=2, random_state=0)
     clf.fit(X_train, y_train)
 
     # Quick simple evaluate on validation as well..
     X_validation = np.array(validation_df[cols])
-    y_validation = np.array(validation_df['end_neighborhood'])
+    y_validation = np.array(validation_df[s.NEW_END_NEIGHBORHOOD])
 
     y_predictions_validation = clf.predict(X_validation)
     zipped = zip(y_validation, y_predictions_validation)
@@ -41,7 +47,10 @@ def make_tree_foo(trainset, stations):
             'bundle_name': 'tree-foo-bundle',
             'label_encoders': label_encoders,
             'evaluation': {'validation_proportion_correct':
-                proportion_correct}
+                proportion_correct},
+            'clf_info': {
+                'feature_importances':
+                zip(cols, clf.feature_importances_)}
             }
     return bundle
 

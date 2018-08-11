@@ -25,6 +25,8 @@ class DuhPipelineTest(unittest.TestCase):
                 {'trainset': datasets['train_df'], 'fn': fn},
                 {'stations_df': stations_df, 'fn': stations_fn})
 
+        assert s.USER_TYPE_COL in bundle['label_encoders']
+
 
         holdout_df = datasets['holdout_df']
         y_preds = blc.run_model_predict(bundle, holdout_df, stations_df)

@@ -47,7 +47,7 @@ def encode_holdout_df(holdout_df, label_encoders, feature_encoding):
         if feature not in holdout_copy.columns:
             continue
 
-        dtype = what_is_dtype(holdout_copy[feature])
+        dtype = feature_encoding[feature]
 
         # Need to encode any unknown value as -1.
         # So first need to do a map for any values not known, map them to be -1.
@@ -318,6 +318,9 @@ def run_model_predict(bundle, df, stations_df):
     # Then apply the clf predict ...
     X_test = np.array(X_df)
     y_predictions = clf.predict(X_test)
+
+    from nose.tools import set_trace; set_trace()
+
     return y_predictions, y_test
 
 

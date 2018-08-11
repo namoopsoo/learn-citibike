@@ -31,7 +31,7 @@ def annotate_df_with_geoloc(df, station_df, noisy_nonmatches=False):
     step1_rename_dict = _make_column_rename_dict(station_df_columns, 'start')
     step2_rename_dict = _make_column_rename_dict(station_df_columns, 'end')
 
-    # Want to throw exception when rows from df were thrown out because no station
+    # Want to throw exception when rows from df dont match a station
     #   found in the station_df
     missing_stations = (set(np.unique(df['start station name'].values)) 
             - set(np.unique(station_df['station_name'].values))) 
@@ -39,11 +39,11 @@ def annotate_df_with_geoloc(df, station_df, noisy_nonmatches=False):
     if noisy_nonmatches:
         assert len(missing_stations) == 0, 'missing stations: %s' % missing_stations
 
-    step1_df = pd.merge(left=df, right=station_df, how='inner',
+    step1_df = pd.merge(left=df, right=station_df, how='left',
                        left_on=['start station name'],
                         right_on=['station_name'])
 
-
+    # TODO... shouldnt be renaming but just appending...
     step1_df.rename(columns=step1_rename_dict, inplace=True)
 
     step2_df = pd.merge(left=step1_df, right=station_df, how='inner',
@@ -90,7 +90,9 @@ def make_medium_simple_df(annotated_df):
 
     df = annotated_df.copy()
 
-    out_columns = [s.NEW_START_POSTAL_CODE,
+    out_columns = [
+            s.USER_TYPE_COL,
+            s.NEW_START_POSTAL_CODE,
             s.NEW_START_BOROUGH, s.NEW_START_NEIGHBORHOOD,
             s.START_DAY, s.START_HOUR,
             s.AGE_COL_NAME, s.GENDER,] + [s.NEW_END_NEIGHBORHOOD]
