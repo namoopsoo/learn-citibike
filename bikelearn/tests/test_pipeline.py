@@ -13,8 +13,6 @@ class DuhPipelineTest(unittest.TestCase):
         fn = 'bikelearn/tests/data/basic-citibike-tripdata.csv'
         df = pd.read_csv(fn)
 
-        from nose.tools import set_trace; set_trace()
-
         stations_fn = os.path.join(s.DATAS_DIR, 'start_stations_103115.fuller.csv')
         stations_df = pd.read_csv(stations_fn, index_col=0, dtype={'postal_code': str})
 
@@ -29,7 +27,8 @@ class DuhPipelineTest(unittest.TestCase):
 
 
         holdout_df = datasets['holdout_df']
-        y_preds = blc.run_model_predict(bundle, holdout_df, stations_df)
+        y_predictions, y_test = blc.run_model_predict(
+                bundle, holdout_df, stations_df)
 
         pass
 

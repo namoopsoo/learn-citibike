@@ -310,6 +310,7 @@ def simple_split(df):
     
 
 def run_model_predict(bundle, df, stations_df):
+    # Given a held-out df, which has an output label.
     label_encoders = bundle['label_encoders']
     clf = bundle['clf']
 
@@ -332,9 +333,5 @@ def run_model_predict(bundle, df, stations_df):
     X_test = np.array(X_df)
     y_predictions = clf.predict(X_test)
 
-    from nose.tools import set_trace; set_trace()
-
     return y_predictions, y_test
-
-
 
