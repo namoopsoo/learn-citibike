@@ -34,6 +34,22 @@ def what_is_dtype(s):
 
     return dtype
 
+
+def replace_the_unknowns(df, feature_encoding):
+    # Need to encode any unknown value as -1.
+    # So first need to do a map for any values not known, map them to be -1.
+    # Otherwise LabelEncoder will freak out.
+    #
+    for feature in feature_encoding:
+        if feature not in df.columns:
+            continue
+        dtype = feature_encoding[feature]
+
+        replacer = replace_unknown(df[feature], dtype)
+        df[feature] = df[feature].apply(replacer)
+    return df
+
+
 def encode_holdout_df(holdout_df, label_encoders, feature_encoding):
     '''
 
@@ -51,6 +67,8 @@ def encode_holdout_df(holdout_df, label_encoders, feature_encoding):
 
         # Need to encode any unknown value as -1.
         # So first need to do a map for any values not known, map them to be -1.
+        # Otherwise LabelEncoder will freak out.
+        #
         replacer = replace_unknown(label_encoders[feature].classes_, dtype)
         holdout_copy[feature] = holdout_copy[feature].apply(replacer)
 
@@ -72,16 +90,17 @@ def build_label_encoders_from_df(df, feature_encoding_dict):
 
         label_encoders[feature] = LabelEncoder()
 
-        if dtype == int:
-            missing_val = -1 
+        if dtype == float:
+            missing_val = -1.
         elif dtype == str:
             missing_val = '-1'
         else:
             raise Exception, 'unknown dtype' + str(dtype)
 
         # The missing value is fit as the last value in the label encoder. 
-        #   So then when a new value is encountered afterwards, it is changed
-        #   into the missing value.
+        #   So then when a new value is encountered afterwards, 
+        # it is changed  into the missing value.
+        dfcopy[feature] = dfcopy[feature].fillna(missing_val)
         label_encoders[feature].fit(
                         np.concatenate([dfcopy[feature], np.array([missing_val])])
                         )
@@ -294,23 +313,17 @@ def run_model_predict(bundle, df, stations_df):
     label_encoders = bundle['label_encoders']
     clf = bundle['clf']
 
+    feature_encoding_dict = bundle['features']['dtypes']
+    prepped_df = pl.prepare_test_data_for_predict(df, stations_df,
+            feature_encoding_dict)
 
-    # XXX FIXME ... one problem here ithink may be that i might be tossing nans... 
-    #  which for test data actually cant do that. 
-
-    prepped_df = pl.prepare_test_data_for_predict(df, stations_df)
-
-    feature_encoding = s.FEATURE_ENCODING # XXX !!! 
-    # XXX hmm. but i think the encoding needs to happen after the annotation..
-    encoded_df = encode_holdout_df(prepped_df, label_encoders, feature_encoding)
-
+    feature_encoding = bundle['features']['dtypes']
+    encoded_df = encode_holdout_df(prepped_df, label_encoders,
+            feature_encoding)
 
     # X,y...
-    X_out_columns = [s.NEW_START_POSTAL_CODE,
-             s.NEW_START_BOROUGH, s.NEW_START_NEIGHBORHOOD,
-             s.START_DAY, s.START_HOUR,
-             s.AGE_COL_NAME, s.GENDER,]
-    y_col = [s.NEW_END_NEIGHBORHOOD]
+    X_out_columns = bundle['features']['input']
+    y_col = [bundle['features']['output_label']]
     X_df = encoded_df[X_out_columns]
     y_df = encoded_df[y_col]
     y_test = np.array(y_df)

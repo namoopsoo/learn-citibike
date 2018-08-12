@@ -336,19 +336,21 @@ def feature_binarization(df, oh_encoders):
     return df
 
 
-def make_simple_df_from_raw(indf, stations_df):
+def make_simple_df_from_raw(indf, stations_df, feature_encoding_dict):
 
     next_df = annotate_geo.annotate_df_with_geoloc(indf, stations_df, noisy_nonmatches=True)
 
 
     and_age_df = annotate_age(next_df)
     more_df = annotate_time_features(and_age_df)
-    simpledf, label_encoders = annotate_geo.make_medium_simple_df(more_df)
+    simpledf, label_encoders = annotate_geo.make_medium_simple_df(
+            more_df, feature_encoding_dict)
 
     return simpledf, label_encoders
 
 
-def prepare_test_data_for_predict(indf, stations_df):
+def prepare_test_data_for_predict(indf, stations_df,
+        feature_encoding_dict):
     out_columns = [s.NEW_START_POSTAL_CODE,
              s.NEW_START_BOROUGH, s.NEW_START_NEIGHBORHOOD,
              s.START_DAY, s.START_HOUR,
@@ -359,8 +361,8 @@ def prepare_test_data_for_predict(indf, stations_df):
     and_age_df = annotate_age(next_df)
     more_df = annotate_time_features(and_age_df)
 
-
-    simpledf = annotate_geo.do_prep(more_df)
+    simpledf = annotate_geo.do_prep(more_df,
+            feature_encoding_dict)
 
     return simpledf[out_columns]
 

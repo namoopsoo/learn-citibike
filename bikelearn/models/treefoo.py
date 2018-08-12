@@ -18,9 +18,16 @@ def make_tree_foo(trainset, stations):
              s.START_DAY, s.START_HOUR,
              s.AGE_COL_NAME, s.GENDER,
              s.USER_TYPE_COL]
+    feature_encoding_dict = {
+            s.USER_TYPE_COL: str,
+            s.AGE_COL_NAME: float,
+            s.NEW_START_POSTAL_CODE: str,
+            s.NEW_START_BOROUGH: str, s.NEW_START_NEIGHBORHOOD:str,
+            s.NEW_END_NEIGHBORHOOD:str}
 
     simpledf, label_encoders = pl.make_simple_df_from_raw(
-            trainset['trainset'], stations['stations_df'])
+            trainset['trainset'], stations['stations_df'],
+            feature_encoding_dict)
     train_df, validation_df = classify.simple_split(simpledf)
 
     X_train = np.array(train_df[cols])
@@ -46,6 +53,10 @@ def make_tree_foo(trainset, stations):
             'model_id': 'tree-foo',
             'bundle_name': 'tree-foo-bundle',
             'label_encoders': label_encoders,
+            'features': {
+                'input': cols,
+                'output_label': s.NEW_END_NEIGHBORHOOD,
+                'dtypes': feature_encoding_dict},
             'evaluation': {'validation_proportion_correct':
                 proportion_correct},
             'clf_info': {

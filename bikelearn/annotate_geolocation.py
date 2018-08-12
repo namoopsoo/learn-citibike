@@ -77,7 +77,7 @@ def make_dead_simple_df(annotated_df):
     return filtered_df
 
 
-def make_medium_simple_df(annotated_df):
+def make_medium_simple_df(annotated_df, feature_encoding_dict):
     '''
     Take a geo and time annotated df, and select the output cols for train/test.
     '''
@@ -97,27 +97,21 @@ def make_medium_simple_df(annotated_df):
             s.START_DAY, s.START_HOUR,
             s.AGE_COL_NAME, s.GENDER,] + [s.NEW_END_NEIGHBORHOOD]
 
-    filtered_df = df[out_columns].dropna()
-
-    # Simple encoding
-    feature_encoding_dict = s.FEATURE_ENCODING
-
-    # ..
     for col, dtype in feature_encoding_dict.items():
-        filtered_df[col] = filtered_df[col].astype(dtype)
+        df[col] = df[col].astype(dtype)
 
     dfcopy, label_encoders = classify.build_label_encoders_from_df(
-            filtered_df, feature_encoding_dict)
+            df, feature_encoding_dict)
+
+    # Apply label encoding...
+
+
 
     # TODO probably need re-indexing?
 
     return dfcopy, label_encoders
 
-def do_prep(df):
-    # Simple encoding
-    feature_encoding_dict = s.FEATURE_ENCODING
-
-    # ..
+def do_prep(df, feature_encoding_dict):
     for col, dtype in feature_encoding_dict.items():
         df[col] = df[col].astype(dtype)
     return df
