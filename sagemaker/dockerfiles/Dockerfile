@@ -26,7 +26,7 @@ RUN pip install ipdb
 
 COPY mypackages /opt/program/mypackages
 WORKDIR /opt/program
-RUN pip install mypackages/bikelearn-0.1.3.tar.gz
+RUN pip install mypackages/bikelearn-0.2.0.tar.gz
 
 
 

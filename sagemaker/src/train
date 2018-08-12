@@ -11,6 +11,7 @@ import json
 import cPickle
 import sys
 import traceback
+import uuid
 
 import pandas as pd
 
@@ -18,6 +19,7 @@ from sklearn import tree
 import xgboost
 
 from bikelearn.models import treefoo as bikemodel
+from bikelearn import pipeline_data as pl
 
 # These are the paths to where SageMaker mounts interesting things in your container.
 
@@ -51,7 +53,8 @@ def train():
         # Write out an error file. This will be returned as the failureReason in the
         # DescribeTrainingJob result.
         trc = traceback.format_exc()
-        with open(os.path.join(output_path, 'failure'), 'w') as s:
+        fn = 'failure.{}.log'.format(pl.make_timestamp())
+        with open(os.path.join(output_path, fn), 'w') as s:
             s.write('Exception during training: ' + str(e) + '\n' + trc)
         # Printing this causes the exception to be in the training job logs, as well.
         print('Exception during training: ' + str(e) + '\n' + trc, file=sys.stderr)
