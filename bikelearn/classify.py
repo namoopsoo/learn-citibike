@@ -1,4 +1,6 @@
 import numpy as np
+import pandas as pd
+from StringIO import StringIO
 from collections import OrderedDict 
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import (LogisticRegression,
@@ -307,6 +309,11 @@ def run_metrics_on_predictions(y_true, y_predictions):
 def simple_split(df):
     train_df, holdout_df = train_test_split(df, test_size=0.2)
     return train_df, holdout_df
+
+def hydrate_csv_to_df(csvdata):
+    s = StringIO(csvdata)
+    df = pd.read_csv(s)
+    return df
     
 
 def run_model_predict(bundle, df, stations_df):

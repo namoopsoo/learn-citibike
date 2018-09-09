@@ -12,6 +12,15 @@ RUN apt-get -y update && apt-get install -y --no-install-recommends \
          vim \
     && rm -rf /var/lib/apt/lists/*
 
+
+# 
+# RUN apt-get -y install apt-transport-https iproute2
+# iproute2 , includes the 'ss' utility , 
+#        ss - another utility to investigate sockets
+# netstat 
+
+
+
 # note from https://docs.datascience.com/en/master/appendix-1/dockerfile-basics-and-best-practices-1.html , 
 
 RUN wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
@@ -21,12 +30,12 @@ ENV PATH /opt/conda/bin:$PATH
 
 RUN conda install python=2.7 numpy scipy scikit-learn pandas py-xgboost-cpu
 RUN conda install ipython
-RUN pip install ipdb
+RUN pip install ipdb flask gevent gunicorn
 
 
 COPY mypackages /opt/program/mypackages
 WORKDIR /opt/program
-RUN pip install mypackages/bikelearn-0.2.0.tar.gz
+RUN pip install mypackages/bikelearn-0.2.2.tar.gz
 
 
 

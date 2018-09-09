@@ -37,7 +37,8 @@ def annotate_df_with_geoloc(df, station_df, noisy_nonmatches=False):
             - set(np.unique(station_df['station_name'].values))) 
 
     if noisy_nonmatches:
-        assert len(missing_stations) == 0, 'missing stations: %s' % missing_stations
+        if missing_stations:
+            print '!missing stations: %s' % missing_stations
 
     step1_df = pd.merge(left=df, right=station_df, how='left',
                        left_on=['start station name'],

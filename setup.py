@@ -5,7 +5,7 @@ from os import path
 
 setup(
     name='bikelearn',
-    version='0.2.0',
+    version='0.2.2',
     description='citibike learn codes',
     url='https://github.com/namoopsoo/learn-citibike',
     author='Michal Piekarczyk',

@@ -47,7 +47,8 @@ def make_tree_foo(trainset, stations):
 
     bundle = {
             'train_metadata': {'trainset_fn': trainset['fn'],
-                'stations_df_fn': stations['fn']},
+                'stations_df_fn': stations['fn'],
+                'stations_df': stations['stations_df']},
             'timestamp': pl.make_timestamp(),
             'clf': clf,
             'model_id': 'tree-foo',
