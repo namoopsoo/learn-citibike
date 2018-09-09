@@ -35,7 +35,7 @@ RUN pip install ipdb flask gevent gunicorn
 
 COPY mypackages /opt/program/mypackages
 WORKDIR /opt/program
-RUN pip install mypackages/bikelearn-0.2.2.tar.gz
+RUN pip install mypackages/bikelearn-0.2.4.tar.gz
 
 
 

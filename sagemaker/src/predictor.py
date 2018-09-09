@@ -41,7 +41,7 @@ def do_predict(bundle, df):
     y_predictions, y_test = blc.run_model_predict(
             bundle, df, stations_df)
 
-    return y_predictions, y_test
+    return y_predictions
 
 
 class ScoringService(object):
@@ -66,8 +66,15 @@ class ScoringService(object):
                 one prediction per row in the dataframe"""
         bundle = cls.get_model()
         df = blc.hydrate_csv_to_df(csvdata)
-        pred = do_predict(bundle, df)
-        return json.dumps(pred)
+        print('Invoked with {} records'.format(df.shape[0]))
+
+        print ('DEBUG, ')
+        df.head()
+
+        preds = do_predict(bundle, df)
+        print ('DEBUG, preds, {}'.format(preds))
+
+        return preds
 
 # The flask app for serving predictions
 app = flask.Flask(__name__)
@@ -78,7 +85,7 @@ def ping():
     it healthy if we can load the model successfully."""
     health = ScoringService.get_model() is not None  # You can insert a health check here
 
-    status = 200 if health else 404
+    status = 200 if health else 500 # why was this 404 prior?
     return flask.Response(response='\n', status=status, mimetype='application/json')
 
 @app.route('/invocations', methods=['POST'])
@@ -92,19 +99,24 @@ def transformation():
     # Convert from CSV to pandas
     if flask.request.content_type == 'text/csv':
         data = flask.request.data.decode('utf-8')
-        s = StringIO.StringIO(data)
-        data = pd.read_csv(s, header=None)
+
+
+        # FIXME ok eventually put back the header=None 
+        # s = StringIO.StringIO(data)
+        # data = pd.read_csv(s, header=None)
+
     else:
         return flask.Response(response='This predictor only supports CSV data', status=415, mimetype='text/plain')
 
-    print('Invoked with {} records'.format(data.shape[0]))
 
     # Do the prediction
     predictions = ScoringService.predict(data)
 
     # Convert from numpy back to CSV
     out = StringIO.StringIO()
-    pd.DataFrame({'results':predictions}).to_csv(out, header=False, index=False)
+    pd.DataFrame({'results': predictions}).to_csv(out, header=False, index=False)
     result = out.getvalue()
 
     return flask.Response(response=result, status=200, mimetype='text/csv')
+
+

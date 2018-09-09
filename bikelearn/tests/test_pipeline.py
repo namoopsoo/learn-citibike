@@ -37,10 +37,12 @@ class DuhPipelineTest(unittest.TestCase):
 class IntegrationLocalTest(unittest.TestCase):
 
     def test_foo(self):
-        url = 'http://127.0.0.1:8000/invocations'
-        data = ',tripduration,starttime,stoptime,start station id,start station name,start station latitude,start station longitude,end station id,end station name,end station latitude,end station longitude,bikeid,usertype,birth year,gender\n0,171,10/1/2015 00:00:02,10/1/2015 00:02:54,388,W 26 St & 10 Ave,40.749717753,-74.002950346,494,W 26 St & 8 Ave,40.74734825,-73.99723551,24302,Subscriber,1973.0,1\n1,593,10/1/2015 00:00:02,10/1/2015 00:09:55,518,E 39 St & 2 Ave,40.74780373,-73.97344190000001,438,St Marks Pl & 1 Ave,40.72779126,-73.98564945,19904,Subscriber,1990.0,1\n'
+        url = 'http://127.0.0.1:8080/invocations'
+        headers = {'Content-Type': 'text/csv'}
+        data = 'tripduration,starttime,stoptime,start station id,start station name,start station latitude,start station longitude,end station id,end station name,end station latitude,end station longitude,bikeid,usertype,birth year,gender\n171,10/1/2015 00:00:02,10/1/2015 00:02:54,388,W 26 St & 10 Ave,40.749717753,-74.002950346,494,W 26 St & 8 Ave,40.74734825,-73.99723551,24302,Subscriber,1973.0,1\n593,10/1/2015 00:00:02,10/1/2015 00:09:55,518,E 39 St & 2 Ave,40.74780373,-73.97344190000001,438,St Marks Pl & 1 Ave,40.72779126,-73.98564945,19904,Subscriber,1990.0,1\n'
 
-        r = requests.post(url, data=data)
+        r = requests.post(url, data=data,headers=headers)
+        assert r.status_code/100 == 2
 
     
         pass
