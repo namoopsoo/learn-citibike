@@ -12,8 +12,19 @@ def _make_column_rename_dict(columns, prefix):
     d = {col: '{}_{}'.format(prefix, col) for col in columns}
     return d
 
+def warn_missing_stations(df, station_df):
+    # Want to throw exception when rows from df dont match a station
+    #   found in the station_df
+    missing_stations = (set(np.unique(df['start station name'].values)) 
+            - set(np.unique(station_df['station_name'].values))) 
 
-def annotate_df_with_geoloc(df, station_df, noisy_nonmatches=False):
+    if missing_stations:
+        print '!missing stations: %s' % missing_stations
+
+
+def annotate_df_with_geoloc(df, station_df,
+        noisy_nonmatches=False):
+        #purpose, noisy_nonmatches=False):
     ''' Given a df with both the 'start station name' and 'end station name'
     columns, join with the station_df to also include the geolocation 
     columns, including the start and end postal code, neighborhood and others.
@@ -37,6 +48,8 @@ def annotate_df_with_geoloc(df, station_df, noisy_nonmatches=False):
             - set(np.unique(station_df['station_name'].values))) 
 
     if noisy_nonmatches:
+        warn_missing_stations(df, station_df)
+
         if missing_stations:
             print '!missing stations: %s' % missing_stations
 
@@ -47,13 +60,17 @@ def annotate_df_with_geoloc(df, station_df, noisy_nonmatches=False):
     # TODO... shouldnt be renaming but just appending...
     step1_df.rename(columns=step1_rename_dict, inplace=True)
 
-    step2_df = pd.merge(left=step1_df, right=station_df, how='inner',
-                       left_on=['end station name'],
-                        right_on=['station_name'])
+    if step1_df[step1_df['end station name'].notnull()].shape[0] > 0:
 
-    step2_df.rename(columns=step2_rename_dict, inplace=True)
+        step2_df = pd.merge(left=step1_df, right=station_df, how='inner',
+                           left_on=['end station name'],
+                            right_on=['station_name'])
 
-    return step2_df
+        step2_df.rename(columns=step2_rename_dict, inplace=True)
+
+        return step2_df
+    
+    return step1_df
 
 
 def make_dead_simple_df(annotated_df):
@@ -114,6 +131,7 @@ def make_medium_simple_df(annotated_df, feature_encoding_dict):
 
 def do_prep(df, feature_encoding_dict):
     for col, dtype in feature_encoding_dict.items():
-        df[col] = df[col].astype(dtype)
+        if col in df:
+            df[col] = df[col].astype(dtype)
     return df
 

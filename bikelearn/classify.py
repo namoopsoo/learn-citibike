@@ -314,16 +314,24 @@ def hydrate_csv_to_df(csvdata):
     s = StringIO(csvdata)
     df = pd.read_csv(s)
     return df
+
+
+def widen_df_with_other_cols(df, all_columns):
+    new_cols = list(set(all_columns)
+            - set(df.columns.tolist()))
+    for col in new_cols:
+        df[col] = np.nan
+    return df
     
 
-def run_model_predict(bundle, df, stations_df):
+def run_model_predict(bundle, df, stations_df, labeled):
     # Given a held-out df, which has an output label.
     label_encoders = bundle['label_encoders']
     clf = bundle['clf']
 
     feature_encoding_dict = bundle['features']['dtypes']
     prepped_df = pl.prepare_test_data_for_predict(df, stations_df,
-            feature_encoding_dict)
+            feature_encoding_dict, labeled)
 
     feature_encoding = bundle['features']['dtypes']
     encoded_df = encode_holdout_df(prepped_df, label_encoders,
@@ -331,14 +339,20 @@ def run_model_predict(bundle, df, stations_df):
 
     # X,y...
     X_out_columns = bundle['features']['input']
-    y_col = [bundle['features']['output_label']]
     X_df = encoded_df[X_out_columns]
-    y_df = encoded_df[y_col]
-    y_test = np.array(y_df)
 
     # Then apply the clf predict ...
     X_test = np.array(X_df)
     y_predictions = clf.predict(X_test)
 
-    return y_predictions, y_test
+    # TODO... probably better pull this out of this function to be cleaner.
+    if labeled:
+        y_col = [bundle['features']['output_label']]
+        y_df = encoded_df[y_col]
+        y_test = np.array(y_df)
+
+        return y_predictions, y_test
+
+    else:
+        return y_predictions, None
 
