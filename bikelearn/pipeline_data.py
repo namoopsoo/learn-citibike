@@ -1,16 +1,17 @@
-
+import sys
 import pandas as pd
 import numpy as np
+import os
 from os import path
 import json
 import datetime
+import pytz
 import utils
 
 from sklearn.preprocessing import OneHotEncoder
-from annotate_geolocation import annotate_df_with_geoloc
-
+import annotate_geolocation as annotate_geo
 from get_station_geolocation_data import get_station_geoloc_data
-
+import dfutils as dfu
 import settings as s
 
 
@@ -29,23 +30,11 @@ def load_data(source_file=s.TRIPS_FILE, num_rows=None):
 
     df = df[df[s.USER_TYPE_COL] == s.USER_TYPE_SUBSCRIBER]
 
-    df_unnulled = remove_rows_with_nulls(df)
-    df_re_index = re_index(df_unnulled)
+    df_unnulled = dfu.remove_rows_with_nulls(df)
+    df_re_index = dfu.re_index(df_unnulled)
 
     return df_re_index
 
-def re_index(df):
-    '''Re index w/o gaps in index.
-
-    Reindexing is really important, because without this, future operations,
-    on the df, will unknowingly not apply() operations to all rows.
-    '''
-    df.index = range(df.shape[0])
-    return df
-
-def remove_rows_with_nulls(df):
-    unnulled = df.dropna()
-    return unnulled
 
 def calc_distance_travelled_col(df):
     '''
@@ -73,6 +62,11 @@ def calc_distance_travelled_col(df):
 
     return distances
 
+
+def make_timestamp():
+    return datetime.datetime.utcnow().replace(tzinfo=pytz.UTC).strftime('%Y-%m-%dT%H%M%SZUTC')
+
+
 def create_annotated_dataset(identifier=None, dataset_name=None,
         dataset_df=None,
         preview_too=True, size=None):
@@ -93,7 +87,7 @@ pl.create_annotated_dataset ('201509-citibike-tripdata.csv', size=10000, preview
             size = min_size
         size = min(size, min_size)
         df = dataset_df.sample(n=size)
-        df = re_index(df)
+        df = dfu.re_index(df)
     else:
         raise Exception, 'need a source'
 
@@ -102,7 +96,7 @@ pl.create_annotated_dataset ('201509-citibike-tripdata.csv', size=10000, preview
     station_dataset = path.join(s.DATAS_DIR, 'stations_geoloc_data.03262016T1349.csv')
     station_df = pd.read_csv(station_dataset)
 
-    next_df = annotate_df_with_geoloc(annotated_df, station_df)
+    next_df = annotate_geo.annotate_df_with_geoloc(annotated_df, station_df)
 
     if not size:
         size = next_df.shape[0]
@@ -270,11 +264,11 @@ def prepare_training_and_holdout_datasets(dataset_source_name):
     holdout_df = full_df.sample(n=holdout_size)
 
     # Do i need to be reindexing here ? 
-    holdout_df = re_index(holdout_df)
+    holdout_df = dfu.re_index(holdout_df)
 
     # Take out the holdout rows.
     full_df.drop(holdout_df.index, inplace=True, axis=0)
-    full_df = re_index(full_df)
+    full_df = dfu.re_index(full_df)
 
     # And make annotated from that holdout.
     annotated_holdout_filename = create_annotated_dataset(
@@ -340,5 +334,45 @@ def feature_binarization(df, oh_encoders):
         df = df_hot
 
     return df
+
+
+def make_simple_df_from_raw(indf, stations_df, feature_encoding_dict):
+
+    next_df = annotate_geo.annotate_df_with_geoloc(indf, stations_df, noisy_nonmatches=True)
+
+
+    and_age_df = annotate_age(next_df)
+    more_df = annotate_time_features(and_age_df)
+    simpledf, label_encoders = annotate_geo.make_medium_simple_df(
+            more_df, feature_encoding_dict)
+
+    return simpledf, label_encoders
+
+
+def prepare_test_data_for_predict(indf, stations_df,
+        feature_encoding_dict, labeled):
+    out_columns = [s.NEW_START_POSTAL_CODE,
+             s.NEW_START_BOROUGH, s.NEW_START_NEIGHBORHOOD,
+             s.START_DAY, s.START_HOUR,
+             s.AGE_COL_NAME, s.GENDER,
+             s.USER_TYPE_COL]
+
+    if labeled:
+        out_columns += [s.NEW_END_NEIGHBORHOOD]
+
+
+    next_df = annotate_geo.annotate_df_with_geoloc(indf, stations_df, noisy_nonmatches=False)
+
+    and_age_df = annotate_age(next_df)
+    more_df = annotate_time_features(and_age_df)
+
+    simpledf = annotate_geo.do_prep(more_df,
+            feature_encoding_dict)
+
+    return simpledf[out_columns]
+
+
+def ship_training_data_to_s3():
+    pass
 
 

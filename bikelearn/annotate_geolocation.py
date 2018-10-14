@@ -12,8 +12,19 @@ def _make_column_rename_dict(columns, prefix):
     d = {col: '{}_{}'.format(prefix, col) for col in columns}
     return d
 
+def warn_missing_stations(df, station_df):
+    # Want to throw exception when rows from df dont match a station
+    #   found in the station_df
+    missing_stations = (set(np.unique(df['start station name'].values)) 
+            - set(np.unique(station_df['station_name'].values))) 
 
-def annotate_df_with_geoloc(df, station_df, noisy_nonmatches=False):
+    if missing_stations:
+        print '!missing stations: %s' % missing_stations
+
+
+def annotate_df_with_geoloc(df, station_df,
+        noisy_nonmatches=False):
+        #purpose, noisy_nonmatches=False):
     ''' Given a df with both the 'start station name' and 'end station name'
     columns, join with the station_df to also include the geolocation 
     columns, including the start and end postal code, neighborhood and others.
@@ -31,28 +42,35 @@ def annotate_df_with_geoloc(df, station_df, noisy_nonmatches=False):
     step1_rename_dict = _make_column_rename_dict(station_df_columns, 'start')
     step2_rename_dict = _make_column_rename_dict(station_df_columns, 'end')
 
-    # Want to throw exception when rows from df were thrown out because no station
+    # Want to throw exception when rows from df dont match a station
     #   found in the station_df
     missing_stations = (set(np.unique(df['start station name'].values)) 
             - set(np.unique(station_df['station_name'].values))) 
 
     if noisy_nonmatches:
-        assert len(missing_stations) == 0, 'missing stations: %s' % missing_stations
+        warn_missing_stations(df, station_df)
 
-    step1_df = pd.merge(left=df, right=station_df, how='inner',
+        if missing_stations:
+            print '!missing stations: %s' % missing_stations
+
+    step1_df = pd.merge(left=df, right=station_df, how='left',
                        left_on=['start station name'],
                         right_on=['station_name'])
 
-
+    # TODO... shouldnt be renaming but just appending...
     step1_df.rename(columns=step1_rename_dict, inplace=True)
 
-    step2_df = pd.merge(left=step1_df, right=station_df, how='inner',
-                       left_on=['end station name'],
-                        right_on=['station_name'])
+    if step1_df[step1_df['end station name'].notnull()].shape[0] > 0:
 
-    step2_df.rename(columns=step2_rename_dict, inplace=True)
+        step2_df = pd.merge(left=step1_df, right=station_df, how='inner',
+                           left_on=['end station name'],
+                            right_on=['station_name'])
 
-    return step2_df
+        step2_df.rename(columns=step2_rename_dict, inplace=True)
+
+        return step2_df
+    
+    return step1_df
 
 
 def make_dead_simple_df(annotated_df):
@@ -77,7 +95,7 @@ def make_dead_simple_df(annotated_df):
     return filtered_df
 
 
-def make_medium_simple_df(annotated_df):
+def make_medium_simple_df(annotated_df, feature_encoding_dict):
     '''
     Take a geo and time annotated df, and select the output cols for train/test.
     '''
@@ -90,24 +108,30 @@ def make_medium_simple_df(annotated_df):
 
     df = annotated_df.copy()
 
-    out_columns = [s.NEW_START_POSTAL_CODE,
+    out_columns = [
+            s.USER_TYPE_COL,
+            s.NEW_START_POSTAL_CODE,
             s.NEW_START_BOROUGH, s.NEW_START_NEIGHBORHOOD,
             s.START_DAY, s.START_HOUR,
             s.AGE_COL_NAME, s.GENDER,] + [s.NEW_END_NEIGHBORHOOD]
 
-    filtered_df = df[out_columns].dropna()
-
-    # Simple encoding
-    feature_encoding = [s.NEW_START_POSTAL_CODE,
-            s.NEW_START_BOROUGH, s.NEW_START_NEIGHBORHOOD] + [s.NEW_END_NEIGHBORHOOD]
-
+    for col, dtype in feature_encoding_dict.items():
+        df[col] = df[col].astype(dtype)
 
     dfcopy, label_encoders = classify.build_label_encoders_from_df(
-            filtered_df, feature_encoding)
+            df, feature_encoding_dict)
+
+    # Apply label encoding...
+
+
 
     # TODO probably need re-indexing?
 
-    return dfcopy
+    return dfcopy, label_encoders
 
-
+def do_prep(df, feature_encoding_dict):
+    for col, dtype in feature_encoding_dict.items():
+        if col in df:
+            df[col] = df[col].astype(dtype)
+    return df
 

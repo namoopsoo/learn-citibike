@@ -49,7 +49,7 @@ import get_station_geolocation_data as getgeo
 
 stations_list = getgeo.extract_stations_from_data('201510-citibike-tripdata.csv')
 
-stations_json_filename = 'data/start_stations_103115.json'
+stations_json_filename = 'datas/start_stations_103115.json'
 
 with open(stations_json_filename, 'w') as fd:
 	json.dump(stations_list, fd, indent=4)
@@ -79,6 +79,7 @@ simpledf.to_csv(s.DATAS_DIR + '/201510-citibike-tripdata.simple.csv')
 import os
 import pandas as pd
 import pipeline_data as pl
+import classify
 import annotate_geolocation as annotate_geo
 import settings as s
 
@@ -93,7 +94,7 @@ next_df = annotate_geo.annotate_df_with_geoloc(octoberdf, stations_df, noisy_non
 and_age_df = pl.annotate_age(next_df)
 more_df = pl.annotate_time_features(and_age_df)
 
-simpledf = annotate_geo.make_medium_simple_df(more_df)
+simpledf, label_encoders = annotate_geo.make_medium_simple_df(more_df)
 simpledf.to_csv(s.DATAS_DIR + '/201510-citibike-tripdata.medium-simple.csv', index_label='index')
 
 

@@ -51,6 +51,9 @@ ALL_END_STATION_COLS = NEW_END_STATION_COLS + [
         END_STATION_NAME, END_STATION_ID]
 
 
+ALL_COLUMNS = ['tripduration', 'starttime', 'stoptime', 'start station id', 'start station name', 'start station latitude', 'start station longitude', 'end station id', 'end station name', 'end station latitude', 'end station longitude', 'bikeid', 'usertype', 'birth year', 'gender']
+
+
 
 DATAS_DIR = 'datas'
 TRIPS_FILE = DATAS_DIR + '/' + '201510-citibike-tripdata.csv'

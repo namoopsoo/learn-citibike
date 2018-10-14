@@ -1,6 +1,6 @@
-
-
 import numpy as np
+import pandas as pd
+from StringIO import StringIO
 from collections import OrderedDict 
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import (LogisticRegression,
@@ -17,11 +17,12 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 
 from sklearn.grid_search import GridSearchCV
 
-from pipeline_data import (remove_rows_with_nulls,
-        re_index, feature_binarization, make_one_hot_encoders)
-
-
+import pipeline_data as pl
+import dfutils as dfu
 from utils import dump_np_array
+
+import bikelearn.settings as s
+
 
 def what_is_dtype(s):
     if s.dtype == int:
@@ -34,6 +35,22 @@ def what_is_dtype(s):
         raise Exception, 'what is the dtype' + str(s.dtype)
 
     return dtype
+
+
+def replace_the_unknowns(df, feature_encoding):
+    # Need to encode any unknown value as -1.
+    # So first need to do a map for any values not known, map them to be -1.
+    # Otherwise LabelEncoder will freak out.
+    #
+    for feature in feature_encoding:
+        if feature not in df.columns:
+            continue
+        dtype = feature_encoding[feature]
+
+        replacer = replace_unknown(df[feature], dtype)
+        df[feature] = df[feature].apply(replacer)
+    return df
+
 
 def encode_holdout_df(holdout_df, label_encoders, feature_encoding):
     '''
@@ -48,10 +65,12 @@ def encode_holdout_df(holdout_df, label_encoders, feature_encoding):
         if feature not in holdout_copy.columns:
             continue
 
-        dtype = what_is_dtype(holdout_copy[feature])
+        dtype = feature_encoding[feature]
 
         # Need to encode any unknown value as -1.
         # So first need to do a map for any values not known, map them to be -1.
+        # Otherwise LabelEncoder will freak out.
+        #
         replacer = replace_unknown(label_encoders[feature].classes_, dtype)
         holdout_copy[feature] = holdout_copy[feature].apply(replacer)
 
@@ -61,29 +80,29 @@ def encode_holdout_df(holdout_df, label_encoders, feature_encoding):
     return holdout_copy
 
 
-def build_label_encoders_from_df(df, feature_encoding):
-    #
+def build_label_encoders_from_df(df, feature_encoding_dict):
+    # NOTE... should unravel the actual encoding done in here though
+    #   for a separate step.
     label_encoders = {}
-
     dfcopy = df.copy()
 
-    for feature in feature_encoding:
+    for feature, dtype in feature_encoding_dict.items():
         if feature not in dfcopy.columns:
             continue
 
         label_encoders[feature] = LabelEncoder()
 
-        dtype = what_is_dtype(dfcopy[feature])
-        if dtype == int:
-            missing_val = -1 
+        if dtype == float:
+            missing_val = -1.
         elif dtype == str:
             missing_val = '-1'
         else:
             raise Exception, 'unknown dtype' + str(dtype)
 
         # The missing value is fit as the last value in the label encoder. 
-        #   So then when a new value is encountered afterwards, it is changed
-        #   into the missing value.
+        #   So then when a new value is encountered afterwards, 
+        # it is changed  into the missing value.
+        dfcopy[feature] = dfcopy[feature].fillna(missing_val)
         label_encoders[feature].fit(
                         np.concatenate([dfcopy[feature], np.array([missing_val])])
                         )
@@ -118,14 +137,14 @@ preparing a holdout set:
     need to check if values are not in the encoding set, then need to replace w/ -1 .
     '''
     # Remove nulls...
-    df_unnulled = remove_rows_with_nulls(df)
-    df_re_index = re_index(df_unnulled)
+    df_unnulled = dfu.remove_rows_with_nulls(df)
+    df_re_index = dfu.re_index(df_unnulled)
     df = df_re_index
 
     # Remove nulls from holdout too
     if holdout_df is not None:
-        holdout_df_unnulled = remove_rows_with_nulls(holdout_df)
-        holdout_df_re_index = re_index(holdout_df_unnulled)
+        holdout_df_unnulled = dfu.remove_rows_with_nulls(holdout_df)
+        holdout_df_re_index = dfu.re_index(holdout_df_unnulled)
         holdout_df = holdout_df_re_index
 
     if feature_encoding:
@@ -153,12 +172,12 @@ preparing a holdout set:
     if one_hot_encoding:
         # For each input feature being encoded, we want the new columns concatenated
         #   into the output.
-        oh_encoders = make_one_hot_encoders(X, one_hot_encoding)
-        X = feature_binarization(X, oh_encoders)
+        oh_encoders = pl.make_one_hot_encoders(X, one_hot_encoding)
+        X = pl.feature_binarization(X, oh_encoders)
 
         if X_holdout is not None:
-            # X_holdout = feature_binarization(X_holdout, one_hot_encoding)
-            X_holdout = feature_binarization(X_holdout, oh_encoders)
+            # X_holdout = pl.feature_binarization(X_holdout, one_hot_encoding)
+            X_holdout = pl.feature_binarization(X_holdout, oh_encoders)
 
     # FIXME ... use the appropriate LabelEncoder here. Unless already done by the t_t_split()
     if label_col:
@@ -290,5 +309,59 @@ def run_metrics_on_predictions(y_true, y_predictions):
 def simple_split(df):
     train_df, holdout_df = train_test_split(df, test_size=0.2)
     return train_df, holdout_df
+
+def hydrate_csv_to_df(csvdata):
+    header = ['starttime',
+            'start station name',
+            'usertype',
+            'birth year',
+            'gender']
+    header_str = ','.join(header)
+    full_csvdata = '{}\n{}'.format(header_str, csvdata)
+    s = StringIO(full_csvdata)
+    # df = pd.read_csv(s)
+    df = pd.read_csv(s)
+
+    return df
+
+
+def widen_df_with_other_cols(df, all_columns):
+    new_cols = list(set(all_columns)
+            - set(df.columns.tolist()))
+    for col in new_cols:
+        df[col] = np.nan
+    return df
     
+
+def run_model_predict(bundle, df, stations_df, labeled):
+    # Given a held-out df, which has an output label.
+    label_encoders = bundle['label_encoders']
+    clf = bundle['clf']
+
+    feature_encoding_dict = bundle['features']['dtypes']
+    prepped_df = pl.prepare_test_data_for_predict(df, stations_df,
+            feature_encoding_dict, labeled)
+
+    feature_encoding = bundle['features']['dtypes']
+    encoded_df = encode_holdout_df(prepped_df, label_encoders,
+            feature_encoding)
+
+    # X,y...
+    X_out_columns = bundle['features']['input']
+    X_df = encoded_df[X_out_columns]
+
+    # Then apply the clf predict ...
+    X_test = np.array(X_df)
+    y_predictions = clf.predict(X_test)
+
+    # TODO... probably better pull this out of this function to be cleaner.
+    if labeled:
+        y_col = [bundle['features']['output_label']]
+        y_df = encoded_df[y_col]
+        y_test = np.array(y_df)
+
+        return y_predictions, y_test
+
+    else:
+        return y_predictions, None
 
