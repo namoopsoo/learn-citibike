@@ -16,6 +16,7 @@ import flask
 import pandas as pd
 
 import bikelearn.classify as blc
+import bikelearn.settings as s
 
 prefix = '/opt/ml/'
 model_path = os.path.join(prefix, 'model')
@@ -31,6 +32,7 @@ def get_bundle_filename():
     with open(path) as fd:
         out = json.load(fd)
 
+    print('DEBUG, bundle_meta.json, {}'.format(out))
     assert out is not None, 'out, {}'.format(out)
     return out.get('bundle_filename')
 
@@ -38,8 +40,13 @@ def get_bundle_filename():
 def do_predict(bundle, df):
     stations_df = bundle['train_metadata']['stations_df']
 
+    widened_df = blc.widen_df_with_other_cols(df, s.ALL_COLUMNS)
+
+    print('DEBUG df.shape, ' + str(df.shape))
+    print('DEBUG widened_df.shape, ' + str(widened_df.shape))
+
     y_predictions, y_test = blc.run_model_predict(
-            bundle, df, stations_df)
+            bundle, widened_df, stations_df, labeled=False)
 
     return y_predictions
 
@@ -65,6 +72,7 @@ class ScoringService(object):
             input (a pandas dataframe): The data on which to do the predictions. There will be
                 one prediction per row in the dataframe"""
         bundle = cls.get_model()
+        print ('DEBUG, csvdata, {}'.format(csvdata))
         df = blc.hydrate_csv_to_df(csvdata)
         print('Invoked with {} records'.format(df.shape[0]))
 
@@ -102,8 +110,8 @@ def transformation():
 
 
         # FIXME ok eventually put back the header=None 
-        # s = StringIO.StringIO(data)
-        # data = pd.read_csv(s, header=None)
+        # sio = StringIO.StringIO(data)
+        # data = pd.read_csv(sio, header=None)
 
     else:
         return flask.Response(response='This predictor only supports CSV data', status=415, mimetype='text/plain')

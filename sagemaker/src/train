@@ -36,13 +36,29 @@ config_path = os.path.join(prefix, 'input/config')
 channel_name='training'
 training_path = os.path.join(input_path, channel_name)
 
+def whats_stations_filename():
+    stations_dir = os.path.join(training_path, 'support')
+    print("DEBUG, stations_dir, " + stations_dir)
+
+    stations_fn_list = [file
+            for file in
+            os.listdir(stations_dir)]
+
+    print('DEBUG, stations_fn_list , ' + str(stations_fn_list))
+    assert len(stations_fn_list) == 1, 'should be one file here'
+
+    stations_fn = stations_fn_list[0]
+
+    return os.path.join(stations_dir, stations_fn)
+
+
 def train():
     train_fns = what_are_train_files()
     fn = train_fns[-1]
     # trainset = pd.read_csv(fn, header=None) # Hmm..
     trainset = pd.read_csv(fn)
 
-    stations_fn = os.path.join(config_path, 'start_stations_103115.csv')
+    stations_fn = whats_stations_filename()
     stations_df = pd.read_csv(stations_fn)
 
     try:
@@ -67,9 +83,17 @@ def train():
 
 def what_are_train_files():
     # Take the set of files and read them all into a single pandas dataframe
+    print('DEBUG, training_path, ' + training_path)
+
+    print('DEBUG, os.listdir(training_path), ' + str(
+        os.listdir(training_path)))
     input_files = [
             os.path.join(training_path, file)
-            for file in os.listdir(training_path)]
+            for file in
+            filter(lambda x: x != 'support', os.listdir(training_path))]
+
+    print('DEBUG, input_files , ')
+    print(str(input_files))
 
     if len(input_files) == 0:
         raise ValueError(('There are no files in {}.\n'

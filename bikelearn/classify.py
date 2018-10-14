@@ -311,8 +311,17 @@ def simple_split(df):
     return train_df, holdout_df
 
 def hydrate_csv_to_df(csvdata):
-    s = StringIO(csvdata)
+    header = ['starttime',
+            'start station name',
+            'usertype',
+            'birth year',
+            'gender']
+    header_str = ','.join(header)
+    full_csvdata = '{}\n{}'.format(header_str, csvdata)
+    s = StringIO(full_csvdata)
+    # df = pd.read_csv(s)
     df = pd.read_csv(s)
+
     return df
 
 

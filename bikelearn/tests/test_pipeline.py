@@ -41,7 +41,10 @@ class DuhPipelineTest(unittest.TestCase):
         pass
 
     def test_treefoo_with_pure_input_data(self):
-        csvdata = 'starttime,start station name,usertype,birth year,gender\n10/1/2015 00:00:02,W 26 St & 10 Ave,Subscriber,1973,1\n10/1/2015 00:00:02,E 39 St & 2 Ave,Subscriber,1990,1'
+        # csvdata = 'starttime,start station name,usertype,birth year,gender\n10/1/2015 00:00:02,W 26 St & 10 Ave,Subscriber,1973,1\n10/1/2015 00:00:02,E 39 St & 2 Ave,Subscriber,1990,1'
+
+        csvdata = '10/1/2015 00:00:02,W 26 St & 10 Ave,Subscriber,1973,1\n10/1/2015 00:00:02,E 39 St & 2 Ave,Subscriber,1990,1'
+
 
         df = blc.hydrate_csv_to_df(csvdata)
         # minimal_cols = 
@@ -49,10 +52,7 @@ class DuhPipelineTest(unittest.TestCase):
 
         bundle, datasets, stations_df = make_basic_minimal_model()
 
-        all_columns = ['tripduration', 'starttime', 'stoptime', 'start station id', 'start station name', 'start station latitude', 'start station longitude', 'end station id', 'end station name', 'end station latitude', 'end station longitude', 'bikeid', 'usertype', 'birth year', 'gender']
-
-        widened_df = blc.widen_df_with_other_cols(df, all_columns)
-
+        widened_df = blc.widen_df_with_other_cols(df, s.ALL_COLUMNS)
 
         y_predictions, _ = blc.run_model_predict(
                 bundle, widened_df, stations_df, labeled=False)
@@ -62,7 +62,7 @@ class DuhPipelineTest(unittest.TestCase):
 
 class IntegrationLocalTest(unittest.TestCase):
 
-    def test_foo(self):
+    def test_foo_full_header(self):
         url = 'http://127.0.0.1:8080/invocations'
         headers = {'Content-Type': 'text/csv'}
         data = 'tripduration,starttime,stoptime,start station id,start station name,start station latitude,start station longitude,end station id,end station name,end station latitude,end station longitude,bikeid,usertype,birth year,gender\n171,10/1/2015 00:00:02,10/1/2015 00:02:54,388,W 26 St & 10 Ave,40.749717753,-74.002950346,494,W 26 St & 8 Ave,40.74734825,-73.99723551,24302,Subscriber,1973.0,1\n593,10/1/2015 00:00:02,10/1/2015 00:09:55,518,E 39 St & 2 Ave,40.74780373,-73.97344190000001,438,St Marks Pl & 1 Ave,40.72779126,-73.98564945,19904,Subscriber,1990.0,1\n'
@@ -81,8 +81,34 @@ class IntegrationLocalTest(unittest.TestCase):
         data = 'starttime,start station name,usertype,birth year,gender\n10/1/2015 00:00:02,W 26 St & 10 Ave,Subscriber,1973,1\n10/1/2015 00:00:02,E 39 St & 2 Ave,Subscriber,1990,1'
 
         r = requests.post(url, data=data,headers=headers)
-        from nose.tools import set_trace; set_trace()
         assert r.status_code/100 == 2
 
         pass
 
+    def test_with_garbage_station(self):
+
+        url = 'http://127.0.0.1:8080/invocations'
+        headers = {'Content-Type': 'text/csv'}
+        data_vec = ['starttime,start station name,usertype,birth year,gender',
+                '\n10/1/2015 00:00:02,Foo Rd & Fake St.,Subscriber,1973,1',
+                '\n10/1/2015 00:00:02,E 39 St & 2 Ave,Subscriber,1990,1']
+        data = '\n'.join(data_vec)
+        from nose.tools import set_trace; set_trace()
+
+        r = requests.post(url, data=data, headers=headers)
+        assert r.status_code/100 == 2
+
+
+    def test_just_inputs_w_o_header(self):
+
+        url = 'http://127.0.0.1:8080/invocations'
+        headers = {'Content-Type': 'text/csv'}
+        data_vec = ['10/1/2015 00:00:02,W 26 St & 10 Ave,Subscriber,1973,1',
+                '10/1/2015 00:00:02,E 39 St & 2 Ave,Subscriber,1990,1']
+        data = '\n'.join(data_vec)
+
+        r = requests.post(url, data=data,headers=headers)
+        from nose.tools import set_trace; set_trace()
+        assert r.status_code/100 == 2
+
+        pass
