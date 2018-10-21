@@ -112,6 +112,9 @@ def build_label_encoders_from_df(df, feature_encoding_dict):
     return dfcopy, label_encoders
 
 
+def label_decode(label_encoder, vec):
+    return label_encoder.inverse_transform(vec)
+
 
 def replace_unknown(values, dtype):
     def replacer(v):
@@ -331,6 +334,13 @@ def widen_df_with_other_cols(df, all_columns):
     for col in new_cols:
         df[col] = np.nan
     return df
+
+
+def contract_df(df):
+    bare_columns = [
+            'starttime', 'start station name', 'usertype', 'birth year', 'gender'
+            ]
+    return df[bare_columns]
     
 
 def run_model_predict(bundle, df, stations_df, labeled):

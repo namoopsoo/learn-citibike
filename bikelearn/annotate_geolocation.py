@@ -123,8 +123,6 @@ def make_medium_simple_df(annotated_df, feature_encoding_dict):
 
     # Apply label encoding...
 
-
-
     # TODO probably need re-indexing?
 
     return dfcopy, label_encoders

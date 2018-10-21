@@ -28,6 +28,13 @@ def make_basic_minimal_model():
     return bundle, datasets, stations_df
 
 
+def get_basic_proportion_correct(y_test, y_predictions):
+    zipped = zip(y_test, y_predictions)
+    correct = len([[x,y] for x,y in zipped if x == y])
+    proportion_correct = 1.0*correct/y_test.shape[0]
+    return proportion_correct
+
+
 class DuhPipelineTest(unittest.TestCase):
 
     def test_treefoo_duh(self):
@@ -35,10 +42,31 @@ class DuhPipelineTest(unittest.TestCase):
 
         holdout_df = datasets['holdout_df']
 
+
         y_predictions, y_test = blc.run_model_predict(
                 bundle, holdout_df, stations_df, labeled=True)
 
+        proportion_correct_labeled_true = get_basic_proportion_correct(
+                y_test, y_predictions)
+
+
+        # Again but unlabeled now.
+        from nose.tools import set_trace; set_trace()
+
+        contracted_df = blc.contract_df(holdout_df)
+
+        widened_df = blc.widen_df_with_other_cols(contracted_df, s.ALL_COLUMNS)
+
+        y_predictions_from_widened, _ = blc.run_model_predict(
+                bundle, widened_df, stations_df, labeled=False)
+
+        proportion_correct_labeled_false = get_basic_proportion_correct(
+                y_test, y_predictions_from_widened)
+
+        # and assert, evaluation should be the same..
+        assert proportion_correct_labeled_false  == proportion_correct_labeled_true
         pass
+
 
     def test_treefoo_with_pure_input_data(self):
         # csvdata = 'starttime,start station name,usertype,birth year,gender\n10/1/2015 00:00:02,W 26 St & 10 Ave,Subscriber,1973,1\n10/1/2015 00:00:02,E 39 St & 2 Ave,Subscriber,1990,1'

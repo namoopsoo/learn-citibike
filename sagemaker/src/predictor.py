@@ -45,7 +45,7 @@ def do_predict(bundle, df):
     print('DEBUG df.shape, ' + str(df.shape))
     print('DEBUG widened_df.shape, ' + str(widened_df.shape))
 
-    y_predictions, y_test = blc.run_model_predict(
+    y_predictions, _ = blc.run_model_predict(
             bundle, widened_df, stations_df, labeled=False)
 
     return y_predictions
@@ -103,9 +103,11 @@ def transformation():
     just means one prediction per line, since there's a single column.
     """
     data = None
+    print('DEBUG, flask.request.content_type, "{}"'.format(flask.request.content_type))
 
     # Convert from CSV to pandas
     if flask.request.content_type == 'text/csv':
+        print ('DEBUG, ok text/csv')
         data = flask.request.data.decode('utf-8')
 
 
@@ -114,6 +116,7 @@ def transformation():
         # data = pd.read_csv(sio, header=None)
 
     else:
+        print ('DEBUG, hmm, not text/csv')
         return flask.Response(response='This predictor only supports CSV data', status=415, mimetype='text/plain')
 
 

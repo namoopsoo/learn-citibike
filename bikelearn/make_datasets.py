@@ -13,8 +13,8 @@ import annotate_geolocation as annotate_geo
 import settings as s
 
 def make_dfs(indf, stations_df):
-    stations_df_filename = os.path.join(s.DATAS_DIR, 'start_stations_103115.fuller.csv')
-    # stations_df = pd.read_csv(stations_df_filename, index_col=0, dtype={'postal_code': str})
+
+
 
     train_df, holdout_df = cl.simple_split(indf)
 

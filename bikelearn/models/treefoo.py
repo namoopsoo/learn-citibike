@@ -28,7 +28,7 @@ def make_tree_foo(trainset, stations):
     simpledf, label_encoders = pl.make_simple_df_from_raw(
             trainset['trainset'], stations['stations_df'],
             feature_encoding_dict)
-    train_df, validation_df = classify.simple_split(simpledf)
+    train_df, validation_df = classify.simple_split(simpledf) # FIXME: label encoders from full or train?
 
     X_train = np.array(train_df[cols])
     y_train = np.array(train_df[s.NEW_END_NEIGHBORHOOD])
@@ -39,6 +39,8 @@ def make_tree_foo(trainset, stations):
     # Quick simple evaluate on validation as well..
     X_validation = np.array(validation_df[cols])
     y_validation = np.array(validation_df[s.NEW_END_NEIGHBORHOOD])
+
+    from nose.tools import set_trace; set_trace()
 
     y_predictions_validation = clf.predict(X_validation)
     zipped = zip(y_validation, y_predictions_validation)

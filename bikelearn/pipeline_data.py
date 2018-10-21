@@ -340,7 +340,6 @@ def make_simple_df_from_raw(indf, stations_df, feature_encoding_dict):
 
     next_df = annotate_geo.annotate_df_with_geoloc(indf, stations_df, noisy_nonmatches=True)
 
-
     and_age_df = annotate_age(next_df)
     more_df = annotate_time_features(and_age_df)
     simpledf, label_encoders = annotate_geo.make_medium_simple_df(
