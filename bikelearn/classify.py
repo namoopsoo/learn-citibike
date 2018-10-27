@@ -375,3 +375,22 @@ def run_model_predict(bundle, df, stations_df, labeled):
     else:
         return y_predictions, None
 
+
+def get_sorted_predict_proba_predictions(out_probabilities, classes, k=None):
+
+#     first_row = out_probabilities[0]
+#     first_grouped = zip(first_row, classes)
+#     first_sorted_list = sorted(first_grouped, key=lambda x:x[0])
+#     first_sorted_predictions = [x[1] for x in first_sorted_predictions]
+
+    v1 = [zip(row, classes) for row in out_probabilities]
+    v2 = [sorted(row, key=lambda x:x[0], reverse=True) for row in v1]
+    v3 = [[x[1] for x in row]
+            for row in v2]
+
+    if k is None:
+        return v3
+
+    v4 = [x[:k] for x in v3]
+    return v4
+

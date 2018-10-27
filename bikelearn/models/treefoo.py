@@ -44,7 +44,7 @@ def make_tree_foo(trainset, stations):
 
     y_predictions_validation = clf.predict(X_validation)
     zipped = zip(y_validation, y_predictions_validation)
-    correct = len([[x,y] for x,y in zipped if x == y])
+    correct = len([[x,y] for x,y in zipped if x == y and y != 'nan'])
     proportion_correct = 1.0*correct/y_validation.shape[0]
 
     bundle = {
