@@ -65,6 +65,8 @@ def train():
         bundle = bikemodel.make_tree_foo(
                 {'trainset': trainset, 'fn': fn},
                 {'stations_df': stations_df, 'fn': stations_fn})
+
+        # TODO... do the test set too..
     except Exception as e:
         # Write out an error file. This will be returned as the failureReason in the
         # DescribeTrainingJob result.
