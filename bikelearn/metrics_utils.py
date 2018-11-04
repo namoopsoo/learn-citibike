@@ -24,7 +24,7 @@ def gather_metrics(y_test, y_predictions, y_predict_proba, classes):
         'rank_k4_proba_score': rank_k_proba_score(y_test, y_predict_proba, classes, k=4),
         'rank_k5_proba_score': rank_k_proba_score(y_test, y_predict_proba, classes, k=5),
         'rank_k10_proba_score': rank_k_proba_score(y_test, y_predict_proba, classes, k=10),
-        'proportion_correct_foo': get_proportion_correct
+        # 'proportion_correct_foo': get_proportion_correct(y_test, y_predictions)
         }
     return metrics
 

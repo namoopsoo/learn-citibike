@@ -37,10 +37,11 @@ class ProbaSortedTest(unittest.TestCase):
                 prepared['y_predict_proba'],
                 clf.classes_, k=1)
 
+        from nose.tools import set_trace; set_trace()
+
         y_predictions, y_test, metrics = blc.run_model_predict(
                bundle, df, stations_df, labeled=True)
 
-        from nose.tools import set_trace; set_trace()
 
 
         assert [x[0] for x in y_topk1_outputs] == list(y_predictions)

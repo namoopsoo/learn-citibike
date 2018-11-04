@@ -355,7 +355,7 @@ def run_model_predict(bundle, df, stations_df, labeled):
         y_df = prepared['encoded_df'][y_col]
         y_test = np.array(y_df)
 
-        metrics = blmu.gather_metrics(y_df, prepared['y_predictions'],
+        metrics = blmu.gather_metrics(y_test, prepared['y_predictions'],
                 prepared['y_predict_proba'],
                 clf.classes_)
 
