@@ -21,6 +21,8 @@ import pipeline_data as pl
 import dfutils as dfu
 from utils import dump_np_array
 
+import bikelearn.metrics_utils as blmu
+
 import bikelearn.settings as s
 
 
@@ -344,6 +346,26 @@ def contract_df(df):
     
 
 def run_model_predict(bundle, df, stations_df, labeled):
+    clf = bundle['clf']
+    prepared = predict_prepare(bundle, df, stations_df, labeled)
+
+    # TODO... probably better pull this out of this function to be cleaner.
+    if labeled:
+        y_col = [bundle['features']['output_label']]
+        y_df = prepared['encoded_df'][y_col]
+        y_test = np.array(y_df)
+
+        metrics = blmu.gather_metrics(y_df, prepared['y_predictions'],
+                prepared['y_predict_proba'],
+                clf.classes_)
+
+        return prepared['y_predictions'], y_test, metrics
+
+    else:
+        return prepared['y_predictions'], None, None
+
+
+def predict_prepare(bundle, df, stations_df, labeled):
     # Given a held-out df, which has an output label.
     label_encoders = bundle['label_encoders']
     clf = bundle['clf']
@@ -363,34 +385,9 @@ def run_model_predict(bundle, df, stations_df, labeled):
     # Then apply the clf predict ...
     X_test = np.array(X_df)
     y_predictions = clf.predict(X_test)
+    y_predict_proba = clf.predict_proba(X_test)
 
-    # TODO... probably better pull this out of this function to be cleaner.
-    if labeled:
-        y_col = [bundle['features']['output_label']]
-        y_df = encoded_df[y_col]
-        y_test = np.array(y_df)
-
-        return y_predictions, y_test
-
-    else:
-        return y_predictions, None
-
-
-def get_sorted_predict_proba_predictions(out_probabilities, classes, k=None):
-
-#     first_row = out_probabilities[0]
-#     first_grouped = zip(first_row, classes)
-#     first_sorted_list = sorted(first_grouped, key=lambda x:x[0])
-#     first_sorted_predictions = [x[1] for x in first_sorted_predictions]
-
-    v1 = [zip(row, classes) for row in out_probabilities]
-    v2 = [sorted(row, key=lambda x:x[0], reverse=True) for row in v1]
-    v3 = [[x[1] for x in row]
-            for row in v2]
-
-    if k is None:
-        return v3
-
-    v4 = [x[:k] for x in v3]
-    return v4
+    return {'encoded_df': encoded_df,
+            'y_predictions': y_predictions,
+            'y_predict_proba': y_predict_proba}
 

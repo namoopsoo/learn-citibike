@@ -1,13 +1,16 @@
+import numpy as np
 import json
 import unittest
 
 import bikelearn.classify as blc
+import bikelearn.tests.utils as bltu
+import bikelearn.metrics_utils as blmu
+
+import bikelearn.settings as s
 
 class ProbaSortedTest(unittest.TestCase):
 
     def test_basic(self):
-
-        from nose.tools import set_trace; set_trace()
 
         y_test = [25, 16, 16, 17, 16, 16, 16, 16, 16, 16, 16, 2, 25, 17, 16, 25, 25, 22, 17, 17]
 
@@ -17,7 +20,29 @@ class ProbaSortedTest(unittest.TestCase):
             out_probabilities = json.load(fd)
 
 
-        sorted_outputs = blc.get_sorted_predict_proba_predictions(out_probabilities, classes, k=5)
+        sorted_outputs = blmu.get_sorted_predict_proba_predictions(out_probabilities, classes, k=5)
 
         pass
+
+    def test_predict_matches_proba(self):
+
+        bundle, datasets, stations_df = bltu.make_basic_minimal_model()
+        df = datasets['holdout_df']
+        clf = bundle['clf']
+
+
+        prepared = blc.predict_prepare(bundle, df, stations_df, labeled=True)
+
+        y_topk1_outputs = blmu.get_sorted_predict_proba_predictions(
+                prepared['y_predict_proba'],
+                clf.classes_, k=1)
+
+        y_predictions, y_test, metrics = blc.run_model_predict(
+               bundle, df, stations_df, labeled=True)
+
+        from nose.tools import set_trace; set_trace()
+
+
+        assert [x[0] for x in y_topk1_outputs] == list(y_predictions)
+
 

@@ -7,46 +7,22 @@ import bikelearn.make_datasets as bm
 from bikelearn.models import treefoo
 import bikelearn.settings as s
 import bikelearn.classify as blc
+import bikelearn.tests.utils as bltu
 
-
-def make_basic_minimal_model():
-    fn = 'bikelearn/tests/data/basic-citibike-tripdata.csv'
-    df = pd.read_csv(fn)
-
-    stations_fn = os.path.join(s.DATAS_DIR, 'start_stations_103115.fuller.csv')
-    stations_df = pd.read_csv(stations_fn, index_col=0, dtype={'postal_code': str})
-
-    # make simple train/test sets
-    datasets = bm.make_dfs(df, stations_df)
-
-    bundle = treefoo.make_tree_foo(
-            {'trainset': datasets['train_df'], 'fn': fn},
-            {'stations_df': stations_df, 'fn': stations_fn})
-
-    assert s.USER_TYPE_COL in bundle['label_encoders']
-
-    return bundle, datasets, stations_df
-
-
-def get_basic_proportion_correct(y_test, y_predictions):
-    zipped = zip(y_test, y_predictions)
-    correct = len([[x,y] for x,y in zipped if x == y])
-    proportion_correct = 1.0*correct/y_test.shape[0]
-    return proportion_correct
 
 
 class DuhPipelineTest(unittest.TestCase):
 
     def test_treefoo_duh(self):
-        bundle, datasets, stations_df = make_basic_minimal_model()
+        bundle, datasets, stations_df = bltu.make_basic_minimal_model()
 
         holdout_df = datasets['holdout_df']
 
 
-        y_predictions, y_test = blc.run_model_predict(
+        y_predictions, y_test, metrics = blc.run_model_predict(
                 bundle, holdout_df, stations_df, labeled=True)
 
-        proportion_correct_labeled_true = get_basic_proportion_correct(
+        proportion_correct_labeled_true = bltu.get_basic_proportion_correct(
                 y_test, y_predictions)
 
 
@@ -57,10 +33,10 @@ class DuhPipelineTest(unittest.TestCase):
 
         widened_df = blc.widen_df_with_other_cols(contracted_df, s.ALL_COLUMNS)
 
-        y_predictions_from_widened, _ = blc.run_model_predict(
+        y_predictions_from_widened, _, _ = blc.run_model_predict(
                 bundle, widened_df, stations_df, labeled=False)
 
-        proportion_correct_labeled_false = get_basic_proportion_correct(
+        proportion_correct_labeled_false = bltu.get_basic_proportion_correct(
                 y_test, y_predictions_from_widened)
 
         # and assert, evaluation should be the same..
@@ -78,7 +54,7 @@ class DuhPipelineTest(unittest.TestCase):
         # minimal_cols = 
         # from nose.tools import set_trace; set_trace()
 
-        bundle, datasets, stations_df = make_basic_minimal_model()
+        bundle, datasets, stations_df = bltu.make_basic_minimal_model()
 
         widened_df = blc.widen_df_with_other_cols(df, s.ALL_COLUMNS)
 

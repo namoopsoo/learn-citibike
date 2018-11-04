@@ -8,39 +8,7 @@ from bikelearn import classify as blc
 from bikelearn import pipeline_data as pl
 import bikelearn.settings as s
 
-
-def do_validation(clf, validation_df, cols):
-
-    X_validation = np.array(validation_df[cols])
-    y_validation = np.array(validation_df[s.NEW_END_NEIGHBORHOOD])
-
-    y_predictions = clf.predict(X_validation)
-    classes = clf.classes_
-    y_predict_proba = clf.predict_proba(X_validation)
-
-    metrics = gather_metrics(y_validation, y_predictions, y_predict_proba, classes)
-
-def gather_metrics(y_test, y_predictions, y_predict_proba, classes):
-
-    metrics = {
-        'rank_k1_proba_score': rank_k_proba_score(y_test, y_predict_proba, classes, k=1),
-        'rank_k2_proba_score': rank_k_proba_score(y_test, y_predict_proba, classes, k=2),
-        'rank_k3_proba_score': rank_k_proba_score(y_test, y_predict_proba, classes, k=3),
-        'rank_k4_proba_score': rank_k_proba_score(y_test, y_predict_proba, classes, k=4),
-        'rank_k5_proba_score': rank_k_proba_score(y_test, y_predict_proba, classes, k=5),
-        'rank_k10_proba_score': rank_k_proba_score(y_test, y_predict_proba, classes, k=10),
-        '': get_proportion_correct
-        }
-
-def rank_k_proba_score(y_test, y_predict_proba, classes_, k=None):
-    y_topk_outputs = blc.get_sorted_predict_proba_predictions(y_predict_proba, classes, k)
-    return get_proportion_correct(y_validation, y_topk_outputs)
-
-def get_proportion_correct(y_validation, y_predictions_validation):
-    zipped = zip(y_validation, y_predictions_validation)
-    correct = len([[x,y] for x,y in zipped if x in y and y != 'nan'])
-    proportion_correct = 1.0*correct/y_validation.shape[0]
-    return proportion_correct
+import bikelearn.metrics_utils as blmu
 
 
 def make_tree_foo(trainset, stations):
@@ -72,6 +40,9 @@ def make_tree_foo(trainset, stations):
 
     # Quick simple evaluate on validation as well..
 
+    # TODO : holdout or validation or both..
+    validation_output = blmu.do_validation(clf, validation_df, cols)
+
     bundle = {
             'train_metadata': {'trainset_fn': trainset['fn'],
                 'stations_df_fn': stations['fn'],
@@ -86,8 +57,8 @@ def make_tree_foo(trainset, stations):
                 'output_label': s.NEW_END_NEIGHBORHOOD,
                 'dtypes': feature_encoding_dict},
             'evaluation': {
-                'validation_set':
-                proportion_correct},
+                'validation_output':
+                validation_output},
             'clf_info': {
                 'feature_importances':
                 zip(cols, clf.feature_importances_)}
