@@ -37,11 +37,13 @@ class ProbaSortedTest(unittest.TestCase):
                 prepared['y_predict_proba'],
                 clf.classes_, k=1)
 
-        from nose.tools import set_trace; set_trace()
 
         y_predictions, y_test, metrics = blc.run_model_predict(
                bundle, df, stations_df, labeled=True)
 
+        l = [x[1] for x in sorted(metrics['rank_k_proba_scores'].items(),
+                key=lambda x:x[0])]
+        assert all([l[i] <= l[i+1] for i in range(len(l) - 1)])
 
 
         assert [x[0] for x in y_topk1_outputs] == list(y_predictions)

@@ -18,13 +18,10 @@ def do_validation(clf, validation_df, cols):
 def gather_metrics(y_test, y_predictions, y_predict_proba, classes):
 
     metrics = {
-        'rank_k1_proba_score': rank_k_proba_score(y_test, y_predict_proba, classes, k=1),
-        'rank_k2_proba_score': rank_k_proba_score(y_test, y_predict_proba, classes, k=2),
-        'rank_k3_proba_score': rank_k_proba_score(y_test, y_predict_proba, classes, k=3),
-        'rank_k4_proba_score': rank_k_proba_score(y_test, y_predict_proba, classes, k=4),
-        'rank_k5_proba_score': rank_k_proba_score(y_test, y_predict_proba, classes, k=5),
-        'rank_k10_proba_score': rank_k_proba_score(y_test, y_predict_proba, classes, k=10),
-        # 'proportion_correct_foo': get_proportion_correct(y_test, y_predictions)
+        'rank_k_proba_scores': 
+        {k: rank_k_proba_score(y_test, y_predict_proba, classes, k=k)
+            for k in [1, 2, 3, 4, 5, 10]}
+
         }
     return metrics
 
