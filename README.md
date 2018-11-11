@@ -34,12 +34,11 @@ GOOGLE_GEO_API_KEY = 'blah'
 
 #### Take the base for a quick spin
 ```python
-import get_station_geolocation_data as getgeo
+import bikelearn.get_station_geolocation_data as getgeo
 
 address = "W 26 St & 10 Ave"
 
-data = getgeo.get_geocoding_results(address)
-
+data = getgeo.get_geocoding_results(address, request_type='geo')
 
 
 ```
