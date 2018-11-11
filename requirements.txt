@@ -1,4 +1,4 @@
-requests==2.18.4
+requests
 hiredis==0.2.0
 redis==2.10.6
 ipython==5.5.0
