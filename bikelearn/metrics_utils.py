@@ -1,4 +1,6 @@
 import numpy as np
+
+import sklearn.metrics as skm
 import bikelearn.settings as s
 
 
@@ -18,17 +20,27 @@ def do_validation(clf, validation_df, cols):
 def gather_metrics(y_test, y_predictions, y_predict_proba, classes):
 
     metrics = {
-        'rank_k_proba_scores': 
-        {k: rank_k_proba_score(y_test, y_predict_proba, classes, k=k)
-            for k in [1, 2, 3, 4, 5, 10]}
-
-        }
+            'rank_k_proba_scores': 
+            {k: rank_k_proba_score(y_test, y_predict_proba, classes, k=k)
+                for k in [1, 2, 3, 4, 5, 10]},
+            'f1_scores': 
+            {average_func:
+                skm.f1_score(y_test, y_predictions, labels=classes,
+                    average=average_func)
+                for average_func in ['micro', 'macro', 'weighted']} 
+            }
     return metrics
 
 
 def rank_k_proba_score(y_test, y_predict_proba, classes_, k=None):
     y_topk_outputs = get_sorted_predict_proba_predictions(y_predict_proba, classes_, k)
     return get_proportion_correct(y_test, y_topk_outputs)
+
+
+def get_confusion_matrix(y_true, y_pred, classes):
+
+
+    skm.confusion_matrix(y_true, y_pred, labels=None)
 
 
 def get_proportion_correct(y_validation, y_predictions_validation):

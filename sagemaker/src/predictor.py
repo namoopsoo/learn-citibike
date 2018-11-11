@@ -45,7 +45,7 @@ def do_predict(bundle, df):
     print('DEBUG df.shape, ' + str(df.shape))
     print('DEBUG widened_df.shape, ' + str(widened_df.shape))
 
-    y_predictions, _ = blc.run_model_predict(
+    y_predictions, _, _ = blc.run_model_predict(
             bundle, widened_df, stations_df, labeled=False)
 
     return y_predictions
@@ -102,32 +102,52 @@ def transformation():
     it to a pandas data frame for internal use and then convert the predictions back to CSV (which really
     just means one prediction per line, since there's a single column.
     """
-    data = None
-    print('DEBUG, flask.request.content_type, "{}"'.format(flask.request.content_type))
+    csvdata = None
+    request_content_type = flask.request.content_type
+    print('DEBUG, flask.request.content_type, "{}"'.format(request_content_type))
+
+    response_type = determine_response_type(request.args)
 
     # Convert from CSV to pandas
-    if flask.request.content_type == 'text/csv':
-        print ('DEBUG, ok text/csv')
-        data = flask.request.data.decode('utf-8')
+    if request_content_type == 'text/csv':
+        csvdata = flask.request.data.decode('utf-8')
+        result = do_output_predict(csvdata, response_type)
+        if response_type == 'simple':
+            return flask.Response(response=result, status=200, mimetype='text/csv')
+        elif response_type == 'complex':
+            return flask.Response(response=result, status=200, mimetype='application/json')
+
+    print ('DEBUG, hmm, not text/csv or application/json')
+    return flask.Response(response='This predictor only supports CSV data',
+            status=415, mimetype='text/plain')
 
 
-        # FIXME ok eventually put back the header=None 
-        # sio = StringIO.StringIO(data)
-        # data = pd.read_csv(sio, header=None)
+# FIXME ok eventually put back the header=None 
+# sio = StringIO.StringIO(data)
+# data = pd.read_csv(sio, header=None)
 
-    else:
-        print ('DEBUG, hmm, not text/csv')
-        return flask.Response(response='This predictor only supports CSV data', status=415, mimetype='text/plain')
+def determine_response_type(querystring):
+    response_type = querystring.get('response', 'simple')
+    print('DEBUG, querystring, ', querystring)
+    return response_type
 
+
+def do_output_predict(csvdata, response_type):
 
     # Do the prediction
-    predictions = ScoringService.predict(data)
+    predictions_dict = ScoringService.predict(csvdata=csvdata)
+    predictions = predictions_dict['simple']
+    predictions_ranked = predictions_dict['ranked']
 
-    # Convert from numpy back to CSV
-    out = StringIO.StringIO()
-    pd.DataFrame({'results': predictions}).to_csv(out, header=False, index=False)
-    result = out.getvalue()
+    if response_type == 'simple':
+        # Convert from numpy back to CSV
+        out = StringIO.StringIO()
+        pd.DataFrame({'results': predictions}).to_csv(out, header=False, index=False)
+        result = out.getvalue()
+        return result
+    elif response_type == 'complex':
+        #
+        return predictions_ranked
 
-    return flask.Response(response=result, status=200, mimetype='text/csv')
 
 

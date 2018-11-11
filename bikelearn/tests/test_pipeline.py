@@ -27,7 +27,7 @@ class DuhPipelineTest(unittest.TestCase):
 
 
         # Again but unlabeled now.
-        from nose.tools import set_trace; set_trace()
+
 
         contracted_df = blc.contract_df(holdout_df)
 
@@ -58,7 +58,7 @@ class DuhPipelineTest(unittest.TestCase):
 
         widened_df = blc.widen_df_with_other_cols(df, s.ALL_COLUMNS)
 
-        y_predictions, _ = blc.run_model_predict(
+        y_predictions, _, _ = blc.run_model_predict(
                 bundle, widened_df, stations_df, labeled=False)
 
         pass

@@ -16,8 +16,10 @@ def make_basic_minimal_model():
     datasets = bm.make_dfs(df, stations_df)
 
     bundle = treefoo.make_tree_foo(
-            {'trainset': datasets['train_df'], 'fn': fn},
-            {'stations_df': stations_df, 'fn': stations_fn})
+            {'trainset': datasets['train_df'], 'train_fn': fn,
+                'testset': datasets['holdout_df'], 'test_fn': fn,},
+            {'stations_df': stations_df, 'fn': stations_fn},
+            hyperparameters={'max_depth': 2, 'n_estimators': 10})
 
     assert s.USER_TYPE_COL in bundle['label_encoders']
 

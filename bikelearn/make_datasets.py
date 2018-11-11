@@ -12,11 +12,13 @@ import pipeline_data as pl
 import annotate_geolocation as annotate_geo
 import settings as s
 
-def make_dfs(indf, stations_df):
-
-
-
-    train_df, holdout_df = cl.simple_split(indf)
+def make_dfs(indf, stations_df, random=True):
+    if random:
+        train_df, holdout_df = cl.simple_split(indf)
+    else:
+        k = int(indf.shape[0]*0.8)
+        train_df = indf.iloc[:k]
+        holdout_df = indf.iloc[k:]
 
     return {'train_df': train_df, 
             'holdout_df': holdout_df,}

@@ -33,8 +33,8 @@ config_path = os.path.join(prefix, 'input/config')
 
 # This algorithm has a single channel of input data called 'training'. Since we run in
 # File mode, the input files are copied to the directory specified here.
-channel_name='training'
-training_path = os.path.join(input_path, channel_name)
+training_path = os.path.join(input_path, 'training')
+testing_path = os.path.join(input_path, 'testing')
 
 def whats_stations_filename():
     stations_dir = os.path.join(training_path, 'support')
@@ -60,11 +60,13 @@ def train():
 
     stations_fn = whats_stations_filename()
     stations_df = pd.read_csv(stations_fn)
+    hyperparameters = read_hyperparams()
 
     try:
         bundle = bikemodel.make_tree_foo(
                 {'trainset': trainset, 'fn': fn},
-                {'stations_df': stations_df, 'fn': stations_fn})
+                {'stations_df': stations_df, 'fn': stations_fn},
+                hyperparameters)
 
         # TODO... do the test set too..
     except Exception as e:
@@ -84,15 +86,23 @@ def train():
 
 
 def what_are_train_files():
-    # Take the set of files and read them all into a single pandas dataframe
-    print('DEBUG, training_path, ' + training_path)
+    return what_are_channel_files(training_path)
 
-    print('DEBUG, os.listdir(training_path), ' + str(
-        os.listdir(training_path)))
+
+def what_are_test_files():
+    return what_are_channel_files(testing_path)
+
+
+def what_are_channel_files(channel_path):
+    # Take the set of files and read them all into a single pandas dataframe
+    print('DEBUG, channel_path, ' + channel_path)
+
+    print('DEBUG, os.listdir(channel_path), ' + str(
+        os.listdir(channel_path)))
     input_files = [
-            os.path.join(training_path, file)
+            os.path.join(channel_path, file)
             for file in
-            filter(lambda x: x != 'support', os.listdir(training_path))]
+            filter(lambda x: x != 'support', os.listdir(channel_path))]
 
     print('DEBUG, input_files , ')
     print(str(input_files))
@@ -100,16 +110,21 @@ def what_are_train_files():
     if len(input_files) == 0:
         raise ValueError(('There are no files in {}.\n'
                     + 'This usually indicates that '
-                    + 'the channel ({}) was incorrectly'
+                    + 'the channel was incorrectly'
                     + ' specified,\n'
                     + 'the data specification in S3 '
                     + ' was incorrectly specified or '
                     + ' the role specified\n'
                     + 'does not have permission to '
                     + ' access the data.').format(
-                            training_path, channel_name))
+                            channel_path))
 
     return input_files
+
+def read_hyperparams():
+    with open(param_path, 'r') as tc:
+        hyperparameters = json.load(tc)
+    return hyperparameters
 
 
 def save_model(bundle):
@@ -129,6 +144,7 @@ def example_train():
             trainingParams = json.load(tc)
 
         train_fns = what_are_train_files()
+        test_fns = what_are_test_files()
 
         raw_data = [pd.read_csv(file, header=None) for file in train_fns]
         train_data = pd.concat(raw_data)
