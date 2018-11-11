@@ -53,18 +53,23 @@ def whats_stations_filename():
 
 
 def train():
-    train_fns = what_are_train_files()
-    fn = train_fns[-1]
+    train_fn = what_are_train_files()[-1]
+    test_fn = what_are_test_files()[-1]
+    print('DEBUG, train_fn, ' + train_fn)
+    print('DEBUG, test_fn, ' + test_fn)
     # trainset = pd.read_csv(fn, header=None) # Hmm..
-    trainset = pd.read_csv(fn)
 
     stations_fn = whats_stations_filename()
     stations_df = pd.read_csv(stations_fn)
     hyperparameters = read_hyperparams()
+    print('DEBUG, hyperparameters, ' + hyperparameters)
 
     try:
         bundle = bikemodel.make_tree_foo(
-                {'trainset': trainset, 'fn': fn},
+                {'train_fn': train_fn,
+                    'trainset': pd.read_csv(train_fn),
+                    'testset': pd.read_csv(test_fn),
+                    'test_fn': test_fn},
                 {'stations_df': stations_df, 'fn': stations_fn},
                 hyperparameters)
 
@@ -102,7 +107,8 @@ def what_are_channel_files(channel_path):
     input_files = [
             os.path.join(channel_path, file)
             for file in
-            filter(lambda x: x != 'support', os.listdir(channel_path))]
+            filter(lambda x: x != 'support' and x.endswith('.csv'),
+                os.listdir(channel_path))]
 
     print('DEBUG, input_files , ')
     print(str(input_files))
@@ -135,48 +141,6 @@ def save_model(bundle):
         cPickle.dump(bundle, out)
 
 
-def example_train():
-    # The function to execute the training.
-    print('Starting the training.')
-    try:
-        # Read in any hyperparameters that the user passed with the training job
-        with open(param_path, 'r') as tc:
-            trainingParams = json.load(tc)
-
-        train_fns = what_are_train_files()
-        test_fns = what_are_test_files()
-
-        raw_data = [pd.read_csv(file, header=None) for file in train_fns]
-        train_data = pd.concat(raw_data)
-
-        # labels are in the first column
-        train_y = train_data.ix[:,0]
-        train_X = train_data.ix[:,1:]
-
-        # Here we only support a single hyperparameter. Note that hyperparameters are always passed in as
-        # strings, so we need to do any necessary conversions.
-        max_leaf_nodes = trainingParams.get('max_leaf_nodes', None)
-        if max_leaf_nodes is not None:
-            max_leaf_nodes = int(max_leaf_nodes)
-
-        # Now use scikit-learn's decision tree classifier to train the model.
-        clf = tree.DecisionTreeClassifier(max_leaf_nodes=max_leaf_nodes)
-        clf = clf.fit(train_X, train_y)
-
-        # save the model
-        with open(os.path.join(model_path, 'decision-tree-model.pkl'), 'w') as out:
-            cPickle.dump(clf, out)
-        print('Training complete.')
-    except Exception as e:
-        # Write out an error file. This will be returned as the failureReason in the
-        # DescribeTrainingJob result.
-        trc = traceback.format_exc()
-        with open(os.path.join(output_path, 'failure'), 'w') as s:
-            s.write('Exception during training: ' + str(e) + '\n' + trc)
-        # Printing this causes the exception to be in the training job logs, as well.
-        print('Exception during training: ' + str(e) + '\n' + trc, file=sys.stderr)
-        # A non-zero exit code causes the training job to be marked as Failed.
-        sys.exit(255)
 
 if __name__ == '__main__':
     train()

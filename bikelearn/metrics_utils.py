@@ -17,30 +17,30 @@ def do_validation(clf, validation_df, cols):
     return metrics
 
 
-def gather_metrics(y_test, y_predictions, y_predict_proba, classes):
+def gather_metrics(y_true, y_predictions, y_predict_proba, classes):
 
     metrics = {
             'rank_k_proba_scores': 
-            {k: rank_k_proba_score(y_test, y_predict_proba, classes, k=k)
+            {k: rank_k_proba_score(y_true, y_predict_proba, classes, k=k)
                 for k in [1, 2, 3, 4, 5, 10]},
             'f1_scores': 
             {average_func:
-                skm.f1_score(y_test, y_predictions, labels=classes,
+                skm.f1_score(y_true, y_predictions, labels=classes,
                     average=average_func)
-                for average_func in ['micro', 'macro', 'weighted']} 
+                for average_func in ['micro', 'macro', 'weighted']},
+            'confusion_matrix': get_confusion_matrix(
+                y_true, y_predictions, classes)
             }
     return metrics
 
 
-def rank_k_proba_score(y_test, y_predict_proba, classes_, k=None):
+def rank_k_proba_score(y_true, y_predict_proba, classes_, k=None):
     y_topk_outputs = get_sorted_predict_proba_predictions(y_predict_proba, classes_, k)
-    return get_proportion_correct(y_test, y_topk_outputs)
+    return get_proportion_correct(y_true, y_topk_outputs)
 
 
 def get_confusion_matrix(y_true, y_pred, classes):
-
-
-    skm.confusion_matrix(y_true, y_pred, labels=None)
+    return skm.confusion_matrix(y_true, y_pred, labels=classes).tolist()
 
 
 def get_proportion_correct(y_validation, y_predictions_validation):
