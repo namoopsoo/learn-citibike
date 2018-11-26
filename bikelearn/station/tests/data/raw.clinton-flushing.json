@@ -1,0 +1,49 @@
+{
+   "results" : [
+      {
+         "address_components" : [
+            {
+               "long_name" : "Flushing Avenue",
+               "short_name" : "Flushing Ave",
+               "types" : [ "route" ]
+            },
+            {
+               "long_name" : "New York",
+               "short_name" : "New York",
+               "types" : [ "locality", "political" ]
+            },
+            {
+               "long_name" : "New York",
+               "short_name" : "NY",
+               "types" : [ "administrative_area_level_1", "political" ]
+            },
+            {
+               "long_name" : "United States",
+               "short_name" : "US",
+               "types" : [ "country", "political" ]
+            }
+         ],
+         "formatted_address" : "Flushing Ave, New York, NY, USA",
+         "geometry" : {
+            "location" : {
+               "lat" : 40.6977702,
+               "lng" : -73.96974059999999
+            },
+            "location_type" : "GEOMETRIC_CENTER",
+            "viewport" : {
+               "northeast" : {
+                  "lat" : 40.6991191802915,
+                  "lng" : -73.96839161970848
+               },
+               "southwest" : {
+                  "lat" : 40.6964212197085,
+                  "lng" : -73.9710895802915
+               }
+            }
+         },
+         "place_id" : "Eh9GbHVzaGluZyBBdmUsIE5ldyBZb3JrLCBOWSwgVVNB",
+         "types" : [ "intersection" ]
+      }
+   ],
+   "status" : "OK"
+}

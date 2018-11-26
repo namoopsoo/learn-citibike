@@ -62,7 +62,7 @@ def train():
     stations_fn = whats_stations_filename()
     stations_df = pd.read_csv(stations_fn)
     hyperparameters = read_hyperparams()
-    print('DEBUG, hyperparameters, ' + hyperparameters)
+    print('DEBUG, hyperparameters, {}'.format(hyperparameters))
 
     try:
         bundle = bikemodel.make_tree_foo(

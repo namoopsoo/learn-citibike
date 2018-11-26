@@ -347,7 +347,7 @@ def contract_df(df):
 
 def run_model_predict(bundle, df, stations_df, labeled):
     clf = bundle['clf']
-    prepared = predict_prepare(bundle, df, stations_df, labeled)
+    prepared = predict_inner(bundle, df, stations_df, labeled)
 
     # TODO... probably better pull this out of this function to be cleaner.
     if labeled:
@@ -365,7 +365,7 @@ def run_model_predict(bundle, df, stations_df, labeled):
         return prepared['y_predictions'], None, None
 
 
-def predict_prepare(bundle, df, stations_df, labeled):
+def predict_inner(bundle, df, stations_df, labeled):
     # Given a held-out df, which has an output label.
     label_encoders = bundle['label_encoders']
     clf = bundle['clf']

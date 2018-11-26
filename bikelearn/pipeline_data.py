@@ -345,6 +345,8 @@ def make_simple_df_from_raw(indf, stations_df, feature_encoding_dict):
     simpledf, label_encoders = annotate_geo.make_medium_simple_df(
             more_df, feature_encoding_dict)
 
+    assert not any(['nan' in le.classes_ for le in label_encoders.values()])
+
     return simpledf, label_encoders
 
 

@@ -8,7 +8,7 @@ from bikelearn.models import treefoo
 import bikelearn.settings as s
 import bikelearn.classify as blc
 import bikelearn.tests.utils as bltu
-
+from bikelearn import pipeline_data as pl
 
 
 class DuhPipelineTest(unittest.TestCase):
@@ -116,3 +116,24 @@ class IntegrationLocalTest(unittest.TestCase):
         assert r.status_code/100 == 2
 
         pass
+
+
+class TestNanLabelEncIssue(unittest.TestCase):
+    def test_assertion_happens_for_nan(self):
+        _, datasets, stations_df = bltu.make_basic_minimal_model()
+        df = pd.DataFrame({s.NEW_END_NEIGHBORHOOD: ['foo', 'nan']})
+
+        feature_encoding_dict = {
+                s.NEW_END_NEIGHBORHOOD: str}
+
+        asserted = False
+        from nose.tools import set_trace; set_trace()
+        try:
+            _, label_encoders = pl.make_simple_df_from_raw(
+                    df, stations_df,
+                    feature_encoding_dict)
+        except AssertionError:
+            asserted = True
+
+
+        assert asserted

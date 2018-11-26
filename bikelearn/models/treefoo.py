@@ -25,8 +25,8 @@ def make_tree_foo(datasets, stations, hyperparameters={}):
             s.USER_TYPE_COL: str,
             s.AGE_COL_NAME: float,
             s.NEW_START_POSTAL_CODE: str,
-            s.NEW_START_BOROUGH: str, s.NEW_START_NEIGHBORHOOD:str,
-            s.NEW_END_NEIGHBORHOOD:str}
+            s.NEW_START_BOROUGH: str, s.NEW_START_NEIGHBORHOOD: str,
+            s.NEW_END_NEIGHBORHOOD: str}
 
     simpledf, label_encoders = pl.make_simple_df_from_raw(
             datasets['trainset'], stations['stations_df'],
@@ -48,7 +48,6 @@ def make_tree_foo(datasets, stations, hyperparameters={}):
     bundle = {
             'train_metadata': {'trainset_fn': datasets['train_fn'],
                 'stations_df_fn': stations['fn'],
-                'stations_df': stations['stations_df'],
                 'hyperparameters': hyperparameters},
             'timestamp': pl.make_timestamp(),
             'clf': clf,
