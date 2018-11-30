@@ -142,6 +142,10 @@ def get_address_geo_wrapper(address, bypass_cache=False):
     address_ny = address + ', NY'
     location_result = get_geocoding_results(address_ny, request_type='geo',
             bypass_cache=bypass_cache)
+    if location_result.get('cache_hit') and not location_result.get('levels'):
+        levels = len(location_result.get('geo_results'))
+        if len(levels) == 4:
+            return location_result
 
     if location_result['levels'] == 4:
         return location_result
@@ -155,8 +159,12 @@ def get_address_geo_wrapper(address, bypass_cache=False):
             bypass_cache=bypass_cache)
 
     geo_result_dict = dict(
-            location_result.get('geo_results').items()
-            + another_location_result.get('geo_results').items()) 
+            location_result.get('geo_results').items())
+            #+ another_location_result.get('geo_results').items()) 
+
+    if another_location_result.get('geo_results'):
+        geo_result_dict.update(
+                another_location_result.get('geo_results'))
     out = {'geo_results': geo_result_dict,
             'levels': len(geo_result_dict),
             'valid': validate_geo_result(geo_result_dict),
