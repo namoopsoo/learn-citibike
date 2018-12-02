@@ -122,7 +122,7 @@ def get_geocoding_results(address, request_type, bypass_cache=False):
     annotated = _parse_geocoding_result(geocoding_result['results'])
 
     valid = validate_geo_result(annotated['geo_results'])
-    if valid:
+    if len(annotated['geo_results']) >= 3:
         redis_client.hset(s.GEO_RAW_RESULTS, address, response.text)
 
     annotated.update({'valid': valid, 'address': address,
@@ -148,6 +148,9 @@ def get_address_geo_wrapper(address, bypass_cache=False):
             return location_result
 
     if location_result['levels'] == 4:
+        return location_result
+
+    if location_result.get('google_response_status') == 'ZERO_RESULTS':
         return location_result
 
     # XXX hmm... but only do this... if the aabove has postal code right?
@@ -248,7 +251,7 @@ def cleanse_cache_of_non_specific_data(dry_run=True):
     if not dry_run:
         redis_client.hdel(s.GEO_RAW_RESULTS,
                 *[x['address'] for x in whats_valid
-                    if not x['valid']])
+                    if not x['valid']]) #TODO <- len(3)?
         
     return pd.DataFrame.from_records(whats_valid)
 
