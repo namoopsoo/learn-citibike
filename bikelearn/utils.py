@@ -173,4 +173,26 @@ def dump_np_array(X, basename):
     np.savetxt(filename, X, delimiter=",")
 
 
+def latlng_box_area(box):
+    if box is None: return None
+
+    {u'northeast': {u'lat': 40.77410690000001,
+            u'lng': -73.95889869999999},
+            u'southwest': {u'lat': 40.72686849999999, u'lng': -74.0089488}}
+
+    point_1_lat = box['northeast']['lat']
+    point_1_long = box['northeast']['lng']
+    point_2_lat = box['southwest']['lat']
+    point_2_long = box['southwest']['lng']
+
+    d_betw_longitude_degrees = distance_betw_longitude_degrees(
+        point_1_lat,
+        point_1_long,
+        point_2_long)
+
+    d_betw_latitude_degrees = distance_betw_lat_degrees(
+            point_1_lat, 
+            point_2_lat)
+
+    return d_betw_longitude_degrees * d_betw_latitude_degrees 
 

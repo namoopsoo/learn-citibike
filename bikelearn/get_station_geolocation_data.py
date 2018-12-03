@@ -7,7 +7,9 @@ import requests
 import datetime
 from copy import deepcopy
 
+
 import settings as s
+import bikelearn.utils as bu
 
 from data_store import connect_redis
 redis_client = connect_redis()
@@ -29,6 +31,22 @@ def validate_geo_result(geo_result_dict):
         SUBLOCALITY, NEIGHBORHOOD, STATE])
         & set(geo_result_dict.keys())) == 4
 
+def geocode_from_address_components(address_components_list):
+    geo_results = {}
+    for component in address_components_list:
+        if POSTAL_CODE in component['types']:
+            geo_results[POSTAL_CODE] = component['long_name']
+        if SUBLOCALITY in component['types']:
+            geo_results[SUBLOCALITY] = component['long_name']
+        if NEIGHBORHOOD in component['types']:
+            geo_results[NEIGHBORHOOD] = component['long_name']
+        if STATE_LABEL_CODE in component['types']:
+            geo_results[STATE] = component['short_name']
+    return geo_results
+
+
+def viewport_size(geometry):
+    pass
 
 def _parse_geocoding_result(raw_results_list):
     '''Take a raw googleapis.com geocoding query result and parse for locality data.
@@ -38,18 +56,9 @@ def _parse_geocoding_result(raw_results_list):
     
     NOTE: Assuming first result is the only one worth using.
     '''
-    postal_code = None
     geo_results = {}
-    for component in raw_results_list[0]['address_components']:
-        if POSTAL_CODE in component['types']:
-            geo_results[POSTAL_CODE] = component['long_name']
-        if SUBLOCALITY in component['types']:
-            geo_results[SUBLOCALITY] = component['long_name']
-        if NEIGHBORHOOD in component['types']:
-            geo_results[NEIGHBORHOOD] = component['long_name']
-        if STATE_LABEL_CODE in component['types']:
-            geo_results[STATE] = component['short_name']
-
+    address_components_list = raw_results_list[0]['address_components']
+    geo_results = geocode_from_address_components(address_components_list)
     
     return {
         'raw_result': raw_results_list,
@@ -81,6 +90,14 @@ def make_geo_url(address):
 def make_latlng_url(address):
     url = 'https://maps.googleapis.com/maps/api/geocode/json?key={}&latlng={}&result_type={}'.format(
         s.GOOGLE_GEO_API_KEY, address, 'neighborhood')
+    return url
+
+
+def make_latlng_limited_url(latlng):
+    url = 'https://maps.googleapis.com/maps/api/geocode/json?key={}&latlng={}&result_type={}'.format(
+        s.GOOGLE_GEO_API_KEY, latlng,
+        'neighborhood|postal_code|sublocality'
+        )
     return url
 
 
@@ -219,6 +236,79 @@ def read_start_station_names(df):
             if s.START_STATION_NAME in df.columns.tolist()
             else s.START_STATION_NAME201110)
     return df[name].unique().tolist()
+
+
+def extract_station_geo(df):
+    cols = [s.START_STATION_NAME,
+            s.START_STATION_LATITUDE_COL,
+            s.START_STATION_LONGITUDE_COL] 
+
+    grouped = df.groupby(cols)
+    locations = grouped.groups.keys()
+    locationsdf = pd.DataFrame.from_records(locations, columns=grouped.keys)
+    locationsdf['latlng'] = locationsdf.apply(
+            lambda x: ','.join([str(x[k])
+                for k in
+                [s.START_STATION_LATITUDE_COL,
+                    s.START_STATION_LONGITUDE_COL]]), axis=1)
+    return locationsdf
+
+
+def annotate_station_df(stationdf):
+    # for each row, pull geo data
+    pass
+
+
+def ok_per_statioin_latlng_get_geo():
+    # for neighborhood, take the smallest geo viewport, since can have,
+    #   multiple neighborhoods, like Hells Kitchen and Midtown.
+    pass
+
+
+def annotate_result(result):
+    geo_results = geocode_from_address_components(result['address_components'])
+
+    return {'geo_results': geo_results, 
+            'viewport_area': bu.latlng_box_area(result['geometry'].get('viewport')),
+            'bounds_area': bu.latlng_box_area(result['geometry'].get('bounds'))
+            }
+
+
+
+def filter_by_result_type(results, result_type):
+    return [x for x in results
+            if result_type in x['types']]
+
+def per_latlng_get_geo_data_wrapper(latlng):
+    per_latlng_get_geo_data(latlng)
+    url = make_latlng_limited_url(latlng)
+    out = requests.get(url).json()
+    assert out['status'] == 'OK'
+    results = out['results']
+    return per_latlng_get_geo_data(results)
+
+
+def per_latlng_get_geo_data(results):
+    # for neighborhood, take the smallest geo viewport, since can have,
+    #   multiple neighborhoods, like Hells Kitchen and Midtown.
+
+
+    sublocality_geo_result = annotate_result(filter_by_result_type(results, SUBLOCALITY)[0])
+    postal_code_geo_result = annotate_result(filter_by_result_type(results, POSTAL_CODE)[0])
+    neighborhood_results = filter_by_result_type(results, NEIGHBORHOOD)
+    neighborhood_geo_results = [annotate_result(x) for x in neighborhood_results]
+
+    neighborhood_geo_result = sorted(neighborhood_geo_results,
+            key=lambda x: x['viewport_area'])[0]
+
+    geo_result = {
+            POSTAL_CODE: postal_code_geo_result['geo_results'][POSTAL_CODE],
+            STATE: postal_code_geo_result['geo_results'][STATE],
+            NEIGHBORHOOD: neighborhood_geo_result['geo_results'][NEIGHBORHOOD],
+            SUBLOCALITY: sublocality_geo_result['geo_results'][SUBLOCALITY]
+            }
+
+    return geo_result
 
 
 def extract_stations_from_files(filename=None, filenames=None):
