@@ -237,26 +237,69 @@ def read_start_station_names(df):
             else s.START_STATION_NAME201110)
     return df[name].unique().tolist()
 
+def is_201110(df):
+    cols = df.columns.tolist()
+    if s.START_STATION_NAME in cols:
+        return False
+
+    if s.START_STATION_NAME201110 in cols:
+        return True
+
+    assert False, 'unknown df type, ' + str(cols)
+
+
+def what_station_cols_from_df(df):
+    if is_201110(df):
+        return [s.START_STATION_NAME201110,
+            s.START_STATION_LATITUDE_COL201110,
+            s.START_STATION_LONGITUDE_COL201110] 
+
+    return [s.START_STATION_NAME,
+        s.START_STATION_LATITUDE_COL,
+        s.START_STATION_LONGITUDE_COL] 
+
+def standard_station_col_dict():
+    return {
+            s.START_STATION_NAME201110: s.START_STATION_NAME,
+            s.START_STATION_LATITUDE_COL201110: s.START_STATION_LATITUDE_COL,
+            s.START_STATION_LONGITUDE_COL201110: s.START_STATION_LONGITUDE_COL,
+            }
+
 
 def extract_station_geo(df):
-    cols = [s.START_STATION_NAME,
-            s.START_STATION_LATITUDE_COL,
-            s.START_STATION_LONGITUDE_COL] 
+    cols = what_station_cols_from_df(df)
+    latcol, lngcol = cols[1:]
 
     grouped = df.groupby(cols)
     locations = grouped.groups.keys()
     locationsdf = pd.DataFrame.from_records(locations, columns=grouped.keys)
     locationsdf['latlng'] = locationsdf.apply(
             lambda x: ','.join([str(x[k])
-                for k in
-                [s.START_STATION_LATITUDE_COL,
-                    s.START_STATION_LONGITUDE_COL]]), axis=1)
-    return locationsdf
+                for k in [latcol, lngcol]]), axis=1)
+    return locationsdf.rename(columns=standard_station_col_dict())
 
 
-def annotate_station_df(stationdf):
-    # for each row, pull geo data
-    pass
+
+def extract_stations_latlng_df_from_files(filename=None, filenames=None):
+    '''Given a citibike data filename, get list of stations
+    '''
+    if filename:
+        filenames = [filename]
+
+    undedupeddf = pd.concat([extract_station_geo(pd.read_csv(fn))
+        for fn in filenames])
+
+    dedupeddf = some_stationdf_dedupe(undedupeddf)
+
+    annotated_df = annotate_station_df(dedupeddf)
+    return annotated_df
+
+
+def some_stationdf_dedupe(df):
+    return df.drop_duplicates(subset=s.START_STATION_NAME)
+
+
+
 
 
 def ok_per_statioin_latlng_get_geo():
@@ -280,35 +323,57 @@ def filter_by_result_type(results, result_type):
             if result_type in x['types']]
 
 def per_latlng_get_geo_data_wrapper(latlng):
-    per_latlng_get_geo_data(latlng)
+    print 'DEBUG, latlng, ', latlng
+    time.sleep(.25)
     url = make_latlng_limited_url(latlng)
     out = requests.get(url).json()
-    assert out['status'] == 'OK'
+    if out['status'] != 'OK':
+        return {'error': out['status'], 'error_message': out.get('error_message')}
+
     results = out['results']
     return per_latlng_get_geo_data(results)
 
 
+def annotate_station_df(stationsdf):
+    s = stationsdf['latlng'].map(per_latlng_get_geo_data_wrapper)
+
+    foodf = s.apply(lambda x: pd.Series(x.get('geo_results')))
+    foodf['raw_result'] = annotated_df.apply(lambda x: x.get('raw_result'))
+
+    newdf = pd.concat([stationsdf, foodf], axis=1)
+
+    return newdf
+
+
+def full_make_stationsdf(filenames):
+    undedupeddf = extract_stations_latlng_df_from_files(filenames=filenames)
+    dedupeddf = some_stationdf_dedupe(undedupeddf)
+         
+
+    annotated_df = annotate_station_df(dedupeddf)
+    
+
+
 def per_latlng_get_geo_data(results):
-    # for neighborhood, take the smallest geo viewport, since can have,
-    #   multiple neighborhoods, like Hells Kitchen and Midtown.
-
-
-    sublocality_geo_result = annotate_result(filter_by_result_type(results, SUBLOCALITY)[0])
-    postal_code_geo_result = annotate_result(filter_by_result_type(results, POSTAL_CODE)[0])
+    sublocality_geo_result = annotate_result(filter_by_result_type(
+        results, SUBLOCALITY)[0])
+    postal_code_geo_result = annotate_result(filter_by_result_type(
+        results, POSTAL_CODE)[0])
     neighborhood_results = filter_by_result_type(results, NEIGHBORHOOD)
     neighborhood_geo_results = [annotate_result(x) for x in neighborhood_results]
 
     neighborhood_geo_result = sorted(neighborhood_geo_results,
-            key=lambda x: x['viewport_area'])[0]
+            key=lambda x: x['viewport_area'])[0] if neighborhood_geo_results else {}
 
     geo_result = {
             POSTAL_CODE: postal_code_geo_result['geo_results'][POSTAL_CODE],
             STATE: postal_code_geo_result['geo_results'][STATE],
-            NEIGHBORHOOD: neighborhood_geo_result['geo_results'][NEIGHBORHOOD],
+            NEIGHBORHOOD: neighborhood_geo_result.get('geo_results', {}).get(NEIGHBORHOOD),
             SUBLOCALITY: sublocality_geo_result['geo_results'][SUBLOCALITY]
             }
 
-    return geo_result
+    return {'raw_result': results,
+            'geo_results': geo_result}
 
 
 def extract_stations_from_files(filename=None, filenames=None):
