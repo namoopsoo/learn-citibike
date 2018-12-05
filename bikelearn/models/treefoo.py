@@ -38,8 +38,8 @@ def make_tree_foo(datasets, stations, hyperparameters={}):
     y_train = np.array(train_df[s.NEW_END_NEIGHBORHOOD])
     
     clf = RandomForestClassifier(
-            max_depth=hyperparameters.get('max_depth'),
-            n_estimators=hyperparameters.get('n_estimators'),
+            max_depth=int(hyperparameters.get('max_depth')),
+            n_estimators=int(hyperparameters.get('n_estimators')),
             random_state=0)
     clf.fit(X_train, y_train)
 

@@ -106,7 +106,7 @@ def transformation():
     request_content_type = flask.request.content_type
     print('DEBUG, flask.request.content_type, "{}"'.format(request_content_type))
 
-    response_type = determine_response_type(request.args)
+    response_type = determine_response_type(flask.request.args)
 
     # Convert from CSV to pandas
     if request_content_type == 'text/csv':

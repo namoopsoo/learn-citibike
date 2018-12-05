@@ -35,7 +35,7 @@ RUN pip install ipdb flask gevent gunicorn
 
 COPY mypackages /opt/program/mypackages
 WORKDIR /opt/program
-RUN pip install mypackages/bikelearn-0.3.1.tar.gz
+RUN pip install mypackages/bikelearn-0.3.3.tar.gz
 RUN pip install mypackages/funkybob-2018.11.11.tar.gz
 
 

@@ -25,9 +25,7 @@ class DuhPipelineTest(unittest.TestCase):
         proportion_correct_labeled_true = bltu.get_basic_proportion_correct(
                 y_test, y_predictions)
 
-
         # Again but unlabeled now.
-
 
         contracted_df = blc.contract_df(holdout_df)
 
@@ -65,6 +63,9 @@ class DuhPipelineTest(unittest.TestCase):
 
 
 class IntegrationLocalTest(unittest.TestCase):
+    def setUp(self):
+        url = 'http://127.0.0.1:8080/ping'
+        assert bltu.ping_service(url), 'local docker is down. Cant test.'
 
     def test_foo_full_header(self):
         url = 'http://127.0.0.1:8080/invocations'
@@ -127,13 +128,37 @@ class TestNanLabelEncIssue(unittest.TestCase):
                 s.NEW_END_NEIGHBORHOOD: str}
 
         asserted = False
-        from nose.tools import set_trace; set_trace()
         try:
             _, label_encoders = pl.make_simple_df_from_raw(
                     df, stations_df,
                     feature_encoding_dict)
-        except AssertionError:
+        except Exception:
             asserted = True
 
 
         assert asserted
+
+
+class TestWidenDfForPredictPipeline(unittest.TestCase):
+    def test_basic(self):
+        csvdata = '10/1/2015 00:00:02,W 26 St & 10 Ave,Subscriber,1973,1\n10/1/2015 00:00:02,E 39 St & 2 Ave,Subscriber,1990,1'
+
+
+        from nose.tools import set_trace; set_trace()
+        df = blc.hydrate_csv_to_df(csvdata)
+        # minimal_cols = 
+        # from nose.tools import set_trace; set_trace()
+
+        bundle, datasets, stations_df = bltu.make_basic_minimal_model()
+
+        widened_df = blc.widen_df_with_other_cols(df, s.ALL_COLUMNS)
+
+
+class TestAgeFeature(unittest.TestCase):
+    def test_basic(self):
+
+        df = pd.DataFrame({s.BIRTH_YEAR_COL: ['1995.0', 1995, '1996']})
+
+        df2 = pl.annotate_age(df)
+        assert df2[s.AGE_COL_NAME].tolist() == [20, 20, 19]
+
