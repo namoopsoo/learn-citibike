@@ -18,15 +18,15 @@ import pandas as pd
 import bikelearn.classify as blc
 import bikelearn.settings as s
 
-prefix = '/opt/ml/'
-model_path = os.path.join(prefix, 'model')
+import utils as ut
+
 
 # A singleton for holding the model. This simply loads the model and holds it.
 # It has a predict function that does a prediction based on the model and the input data.
 
 
 def get_bundle_filename():
-    path = os.path.join(model_path, 'bundle_meta.json')
+    path = os.path.join(ut.model_path, 'bundle_meta.json')
     print('DEBUG get_bundle_filename, path, {}'.format(path))
 
     with open(path) as fd:
@@ -37,16 +37,22 @@ def get_bundle_filename():
     return out.get('bundle_filename')
 
 
-def do_predict(bundle, df):
-    stations_df = bundle['train_metadata']['stations_df']
+def do_predict(bundle, csvdata):
+    bundle_stations_fn = bundle['train_metadata']['stations_fn']
+    stations_id, stations_df = ut.get_stations()
 
-    widened_df = blc.widen_df_with_other_cols(df, s.ALL_COLUMNS)
+    assert bundle_stations_fn == stations_id, \
+            'oops, bundle_stations_fn, {} stations_id, {}'.format(
+                    bundle_stations_fn, stations_id)
 
+    df = blc.hydrate_and_widen(bundle, stations_df, csvdata)
+
+    print('Invoked with {} records'.format(df.shape[0]))
     print('DEBUG df.shape, ' + str(df.shape))
-    print('DEBUG widened_df.shape, ' + str(widened_df.shape))
+    print('DEBUG df.shape, ' + str(df.shape))
 
     y_predictions, _, _ = blc.run_model_predict(
-            bundle, widened_df, stations_df, labeled=False)
+            bundle, df, stations_df, labeled=False)
 
     return y_predictions
 
@@ -60,7 +66,7 @@ class ScoringService(object):
         """Get the model object for this instance, loading it if it's not already loaded."""
         if cls.bundle is None:
             bundle_filename = get_bundle_filename()
-            with open(os.path.join(model_path, bundle_filename), 'r') as inp:
+            with open(os.path.join(ut.model_path, bundle_filename), 'r') as inp:
                 cls.bundle = pickle.load(inp)
         return cls.bundle
 
@@ -73,13 +79,13 @@ class ScoringService(object):
                 one prediction per row in the dataframe"""
         bundle = cls.get_model()
         print ('DEBUG, csvdata, {}'.format(csvdata))
-        df = blc.hydrate_csv_to_df(csvdata)
-        print('Invoked with {} records'.format(df.shape[0]))
+#         df = blc.hydrate_csv_to_df(csvdata)
+#         print('Invoked with {} records'.format(df.shape[0]))
+# 
+#         print ('DEBUG, df.head(), ')
+#         df.head()
 
-        print ('DEBUG, ')
-        df.head()
-
-        preds = do_predict(bundle, df)
+        preds = do_predict(bundle, csvdata)
         print ('DEBUG, preds, {}'.format(preds))
 
         return preds
@@ -112,10 +118,10 @@ def transformation():
     if request_content_type == 'text/csv':
         csvdata = flask.request.data.decode('utf-8')
         result = do_output_predict(csvdata, response_type)
-        if response_type == 'simple':
-            return flask.Response(response=result, status=200, mimetype='text/csv')
-        elif response_type == 'complex':
-            return flask.Response(response=result, status=200, mimetype='application/json')
+        mimetype = {'simple': 'text/csv',
+                'complex': 'application/json'}[response_type]
+        return flask.Response(response=result, status=200, mimetype=mimetype)
+
 
     print ('DEBUG, hmm, not text/csv or application/json')
     return flask.Response(response='This predictor only supports CSV data',
@@ -133,21 +139,11 @@ def determine_response_type(querystring):
 
 
 def do_output_predict(csvdata, response_type):
+    predictions  = ScoringService.predict(csvdata=csvdata)
 
-    # Do the prediction
-    predictions_dict = ScoringService.predict(csvdata=csvdata)
-    predictions = predictions_dict['simple']
-    predictions_ranked = predictions_dict['ranked']
-
-    if response_type == 'simple':
-        # Convert from numpy back to CSV
-        out = StringIO.StringIO()
-        pd.DataFrame({'results': predictions}).to_csv(out, header=False, index=False)
-        result = out.getvalue()
-        return result
-    elif response_type == 'complex':
-        #
-        return predictions_ranked
-
-
+    # Convert from numpy back to CSV
+    out = StringIO.StringIO()
+    pd.DataFrame({'results': predictions}).to_csv(out, header=False, index=False)
+    result = out.getvalue()
+    return result
 

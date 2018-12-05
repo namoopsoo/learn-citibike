@@ -152,7 +152,8 @@ def append_travel_stats(df):
 
 def annotate_age(df):
     df[s.AGE_COL_NAME] = df[s.BIRTH_YEAR_COL].map(
-            lambda x: 2015 - int(float(x)))
+            lambda x: 2015 - int(float(x))
+            if not pd.isnull(x) else x)
 
     return df
 

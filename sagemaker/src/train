@@ -20,37 +20,12 @@ import xgboost
 
 from bikelearn.models import treefoo as bikemodel
 from bikelearn import pipeline_data as pl
+import utils as ut
 
 # These are the paths to where SageMaker mounts interesting things in your container.
 
-prefix = '/opt/ml/'
 
-input_path = prefix + 'input/data'
-output_path = os.path.join(prefix, 'output')
-model_path = os.path.join(prefix, 'model')
-param_path = os.path.join(prefix, 'input/config/hyperparameters.json')
-config_path = os.path.join(prefix, 'input/config')
 
-# This algorithm has a single channel of input data called 'training'. Since we run in
-# File mode, the input files are copied to the directory specified here.
-training_path = os.path.join(input_path, 'training')
-testing_path = os.path.join(input_path, 'testing')
-
-def whats_stations_filename():
-    stations_dir = os.path.join(training_path, 'support')
-    print("DEBUG, stations_dir, " + stations_dir)
-
-    stations_fn_list = [file
-            for file in
-            os.listdir(stations_dir)
-            if file.endswith('.csv')]
-
-    print('DEBUG, stations_fn_list , ' + str(stations_fn_list))
-    assert len(stations_fn_list) == 1, 'should be one file here'
-
-    stations_fn = stations_fn_list[0]
-
-    return os.path.join(stations_dir, stations_fn)
 
 
 def train():
@@ -58,10 +33,9 @@ def train():
     test_fn = what_are_test_files()[-1]
     print('DEBUG, train_fn, ' + train_fn)
     print('DEBUG, test_fn, ' + test_fn)
-    # trainset = pd.read_csv(fn, header=None) # Hmm..
 
-    stations_fn = whats_stations_filename()
-    stations_df = pd.read_csv(stations_fn)
+    stations_id, stations_df = ut.get_stations()
+
     hyperparameters = read_hyperparams()
     print('DEBUG, hyperparameters, {}'.format(hyperparameters))
 
@@ -71,7 +45,7 @@ def train():
                     'trainset': pd.read_csv(train_fn),
                     'testset': pd.read_csv(test_fn),
                     'test_fn': test_fn},
-                {'stations_df': stations_df, 'fn': stations_fn},
+                {'stations_df': stations_df, 'fn': stations_id},
                 hyperparameters)
 
         # TODO... do the test set too..
@@ -82,7 +56,7 @@ def train():
         # DescribeTrainingJob result.
         trc = traceback.format_exc()
         fn = 'failure.{}.log'.format(pl.make_timestamp())
-        with open(os.path.join(output_path, fn), 'w') as s:
+        with open(os.path.join(ut.output_path, fn), 'w') as s:
             s.write('Exception during training: ' + str(e) + '\n' + trc)
         # Printing this causes the exception to be in the training job logs, as well.
         print('Exception during training: ' + str(e) + '\n' + trc, file=sys.stderr)
@@ -94,11 +68,11 @@ def train():
 
 
 def what_are_train_files():
-    return what_are_channel_files(training_path)
+    return what_are_channel_files(ut.training_path)
 
 
 def what_are_test_files():
-    return what_are_channel_files(testing_path)
+    return what_are_channel_files(ut.testing_path)
 
 
 def what_are_channel_files(channel_path):
@@ -131,7 +105,7 @@ def what_are_channel_files(channel_path):
     return input_files
 
 def read_hyperparams():
-    with open(param_path, 'r') as tc:
+    with open(ut.param_path, 'r') as tc:
         hyperparameters = json.load(tc)
     return hyperparameters
 
@@ -141,11 +115,11 @@ def save_model(bundle):
             bundle['timestamp'])
     print('DEBUG, save_model, ' + output_name)
     with open(
-            os.path.join(model_path, output_name), 'w') as out:
+            os.path.join(ut.model_path, output_name), 'w') as out:
         cPickle.dump(bundle, out)
 
     with open(
-            os.path.join(model_path, 'bundle_meta.json'), 'w') as out:
+            os.path.join(ut.model_path, 'bundle_meta.json'), 'w') as out:
         json.dump({'bundle_filename': output_name}, out)
 
 

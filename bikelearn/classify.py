@@ -315,16 +315,19 @@ def simple_split(df):
     train_df, holdout_df = train_test_split(df, test_size=0.2)
     return train_df, holdout_df
 
+
 def hydrate_csv_to_df(csvdata):
     header = ['starttime',
             'start station name',
             'usertype',
             'birth year',
             'gender']
+    assert len(csvdata.split('\n')[0].split(',')) == len(header),\
+            'len csvdata row is too big. ' + csvdata
+
     header_str = ','.join(header)
     full_csvdata = '{}\n{}'.format(header_str, csvdata)
     s = StringIO(full_csvdata)
-    # df = pd.read_csv(s)
     df = pd.read_csv(s)
 
     return df
@@ -390,4 +393,12 @@ def predict_inner(bundle, df, stations_df, labeled):
     return {'encoded_df': encoded_df,
             'y_predictions': y_predictions,
             'y_predict_proba': y_predict_proba}
+
+
+def hydrate_and_widen(csvdata):
+    df = hydrate_csv_to_df(csvdata)
+
+    widened_df = widen_df_with_other_cols(df, s.ALL_COLUMNS)
+
+    return widened_df
 
