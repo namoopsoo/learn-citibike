@@ -50,7 +50,6 @@ class DuhPipelineTest(unittest.TestCase):
 
 
         df = blc.hydrate_csv_to_df(csvdata)
-        # minimal_cols = 
 
         bundle, datasets, stations_df = bltu.make_basic_minimal_model()
 
@@ -93,8 +92,8 @@ class IntegrationLocalTest(unittest.TestCase):
         url = 'http://127.0.0.1:8080/invocations'
         headers = {'Content-Type': 'text/csv'}
         data_vec = [
-                '\n10/1/2015 00:00:02,Foo Rd & Fake St.,Subscriber,1973,1',
-                '\n10/1/2015 00:00:02,E 39 St & 2 Ave,Subscriber,1990,1']
+                '10/1/2015 00:00:02,Foo Rd & Fake St.,Subscriber,1973,1',
+                '10/1/2015 00:00:02,E 39 St & 2 Ave,Subscriber,1990,1']
         data = '\n'.join(data_vec)
 
         r = requests.post(url, data=data, headers=headers)
@@ -175,3 +174,20 @@ class TestAgeFeature(unittest.TestCase):
         assert out[:-1] == [20, 20, 19]
         assert pd.isnull(out[-1])
 
+class TestForestShowDecisionPath(unittest.TestCase):
+    def test_basic(self):
+        from nose.tools import set_trace; set_trace()
+
+        csvdata = '10/1/2015 00:00:02,E 39 St & 2 Ave,Subscriber,1990,1'
+
+        df = blc.hydrate_and_widen(csvdata)
+
+        bundle, datasets, stations_df = bltu.make_basic_minimal_model()
+
+        _, X_test = blc.df_to_np_for_clf(bundle, df, stations_df, labeled=False)
+        clf = bundle['clf']
+
+        path = clf.decision_path(X_test)
+
+#y_predictions, _, _ = blc.run_model_predict(
+#        bundle, df, stations_df, labeled=False)

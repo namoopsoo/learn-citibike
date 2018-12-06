@@ -25,30 +25,14 @@ import utils as ut
 # It has a predict function that does a prediction based on the model and the input data.
 
 
-def get_bundle_filename():
-    path = os.path.join(ut.model_path, 'bundle_meta.json')
-    print('DEBUG get_bundle_filename, path, {}'.format(path))
-
-    with open(path) as fd:
-        out = json.load(fd)
-
-    print('DEBUG, bundle_meta.json, {}'.format(out))
-    assert out is not None, 'out, {}'.format(out)
-    return out.get('bundle_filename')
-
-
 def do_predict(bundle, csvdata):
-    bundle_stations_fn = bundle['train_metadata']['stations_fn']
+    bundle_stations_fn = bundle['train_metadata']['stations_df_fn']
     stations_id, stations_df = ut.get_stations()
 
-    assert bundle_stations_fn == stations_id, \
-            'oops, bundle_stations_fn, {} stations_id, {}'.format(
-                    bundle_stations_fn, stations_id)
-
-    df = blc.hydrate_and_widen(bundle, stations_df, csvdata)
+    ut.validate_stations_being_used(bundle_stations_fn, stations_id)
+    df = blc.hydrate_and_widen(csvdata)
 
     print('Invoked with {} records'.format(df.shape[0]))
-    print('DEBUG df.shape, ' + str(df.shape))
     print('DEBUG df.shape, ' + str(df.shape))
 
     y_predictions, _, _ = blc.run_model_predict(
@@ -65,7 +49,7 @@ class ScoringService(object):
     def get_model(cls):
         """Get the model object for this instance, loading it if it's not already loaded."""
         if cls.bundle is None:
-            bundle_filename = get_bundle_filename()
+            bundle_filename = ut.get_bundle_filename()
             with open(os.path.join(ut.model_path, bundle_filename), 'r') as inp:
                 cls.bundle = pickle.load(inp)
         return cls.bundle

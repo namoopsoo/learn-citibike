@@ -37,8 +37,9 @@ from copy import deepcopy
 from collections import OrderedDict 
 
 from utils import distance_between_positions, get_start_time_bucket
-from classify import (prepare_datas, grid_search_params,
+from classify import (grid_search_params,
         build_classifier, run_predictions, run_metrics_on_predictions)
+from bikelearn.old.prepare import prepare_datas
 # from plottings import (plot_age_speed, plot_distance_trip_time)
 
 from pipeline_data import (append_travel_stats, load_data, choose_end_station_label_column,
