@@ -340,7 +340,6 @@ def feature_binarization(df, oh_encoders):
 
 
 def make_simple_df_from_raw(indf, stations_df, feature_encoding_dict):
-
     next_df = annotate_geo.annotate_df_with_geoloc(indf, stations_df, noisy_nonmatches=True)
 
     and_age_df = annotate_age(next_df)
@@ -366,17 +365,21 @@ def prepare_test_data_for_predict(indf, stations_df,
     if labeled:
         out_columns += [s.NEW_END_NEIGHBORHOOD]
 
-
     next_df = annotate_geo.annotate_df_with_geoloc(indf, stations_df, noisy_nonmatches=False)
 
     and_age_df = annotate_age(next_df)
     more_df = annotate_time_features(and_age_df)
 
-    simpledf = annotate_geo.do_prep(more_df,
-            feature_encoding_dict)
+    simpledf = do_prep(more_df, feature_encoding_dict)
 
     return simpledf[out_columns]
 
+
+def do_prep(df, feature_encoding_dict):
+    for col, dtype in feature_encoding_dict.items():
+        if col in df:
+            df[col] = df[col].astype(dtype)
+    return df
 
 def ship_training_data_to_s3():
     pass

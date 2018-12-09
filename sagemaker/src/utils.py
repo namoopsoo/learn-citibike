@@ -18,7 +18,15 @@ testing_path = os.path.join(input_path, 'testing')
 stations_dir = os.path.join(training_path, 'support')
 
 def whats_stations_filename():
-    print("DEBUG, stations_dir, " + stations_dir)
+    stations_fn = get_bundle_stations_filename()
+    if stations_fn:
+        return os.path.join(model_path, stations_fn)
+
+    return during_training_stations_filename()
+
+
+def during_training_stations_filename():
+    print("DEBUG, during training, stations_dir, " + stations_dir)
     stations_fn_list = [file
             for file in
             os.listdir(stations_dir)
@@ -37,7 +45,17 @@ def get_stations():
     return stations_fn, stations_df
 
 
+def get_bundle_stations_filename():
+    out = get_bundle_meta_dict()
+    return out.get('stations_filename')
+
+
 def get_bundle_filename():
+    out = get_bundle_meta_dict()
+    return out.get('bundle_filename')
+
+
+def get_bundle_meta_dict():
     path = os.path.join(model_path, 'bundle_meta.json')
     print('DEBUG get_bundle_filename, path, {}'.format(path))
 
@@ -46,10 +64,11 @@ def get_bundle_filename():
 
     print('DEBUG, bundle_meta.json, {}'.format(out))
     assert out is not None, 'out, {}'.format(out)
-    return out.get('bundle_filename')
+    return out
 
-def validate_stations_being_used(
-        bundle_stations_fn, stations_id):
+
+def validate_stations_being_used(bundle, stations_id):
+    bundle_stations_fn = bundle['train_metadata']['stations_df_fn']
     print('DEBUG, '
             'bundle_stations_fn, {} stations_id, {}'.format(
                 bundle_stations_fn, stations_id)

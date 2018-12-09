@@ -203,39 +203,6 @@ def simple_split(df):
     return train_df, holdout_df
 
 
-def hydrate_csv_to_df(csvdata):
-    header = ['starttime',
-            'start station name',
-            'usertype',
-            'birth year',
-            'gender']
-    measured = len(csvdata.split('\n')[0].split(','))
-    assert measured == len(header),\
-            'len csvdata row ({}) is different than header {}. csvdata: """{}"""'.format(
-                    measured, len(header),
-                    csvdata)
-
-    header_str = ','.join(header)
-    full_csvdata = '{}\n{}'.format(header_str, csvdata)
-    s = StringIO(full_csvdata)
-    df = pd.read_csv(s)
-
-    return df
-
-
-def widen_df_with_other_cols(df, all_columns):
-    new_cols = list(set(all_columns)
-            - set(df.columns.tolist()))
-    for col in new_cols:
-        df[col] = np.nan
-    return df
-
-
-def contract_df(df):
-    bare_columns = [
-            'starttime', 'start station name', 'usertype', 'birth year', 'gender'
-            ]
-    return df[bare_columns]
     
 
 def run_model_predict(bundle, df, stations_df, labeled):
@@ -289,6 +256,47 @@ def df_to_np_for_clf(bundle, df, stations_df, labeled):
 def hydrate_and_widen(csvdata):
     df = hydrate_csv_to_df(csvdata)
     widened_df = widen_df_with_other_cols(df, s.ALL_COLUMNS)
-
     return widened_df
 
+
+def hydrate_labeled_csvdata(csvdata):
+    s = StringIO(full_csvdata)
+    df = pd.read_csv(s)
+    assert df.columns.tolist() == s.ALL_COLUMNS, \
+            'bad csvdata columns. seeing {}'.format(df.columns.tolist())
+    return df
+
+
+def hydrate_csv_to_df(csvdata):
+    header = ['starttime',
+            'start station name',
+            'usertype',
+            'birth year',
+            'gender']
+    measured = len(csvdata.split('\n')[0].split(','))
+    assert measured == len(header),\
+            'len csvdata row ({}) is different than header {}. csvdata: """{}"""'.format(
+                    measured, len(header),
+                    csvdata)
+
+    header_str = ','.join(header)
+    full_csvdata = '{}\n{}'.format(header_str, csvdata)
+    s = StringIO(full_csvdata)
+    df = pd.read_csv(s)
+
+    return df
+
+
+def widen_df_with_other_cols(df, all_columns):
+    new_cols = list(set(all_columns)
+            - set(df.columns.tolist()))
+    for col in new_cols:
+        df[col] = np.nan
+    return df
+
+
+def contract_df(df):
+    bare_columns = [
+            'starttime', 'start station name', 'usertype', 'birth year', 'gender'
+            ]
+    return df[bare_columns]

@@ -32,10 +32,13 @@ RUN conda install python=2.7 numpy scipy scikit-learn pandas py-xgboost-cpu
 RUN conda install ipython
 RUN pip install ipdb flask gevent gunicorn
 
+ARG BIKELEARN_VERSION
 
 COPY mypackages /opt/program/mypackages
 WORKDIR /opt/program
-RUN pip install mypackages/bikelearn-0.3.5.tar.gz
+RUN echo "blah-$BIKELEARN_VERSION.tar.gz"
+RUN echo "blah-${BIKELEARN_VERSION}.tar.gz"
+RUN pip install mypackages/bikelearn-$BIKELEARN_VERSION.tar.gz
 RUN pip install mypackages/funkybob-2018.11.11.tar.gz
 
 

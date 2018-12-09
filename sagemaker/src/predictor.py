@@ -25,24 +25,40 @@ import utils as ut
 # It has a predict function that does a prediction based on the model and the input data.
 
 
+def predict_or_validation(bundle, csvdata):
+    if os.getenv('DO_VALIDATION'):
+        return do_batch_validation(bundle, csvdata)
+
+    return do_predict(bundle, csvdata)
+
+
 def do_predict(bundle, csvdata):
-    bundle_stations_fn = bundle['train_metadata']['stations_df_fn']
-    stations_id, stations_df = ut.get_stations()
+    stations_fn, stations_df = ut.get_stations()
+    ut.validate_stations_being_used(bundle, stations_fn)
 
-    ut.validate_stations_being_used(bundle_stations_fn, stations_id)
     df = blc.hydrate_and_widen(csvdata)
-
-    print('Invoked with {} records'.format(df.shape[0]))
-    print('DEBUG df.shape, ' + str(df.shape))
+    print('DEBUG predict, df.shape, ' + str(df.shape))
 
     y_predictions, _, _ = blc.run_model_predict(
             bundle, df, stations_df, labeled=False)
 
-    return y_predictions
+    return numpy_to_csv(y_predictions)
+
+
+def do_batch_validation(bundle, csvdata):
+    stations_fn, stations_df = ut.get_stations()
+    ut.validate_stations_being_used(bundle, stations_fn)
+
+    df = blc.hydrate_labeled_csvdata(csvdata)
+    print('DEBUG batch_validation, df.shape, ' + str(df.shape))
+
+    y_predictions, y_test, metrics = blc.run_model_predict(
+            bundle, df, stations_df, labeled=True)
+
+    return json.dumps(metrics)
 
 
 class ScoringService(object):
-    # model = None                # Where we keep the model when it's loaded
     bundle = None
 
     @classmethod
@@ -62,17 +78,11 @@ class ScoringService(object):
             input (a pandas dataframe): The data on which to do the predictions. There will be
                 one prediction per row in the dataframe"""
         bundle = cls.get_model()
-        print ('DEBUG, csvdata, {}'.format(csvdata))
-#         df = blc.hydrate_csv_to_df(csvdata)
-#         print('Invoked with {} records'.format(df.shape[0]))
-# 
-#         print ('DEBUG, df.head(), ')
-#         df.head()
+        print ('DEBUG, csvdata[:1000], {}'.format(csvdata[:1000]))
 
-        preds = do_predict(bundle, csvdata)
-        print ('DEBUG, preds, {}'.format(preds))
-
-        return preds
+        out = predict_or_validation(bundle, csvdata)
+        print ('DEBUG, out, {}'.format(out))
+        return out
 
 # The flask app for serving predictions
 app = flask.Flask(__name__)
@@ -96,14 +106,13 @@ def transformation():
     request_content_type = flask.request.content_type
     print('DEBUG, flask.request.content_type, "{}"'.format(request_content_type))
 
-    response_type = determine_response_type(flask.request.args)
-
-    # Convert from CSV to pandas
     if request_content_type == 'text/csv':
         csvdata = flask.request.data.decode('utf-8')
-        result = do_output_predict(csvdata, response_type)
-        mimetype = {'simple': 'text/csv',
-                'complex': 'application/json'}[response_type]
+        result = ScoringService.predict(csvdata=csvdata)
+        do_validation = os.getenv('DO_VALIDATION', False)
+        print('DEBUG, DO_VALIDATION env, ' + str(do_validation))
+        mimetype = {False: 'text/csv',
+                'yes': 'application/json'}[do_validation]
         return flask.Response(response=result, status=200, mimetype=mimetype)
 
 
@@ -112,20 +121,13 @@ def transformation():
             status=415, mimetype='text/plain')
 
 
-# FIXME ok eventually put back the header=None 
-# sio = StringIO.StringIO(data)
-# data = pd.read_csv(sio, header=None)
-
 def determine_response_type(querystring):
     response_type = querystring.get('response', 'simple')
     print('DEBUG, querystring, ', querystring)
     return response_type
 
 
-def do_output_predict(csvdata, response_type):
-    predictions  = ScoringService.predict(csvdata=csvdata)
-
-    # Convert from numpy back to CSV
+def numpy_to_csv(predictions):
     out = StringIO.StringIO()
     pd.DataFrame({'results': predictions}).to_csv(out, header=False, index=False)
     result = out.getvalue()
