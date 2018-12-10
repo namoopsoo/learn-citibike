@@ -260,11 +260,13 @@ def hydrate_and_widen(csvdata):
 
 
 def hydrate_labeled_csvdata(csvdata):
-    s = StringIO(full_csvdata)
-    df = pd.read_csv(s)
-    assert df.columns.tolist() == s.ALL_COLUMNS, \
-            'bad csvdata columns. seeing {}'.format(df.columns.tolist())
-    return df
+#     sio = StringIO(csvdata)
+#     df = pd.read_csv(sio)
+#     assert df.columns.tolist() == s.ALL_COLUMNS, \
+#             'bad csvdata columns. seeing {}'.format(df.columns.tolist())
+
+    header = s.ALL_COLUMNS
+    return hydrate_inner(header, csvdata)
 
 
 def hydrate_csv_to_df(csvdata):
@@ -279,11 +281,14 @@ def hydrate_csv_to_df(csvdata):
                     measured, len(header),
                     csvdata)
 
+    return hydrate_inner(header, csvdata)
+
+
+def hydrate_inner(header, csvdata):
     header_str = ','.join(header)
     full_csvdata = '{}\n{}'.format(header_str, csvdata)
-    s = StringIO(full_csvdata)
-    df = pd.read_csv(s)
-
+    sio = StringIO(full_csvdata)
+    df = pd.read_csv(sio)
     return df
 
 
