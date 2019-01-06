@@ -15,6 +15,7 @@ MILES_PER_DEGREE_LAT = EARTH_CIRCUMFERENCE / 360
 PRECISION = Decimal('0.001')
 
 STARTTIME_REGEX = "%m/%d/%Y %H:%M:%S"
+STARTTIME_REGEX_201610 = '%Y-%m-%d %H:%M:%S'
 
 
 def _quantize(x):
@@ -105,7 +106,11 @@ For 24x7 = 168 hours in a week, starting from Monday midnight,
     '''
 
     # What day of week?
-    d = datetime.datetime.strptime(str(start_time), STARTTIME_REGEX)
+    try:
+        d = datetime.datetime.strptime(str(start_time), STARTTIME_REGEX)
+    except ValueError:
+        d = datetime.datetime.strptime(str(start_time), STARTTIME_REGEX_201610)
+
     weekday = d.weekday()  # Monday is 0
     
     hour = d.hour
@@ -117,13 +122,21 @@ For 24x7 = 168 hours in a week, starting from Monday midnight,
 
 
 def get_start_day(start_time):
-    d = datetime.datetime.strptime(str(start_time), STARTTIME_REGEX)
+    try:
+        d = datetime.datetime.strptime(str(start_time), STARTTIME_REGEX)
+    except ValueError:
+        d = datetime.datetime.strptime(str(start_time), STARTTIME_REGEX_201610)
+
     weekday = d.weekday()  # Monday is 0
     return weekday    
 
 
 def get_start_hour(start_time):
-    d = datetime.datetime.strptime(str(start_time), STARTTIME_REGEX)
+    try:
+        d = datetime.datetime.strptime(str(start_time), STARTTIME_REGEX)
+    except ValueError:
+        d = datetime.datetime.strptime(str(start_time), STARTTIME_REGEX_201610)
+
     hour = d.hour
     return hour
 
