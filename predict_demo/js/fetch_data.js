@@ -395,7 +395,7 @@ queryMyUrl = function(parameters, output_id) {
 	var full_uri = base_url + makeSortedParamString(parameters); 
 	console.log("full_uri: " + full_uri);
 
-	$("#out-div-2").update("Flarg text");
+	$("#out-div-2").text("Flarg text");
 
 
 	// Make Request.
