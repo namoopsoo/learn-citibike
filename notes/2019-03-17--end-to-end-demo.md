@@ -20,3 +20,10 @@ https://console.aws.amazon.com/s3/buckets/bike-hop-predict/?region=us-east-1&tab
 http://bike-hop-predict.s3-website-us-east-1.amazonaws.com/index.html
 
 ```
+
+* Trying to tweak the API Gateway , but still getting error on the browser side, 
+```
+Access to XMLHttpRequest at 'https://rmuxqpksz2.execute-api.us-east-1.amazonaws.com/default/myBikelearnSageLambda?start_station=Forsyth+St+%26+Broome+St&start_time=10%2F8%2F2015+18%3A04%3A57&rider_gender=2&rider_type=Subscriber&birth_year=1973' from origin 'http://bike-hop-predict.s3-website-us-east-1.amazonaws.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+
+VM29:1 Cross-Origin Read Blocking (CORB) blocked cross-origin response https://rmuxqpksz2.execute-api.us-east-1.amazonaws.com/default/myBikelearnSageLambda?start_station=Forsyth+St+%26+Broome+St&start_time=10%2F8%2F2015+18%3A04%3A57&rider_gender=2&rider_type=Subscriber&birth_year=1973 with MIME type application/json. See https://www.chromestatus.com/feature/5629709824032768
+```
