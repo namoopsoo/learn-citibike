@@ -1,0 +1,46 @@
+<html>
+	<body>
+		<!--
+	  <script src="bower_components/cryptojslib/rollups/sha256.js"></script>
+	  <script src="bower_components/cryptojslib/rollups/hmac-sha256.js"></script>
+	  <script src="bower_components/aws-sign-web/aws-sign-web.js"></script>
+	  <script src="//d3js.org/d3.v3.min.js"></script>
+	  -->
+	  <script src="js/jquery-3.2.0.min.js"></script>
+	  <script src="js/fetch_data.js"></script>
+	<script>
+
+
+$(document).on('click','.blah-submit-class', function(){
+ //your code
+
+	console.log('start station: ' + $('#startStation'));
+
+	parameters = {
+		'start_station': 'Forsyth+St+%26+Broome+St',
+		'start_time': '10%2F8%2F2015+18%3A04%3A57',
+		'rider_gender': '2',
+		'rider_type': 'Subscriber',
+		'birth_year': '1973'
+	}
+
+	queryMyUrl(parameters, 'out-div');
+
+ return false;  //this will prevent the page refresh
+});
+
+	</script>
+
+	  <form >
+		  <label for="startStation">Name: <span class="required">*</span></label>  
+		  <input type="text" id="startStation" name="startStation"
+		  value="" placeholder="Start Station Name"
+		  required="required" autofocus="autofocus" />  
+
+		  <input type="submit" class="blah-submit-class" />
+	  </form>
+	  <div id='out-div'> </div>
+	  <div id='out-div-2'> </div>
+	</body>
+
+</html>
