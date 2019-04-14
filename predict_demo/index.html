@@ -1,9 +1,9 @@
 <html>
 	<body>
+	  <script src="js/sha256.js"></script>
+	  <script src="js/hmac-sha256.js"></script>
+	  <script src="js/aws-sign-web.js"></script>
 		<!--
-	  <script src="bower_components/cryptojslib/rollups/sha256.js"></script>
-	  <script src="bower_components/cryptojslib/rollups/hmac-sha256.js"></script>
-	  <script src="bower_components/aws-sign-web/aws-sign-web.js"></script>
 	  <script src="//d3js.org/d3.v3.min.js"></script>
 	  -->
 	  <script src="js/jquery-3.2.0.min.js"></script>
@@ -28,11 +28,11 @@ $(document).on('click','.blah-submit-class', function(){
 		'birth_year': $('#birthYear').val()}
 
 	var authparameters = {
-		'accessKeyId': $('#auth1').val()
-		'secretAccessKey': $('#auth1').val()};
+		'accessKeyId': $('#auth1').val(),
+		'secretAccessKey': $('#auth2').val()};
 
 	console.log('parameters from form: ' + JSON.stringify(parameters));
-	queryMyUrl(parameters, authparams, 'out-div');
+	queryMyUrl(parameters, authparameters, 'out-div');
 
  return false;  //this will prevent the page refresh
 });
