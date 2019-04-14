@@ -385,30 +385,18 @@ testFillMissingDates = function() {
 
 }
 
-queryMyUrl = function(parameters, output_id) {
+queryMyUrl = function(parameters, authparams, output_id) {
 
 
-	url = 'https://rmuxqpksz2.execute-api.us-east-1.amazonaws.com/default/myBikelearnSageLambda?start_station=Forsyth+St+%26+Broome+St&start_time=10%2F8%2F2015+18%3A04%3A57&rider_gender=2&rider_type=Subscriber&birth_year=1973'
+	// url = 'https://rmuxqpksz2.execute-api.us-east-1.amazonaws.com/default/myBikelearnSageLambda?start_station=Forsyth+St+%26+Broome+St&start_time=10%2F8%2F2015+18%3A04%3A57&rider_gender=2&rider_type=Subscriber&birth_year=1973'
 	base_url = 'https://rmuxqpksz2.execute-api.us-east-1.amazonaws.com/default/myBikelearnSageLambda'
-
-
-	console.log('parameters: '); 
-	console.log(parameters); 
-
-	var full_uri = base_url + makeSortedParamString(parameters); 
-	console.log("full_uri: " + full_uri);
-
-
-	// Make Request.
-	console.log('parameters:');
-	console.log(parameters);
+	
+	var goodstuff = prepareAuthenticatedAPIRequest(parameters,
+												authparams,
+												base_url);
 	$.get({
-		url: full_uri,
-		headers: {
-			//'Authorization': signed.Authorization,
-			//'Accept': signed.Accept,
-			//'x-amz-date': signed['x-amz-date'],
-		},
+		url: goodstuff['full_uri'],
+		headers: goodstuff['headers'],
 
 		success: function(response) {
 			console.log(response);
@@ -429,6 +417,40 @@ queryMyUrl = function(parameters, output_id) {
 }
 
 
+prepareAuthenticatedAPIRequest = function(parameters,
+										authparams,
+										base_url) {
+
+	var config = Object.assign(
+								{},
+								authparams, 
+								{region: 'us-east-1',
+								service: 'execute-api'});
+
+	var signer = new awsSignWeb.AwsSigner(config);
+	var full_uri = base_url + makeSortedParamString(parameters); 
+	//console.log("full_uri: " + full_uri);
+
+	var request = {
+		method: 'GET',
+		url: base_url, // URL w/o querystring here!
+		headers: {},
+		params: parameters,
+		data: null
+	};
+	var signed = signer.sign(request);
+
+	var headers = {
+			'Authorization': signed.Authorization,
+			'Accept': signed.Accept,
+			'x-amz-date': signed['x-amz-date']}
+
+	return {
+		base_url: base_url,
+		full_uri: full_uri,
+		headers: headers}
+}
+
 
 querySummaryWithParams = function(parameters, chart_id) {
 	// Create a new signer
@@ -436,8 +458,8 @@ querySummaryWithParams = function(parameters, chart_id) {
 		region: 'us-east-1',
 		service: 'execute-api',
 		// AWS IAM credentials, here some temporary credentials
-		accessKeyId: 'AKIAJZRBX47EKWFJQ5UA',
-		secretAccessKey: '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'
+		accessKeyId: '',
+		secretAccessKey: ''
 	};
 	console.log("config: ");
 	console.log(config);

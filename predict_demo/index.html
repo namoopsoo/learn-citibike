@@ -18,36 +18,44 @@ $(document).on('click','.blah-submit-class', function(){
 	// console.log('start time: ' + );
 	// url = 'https://rmuxqpksz2.execute-api.us-east-1.amazonaws.com/default/myBikelearnSageLambda?start_station=Forsyth+St+%26+Broome+St&start_time=10%2F8%2F2015+18%3A04%3A57&rider_gender=2&rider_type=Subscriber&birth_year=1973'
 	// Forsyth St & Broome St
-	parameters = {
+	var parameters = {
 		'start_station': replaceSpacesPluses(
 						$('#startStation').val()),
 		'start_time': replaceSpacesPluses(
 						$('#startTime').val()),
 		'rider_gender': $('#riderGender').val(),
 		'rider_type': $('#riderType').val(),
-		'birth_year': $('#birthYear').val()
+		'birth_year': $('#birthYear').val()}
 
+	var authparameters = {
+		'accessKeyId': $('#auth1').val()
+		'secretAccessKey': $('#auth1').val()};
 
-	}
 	console.log('parameters from form: ' + JSON.stringify(parameters));
-
-	queryMyUrl(parameters, 'out-div');
+	queryMyUrl(parameters, authparams, 'out-div');
 
  return false;  //this will prevent the page refresh
 });
 
 	</script>
+	<!-- 
+	 17:
+	 Forsyth St & Broome St
+
+	 16: Same as above, but change birth year 
+	 birth year: 1993
+	-->
 
 	  <form >
 		  Start station:
 		  <input type="text" id="startStation"
 		  value="" placeholder='Forsyth St & Broome St'
-				   autofocus="autofocus" />  <br/>
+				   autofocus="autofocus" />  (e.g. "Forsyth St & Broome St") <br/>
 
 		  Start time:
 		  <input type="text" id="startTime"
-		  value="" placeholder="10/8/2015 18:04:57"
-				   autofocus="autofocus" />  <br/>
+		  value="" placeholder="10/8/2015 18:04:57" 
+				   autofocus="autofocus" /> (e.g. "10/8/2015 18:04:57") <br/>
 
 		  Gender:
 		  <select id="riderGender">
@@ -65,6 +73,14 @@ $(document).on('click','.blah-submit-class', function(){
 
 		  Birth year:
 		  <input type="text" id="birthYear"
+		  value="" />  <br/>
+
+		  Auth1:
+		  <input type="text" id="auth1"
+		  value="" />  <br/>
+
+		  Auth2:
+		  <input type="text" id="auth2"
 		  value="" />  <br/>
 
 		  <input type="submit" class="blah-submit-class" />
