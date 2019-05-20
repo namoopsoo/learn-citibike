@@ -18,49 +18,55 @@ import pandas as pd
 import bikelearn.classify as blc
 import bikelearn.settings as s
 
-prefix = '/opt/ml/'
-model_path = os.path.join(prefix, 'model')
+import utils as ut
+
 
 # A singleton for holding the model. This simply loads the model and holds it.
 # It has a predict function that does a prediction based on the model and the input data.
 
 
-def get_bundle_filename():
-    path = os.path.join(model_path, 'bundle_meta.json')
-    print('DEBUG get_bundle_filename, path, {}'.format(path))
+def predict_or_validation(bundle, csvdata):
+    if os.getenv('DO_VALIDATION'):
+        return do_batch_validation(bundle, csvdata)
 
-    with open(path) as fd:
-        out = json.load(fd)
-
-    print('DEBUG, bundle_meta.json, {}'.format(out))
-    assert out is not None, 'out, {}'.format(out)
-    return out.get('bundle_filename')
+    return do_predict(bundle, csvdata)
 
 
-def do_predict(bundle, df):
-    stations_df = bundle['train_metadata']['stations_df']
+def do_predict(bundle, csvdata):
+    stations_fn, stations_df = ut.get_stations()
+    ut.validate_stations_being_used(bundle, stations_fn)
 
-    widened_df = blc.widen_df_with_other_cols(df, s.ALL_COLUMNS)
+    df = blc.hydrate_and_widen(csvdata)
+    print('DEBUG predict, df.shape, ' + str(df.shape))
 
-    print('DEBUG df.shape, ' + str(df.shape))
-    print('DEBUG widened_df.shape, ' + str(widened_df.shape))
+    y_predictions, _, _ = blc.run_model_predict(
+            bundle, df, stations_df, labeled=False)
 
-    y_predictions, y_test = blc.run_model_predict(
-            bundle, widened_df, stations_df, labeled=False)
+    return numpy_to_csv(y_predictions)
 
-    return y_predictions
+
+def do_batch_validation(bundle, csvdata):
+    stations_fn, stations_df = ut.get_stations()
+    ut.validate_stations_being_used(bundle, stations_fn)
+
+    df = blc.hydrate_labeled_csvdata(csvdata)
+    print('DEBUG batch_validation, df.shape, ' + str(df.shape))
+
+    y_predictions, y_test, metrics = blc.run_model_predict(
+            bundle, df, stations_df, labeled=True)
+
+    return json.dumps(metrics)
 
 
 class ScoringService(object):
-    # model = None                # Where we keep the model when it's loaded
     bundle = None
 
     @classmethod
     def get_model(cls):
         """Get the model object for this instance, loading it if it's not already loaded."""
         if cls.bundle is None:
-            bundle_filename = get_bundle_filename()
-            with open(os.path.join(model_path, bundle_filename), 'r') as inp:
+            bundle_filename = ut.get_bundle_filename()
+            with open(os.path.join(ut.model_path, bundle_filename), 'r') as inp:
                 cls.bundle = pickle.load(inp)
         return cls.bundle
 
@@ -72,17 +78,11 @@ class ScoringService(object):
             input (a pandas dataframe): The data on which to do the predictions. There will be
                 one prediction per row in the dataframe"""
         bundle = cls.get_model()
-        print ('DEBUG, csvdata, {}'.format(csvdata))
-        df = blc.hydrate_csv_to_df(csvdata)
-        print('Invoked with {} records'.format(df.shape[0]))
+        print ('DEBUG, csvdata[:1000], {}'.format(csvdata[:1000]))
 
-        print ('DEBUG, ')
-        df.head()
-
-        preds = do_predict(bundle, df)
-        print ('DEBUG, preds, {}'.format(preds))
-
-        return preds
+        out = predict_or_validation(bundle, csvdata)
+        print ('DEBUG, out, {}'.format(out))
+        return out
 
 # The flask app for serving predictions
 app = flask.Flask(__name__)
@@ -102,29 +102,34 @@ def transformation():
     it to a pandas data frame for internal use and then convert the predictions back to CSV (which really
     just means one prediction per line, since there's a single column.
     """
-    data = None
+    csvdata = None
+    request_content_type = flask.request.content_type
+    print('DEBUG, flask.request.content_type, "{}"'.format(request_content_type))
 
-    # Convert from CSV to pandas
-    if flask.request.content_type == 'text/csv':
-        data = flask.request.data.decode('utf-8')
+    if request_content_type == 'text/csv':
+        csvdata = flask.request.data.decode('utf-8')
+        result = ScoringService.predict(csvdata=csvdata)
+        do_validation = os.getenv('DO_VALIDATION', False)
+        print('DEBUG, DO_VALIDATION env, ' + str(do_validation))
+        mimetype = {False: 'text/csv',
+                'yes': 'application/json'}[do_validation]
+        return flask.Response(response=result, status=200, mimetype=mimetype)
 
 
-        # FIXME ok eventually put back the header=None 
-        # sio = StringIO.StringIO(data)
-        # data = pd.read_csv(sio, header=None)
-
-    else:
-        return flask.Response(response='This predictor only supports CSV data', status=415, mimetype='text/plain')
+    print ('DEBUG, hmm, not text/csv or application/json')
+    return flask.Response(response='This predictor only supports CSV data',
+            status=415, mimetype='text/plain')
 
 
-    # Do the prediction
-    predictions = ScoringService.predict(data)
+def determine_response_type(querystring):
+    response_type = querystring.get('response', 'simple')
+    print('DEBUG, querystring, ', querystring)
+    return response_type
 
-    # Convert from numpy back to CSV
+
+def numpy_to_csv(predictions):
     out = StringIO.StringIO()
     pd.DataFrame({'results': predictions}).to_csv(out, header=False, index=False)
     result = out.getvalue()
-
-    return flask.Response(response=result, status=200, mimetype='text/csv')
-
+    return result
 

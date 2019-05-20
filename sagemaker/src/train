@@ -20,57 +20,43 @@ import xgboost
 
 from bikelearn.models import treefoo as bikemodel
 from bikelearn import pipeline_data as pl
+import utils as ut
 
 # These are the paths to where SageMaker mounts interesting things in your container.
 
-prefix = '/opt/ml/'
 
-input_path = prefix + 'input/data'
-output_path = os.path.join(prefix, 'output')
-model_path = os.path.join(prefix, 'model')
-param_path = os.path.join(prefix, 'input/config/hyperparameters.json')
-config_path = os.path.join(prefix, 'input/config')
 
-# This algorithm has a single channel of input data called 'training'. Since we run in
-# File mode, the input files are copied to the directory specified here.
-channel_name='training'
-training_path = os.path.join(input_path, channel_name)
-
-def whats_stations_filename():
-    stations_dir = os.path.join(training_path, 'support')
-    print("DEBUG, stations_dir, " + stations_dir)
-
-    stations_fn_list = [file
-            for file in
-            os.listdir(stations_dir)]
-
-    print('DEBUG, stations_fn_list , ' + str(stations_fn_list))
-    assert len(stations_fn_list) == 1, 'should be one file here'
-
-    stations_fn = stations_fn_list[0]
-
-    return os.path.join(stations_dir, stations_fn)
 
 
 def train():
-    train_fns = what_are_train_files()
-    fn = train_fns[-1]
-    # trainset = pd.read_csv(fn, header=None) # Hmm..
-    trainset = pd.read_csv(fn)
+    train_fn = what_are_train_files()[-1]
+    test_fn = what_are_test_files()[-1]
+    print('DEBUG, train_fn, ' + train_fn)
+    print('DEBUG, test_fn, ' + test_fn)
 
-    stations_fn = whats_stations_filename()
-    stations_df = pd.read_csv(stations_fn)
+    stations_id, stations_df = ut.get_stations()
+
+    hyperparameters = read_hyperparams()
+    print('DEBUG, hyperparameters, {}'.format(hyperparameters))
 
     try:
-        bundle = bikemodel.make_tree_foo(
-                {'trainset': trainset, 'fn': fn},
-                {'stations_df': stations_df, 'fn': stations_fn})
+        bundle = bikemodel.make_tree_foo({
+                    'train_fn': train_fn,
+                    'trainset': pd.read_csv(train_fn),
+                    'testset': pd.read_csv(test_fn),
+                    'test_fn': test_fn},
+                {'stations_df': stations_df, 'fn': stations_id},
+                hyperparameters)
+
+        # TODO... do the test set too..
+        print ('DEBUG, done baking bundle.')
     except Exception as e:
+        print('DEBUG, oh crap exception, ' + str({'e': e.__class__.__name__, 'str': str(e)}))
         # Write out an error file. This will be returned as the failureReason in the
         # DescribeTrainingJob result.
         trc = traceback.format_exc()
         fn = 'failure.{}.log'.format(pl.make_timestamp())
-        with open(os.path.join(output_path, fn), 'w') as s:
+        with open(os.path.join(ut.output_path, fn), 'w') as s:
             s.write('Exception during training: ' + str(e) + '\n' + trc)
         # Printing this causes the exception to be in the training job logs, as well.
         print('Exception during training: ' + str(e) + '\n' + trc, file=sys.stderr)
@@ -82,15 +68,24 @@ def train():
 
 
 def what_are_train_files():
-    # Take the set of files and read them all into a single pandas dataframe
-    print('DEBUG, training_path, ' + training_path)
+    return what_are_channel_files(ut.training_path)
 
-    print('DEBUG, os.listdir(training_path), ' + str(
-        os.listdir(training_path)))
+
+def what_are_test_files():
+    return what_are_channel_files(ut.testing_path)
+
+
+def what_are_channel_files(channel_path):
+    # Take the set of files and read them all into a single pandas dataframe
+    print('DEBUG, channel_path, ' + channel_path)
+
+    print('DEBUG, os.listdir(channel_path), ' + str(
+        os.listdir(channel_path)))
     input_files = [
-            os.path.join(training_path, file)
+            os.path.join(channel_path, file)
             for file in
-            filter(lambda x: x != 'support', os.listdir(training_path))]
+            filter(lambda x: x != 'support' and x.endswith('.csv'),
+                os.listdir(channel_path))]
 
     print('DEBUG, input_files , ')
     print(str(input_files))
@@ -98,67 +93,35 @@ def what_are_train_files():
     if len(input_files) == 0:
         raise ValueError(('There are no files in {}.\n'
                     + 'This usually indicates that '
-                    + 'the channel ({}) was incorrectly'
+                    + 'the channel was incorrectly'
                     + ' specified,\n'
                     + 'the data specification in S3 '
                     + ' was incorrectly specified or '
                     + ' the role specified\n'
                     + 'does not have permission to '
                     + ' access the data.').format(
-                            training_path, channel_name))
+                            channel_path))
 
     return input_files
+
+def read_hyperparams():
+    with open(ut.param_path, 'r') as tc:
+        hyperparameters = json.load(tc)
+    return hyperparameters
 
 
 def save_model(bundle):
     output_name = '{}.{}.pkl'.format(bundle['bundle_name'],
             bundle['timestamp'])
+    print('DEBUG, save_model, ' + output_name)
     with open(
-            os.path.join(model_path, output_name), 'w') as out:
+            os.path.join(ut.model_path, output_name), 'w') as out:
         cPickle.dump(bundle, out)
 
+    with open(
+            os.path.join(ut.model_path, 'bundle_meta.json'), 'w') as out:
+        json.dump({'bundle_filename': output_name}, out)
 
-def example_train():
-    # The function to execute the training.
-    print('Starting the training.')
-    try:
-        # Read in any hyperparameters that the user passed with the training job
-        with open(param_path, 'r') as tc:
-            trainingParams = json.load(tc)
-
-        train_fns = what_are_train_files()
-
-        raw_data = [pd.read_csv(file, header=None) for file in train_fns]
-        train_data = pd.concat(raw_data)
-
-        # labels are in the first column
-        train_y = train_data.ix[:,0]
-        train_X = train_data.ix[:,1:]
-
-        # Here we only support a single hyperparameter. Note that hyperparameters are always passed in as
-        # strings, so we need to do any necessary conversions.
-        max_leaf_nodes = trainingParams.get('max_leaf_nodes', None)
-        if max_leaf_nodes is not None:
-            max_leaf_nodes = int(max_leaf_nodes)
-
-        # Now use scikit-learn's decision tree classifier to train the model.
-        clf = tree.DecisionTreeClassifier(max_leaf_nodes=max_leaf_nodes)
-        clf = clf.fit(train_X, train_y)
-
-        # save the model
-        with open(os.path.join(model_path, 'decision-tree-model.pkl'), 'w') as out:
-            cPickle.dump(clf, out)
-        print('Training complete.')
-    except Exception as e:
-        # Write out an error file. This will be returned as the failureReason in the
-        # DescribeTrainingJob result.
-        trc = traceback.format_exc()
-        with open(os.path.join(output_path, 'failure'), 'w') as s:
-            s.write('Exception during training: ' + str(e) + '\n' + trc)
-        # Printing this causes the exception to be in the training job logs, as well.
-        print('Exception during training: ' + str(e) + '\n' + trc, file=sys.stderr)
-        # A non-zero exit code causes the training job to be marked as Failed.
-        sys.exit(255)
 
 if __name__ == '__main__':
     train()

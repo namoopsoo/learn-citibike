@@ -5,6 +5,12 @@ GEO_RAW_RESULTS = 'geolocation_raw_results'
 START_STATION_LATITUDE_COL = 'start station latitude'
 START_STATION_LONGITUDE_COL = 'start station longitude'
 START_STATION_NAME = 'start station name'
+
+START_STATION_NAME201110 = 'Start Station Name'
+START_STATION_LATITUDE_COL201110 = 'Start Station Latitude'
+START_STATION_LONGITUDE_COL201110 = 'Start Station Longitude'
+
+
 START_STATION_ID = 'start station id'
 END_STATION_LATITUDE_COL = 'end station latitude'
 END_STATION_LONGITUDE_COL = 'end station longitude'

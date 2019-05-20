@@ -121,17 +121,8 @@ def make_medium_simple_df(annotated_df, feature_encoding_dict):
     dfcopy, label_encoders = classify.build_label_encoders_from_df(
             df, feature_encoding_dict)
 
-    # Apply label encoding...
-
-
-
     # TODO probably need re-indexing?
 
     return dfcopy, label_encoders
 
-def do_prep(df, feature_encoding_dict):
-    for col, dtype in feature_encoding_dict.items():
-        if col in df:
-            df[col] = df[col].astype(dtype)
-    return df
 

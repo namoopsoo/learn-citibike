@@ -12,11 +12,13 @@ import pipeline_data as pl
 import annotate_geolocation as annotate_geo
 import settings as s
 
-def make_dfs(indf, stations_df):
-    stations_df_filename = os.path.join(s.DATAS_DIR, 'start_stations_103115.fuller.csv')
-    # stations_df = pd.read_csv(stations_df_filename, index_col=0, dtype={'postal_code': str})
-
-    train_df, holdout_df = cl.simple_split(indf)
+def make_dfs(indf, stations_df, random=True):
+    if random:
+        train_df, holdout_df = cl.simple_split(indf)
+    else:
+        k = int(indf.shape[0]*0.8)
+        train_df = indf.iloc[:k]
+        holdout_df = indf.iloc[k:]
 
     return {'train_df': train_df, 
             'holdout_df': holdout_df,}

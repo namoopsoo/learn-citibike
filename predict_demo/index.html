@@ -1,0 +1,92 @@
+<html>
+	<body>
+	  <script src="js/sha256.js"></script>
+	  <script src="js/hmac-sha256.js"></script>
+	  <script src="js/aws-sign-web.js"></script>
+		<!--
+	  <script src="//d3js.org/d3.v3.min.js"></script>
+	  -->
+	  <script src="js/jquery-3.2.0.min.js"></script>
+	  <script src="js/fetch_data.js"></script>
+	<script>
+
+
+$(document).on('click','.blah-submit-class', function(){
+ //your code
+
+	// console.log('start station: '  );
+	// console.log('start time: ' + );
+	// url = 'https://rmuxqpksz2.execute-api.us-east-1.amazonaws.com/default/myBikelearnSageLambda?start_station=Forsyth+St+%26+Broome+St&start_time=10%2F8%2F2015+18%3A04%3A57&rider_gender=2&rider_type=Subscriber&birth_year=1973'
+	// Forsyth St & Broome St
+	var parameters = {
+		'start_station': replaceSpacesPluses(
+						$('#startStation').val()),
+		'start_time': replaceSpacesPluses(
+						$('#startTime').val()),
+		'rider_gender': $('#riderGender').val(),
+		'rider_type': $('#riderType').val(),
+		'birth_year': $('#birthYear').val()}
+
+	var authparameters = {
+		'accessKeyId': $('#auth1').val(),
+		'secretAccessKey': $('#auth2').val()};
+
+	console.log('parameters from form: ' + JSON.stringify(parameters));
+	queryMyUrl(parameters, authparameters, 'out-div');
+
+ return false;  //this will prevent the page refresh
+});
+
+	</script>
+	<!-- 
+	 17:
+	 Forsyth St & Broome St
+
+	 16: Same as above, but change birth year 
+	 birth year: 1993
+	-->
+
+	  <form >
+		  Start station:
+		  <input type="text" id="startStation"
+		  value="" placeholder='Forsyth St & Broome St'
+				   autofocus="autofocus" />  (e.g. "Forsyth St & Broome St") <br/>
+
+		  Start time:
+		  <input type="text" id="startTime"
+		  value="" placeholder="10/8/2015 18:04:57" 
+				   autofocus="autofocus" /> (e.g. "10/8/2015 18:04:57") <br/>
+
+		  Gender:
+		  <select id="riderGender">
+			  <option value="">--</option>
+			  <option value="1">M</option>
+			  <option value="2">F</option>
+		  </select>   <br/>
+
+		  Rider Type:
+		  <select id="riderType">
+			  <option value="">--</option>
+			  <option value="Subscriber">Subscriber</option>
+			  <option value="Customer">Customer</option>
+		  </select>   <br/>
+
+		  Birth year:
+		  <input type="text" id="birthYear"
+		  value="" />  <br/>
+
+		  Auth1:
+		  <input type="text" id="auth1"
+		  value="" />  <br/>
+
+		  Auth2:
+		  <input type="text" id="auth2"
+		  value="" />  <br/>
+
+		  <input type="submit" class="blah-submit-class" />
+	  </form>
+	  <div id='out-div'> </div>
+	  <div id='out-div-2'> </div>
+	</body>
+
+</html>

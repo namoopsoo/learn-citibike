@@ -1,0 +1,463 @@
+,station_name,postal_code,sublocality,neighborhood,state
+0,W 26 St & 10 Ave,10001,Manhattan,Midtown,NY
+1,E 39 St & 2 Ave,10016,Manhattan,Midtown,NY
+2,8 Ave & W 52 St,10019,Manhattan,Midtown,NY
+3,Sullivan St & Washington Sq,10012,Manhattan,Lower Manhattan,NY
+4,Bedford Ave & Nassau Ave,11222,Brooklyn,Greenpoint,NY
+5,Forsyth St & Broome St,10002,Manhattan,Lower Manhattan,NY
+6,South End Ave & Liberty St,10281,Manhattan,Lower Manhattan,NY
+7,St Marks Pl & 1 Ave,10009,Manhattan,Lower Manhattan,NY
+8,Barrow St & Hudson St,10014,Manhattan,Lower Manhattan,NY
+9,Berry St & N 8 St,11249,Brooklyn,Williamsburg,NY
+10,E 2 St & Avenue C,10009,Manhattan,Lower Manhattan,NY
+11,2 Ave & E 31 St,10016,Manhattan,Midtown,NY
+12,E 4 St & 2 Ave,10003,Manhattan,East Village,NY
+13,E 12 St & 3 Ave,10003,Manhattan,Lower Manhattan,NY
+14,Peck Slip & Front St,10038,Manhattan,Lower Manhattan,NY
+15,Graham Ave & Grand St,11211,Brooklyn,Williamsburg,NY
+16,Broadway & Whipple St,11206,Brooklyn,Williamsburg,NY
+17,5 Ave & E 29 St,10016,Manhattan,Midtown,NY
+18,W 63 St & Broadway,10023,Manhattan,Upper West Side,NY
+19,Division Ave & Marcy Ave,,Brooklyn,Williamsburg,NY
+20,Lexington Ave & E 24 St,10010,Manhattan,Midtown,NY
+21,Broadway & E 14 St,10003,Manhattan,Midtown,NY
+22,W 38 St & 8 Ave,10018,Manhattan,Midtown,NY
+23,1 Ave & E 68 St,10065,Manhattan,Upper East Side,NY
+24,E 14 St & Avenue B,10009,Manhattan,Lower Manhattan,NY
+25,E 11 St & 1 Ave,10009,Manhattan,Lower Manhattan,NY
+26,W 22 St & 8 Ave,10011,Manhattan,Midtown,NY
+27,St Marks Pl & 2 Ave,10003,Manhattan,Lower Manhattan,NY
+28,Reade St & Broadway,10007,Manhattan,Lower Manhattan,NY
+29,Clermont Ave & Lafayette Ave,11238,Brooklyn,Clinton Hill,NY
+30,Washington Pl & Broadway,10003,Manhattan,Lower Manhattan,NY
+31,W 42 St & 8 Ave,10018,Manhattan,Midtown,NY
+32,Kent Ave & S 11 St,11249,Brooklyn,Williamsburg,NY
+33,E 11 St & 2 Ave,10003,Manhattan,Lower Manhattan,NY
+34,W 41 St & 8 Ave,10018,Manhattan,Midtown,NY
+35,N 8 St & Driggs Ave,11211,Brooklyn,Williamsburg,NY
+36,Graham Ave & Withers St,,Brooklyn,Williamsburg,NY
+37,Bank St & Washington St,10014,Manhattan,Lower Manhattan,NY
+38,Mercer St & Bleecker St,10012,Manhattan,Lower Manhattan,NY
+39,W 70 St & Amsterdam Ave,10023,Manhattan,Upper West Side,NY
+40,9 Ave & W 16 St,10011,Manhattan,Midtown,NY
+41,Vesey Pl & River Terrace,10282,Manhattan,Lower Manhattan,NY
+42,Harrison St & Hudson St,10013,Manhattan,Lower Manhattan,NY
+43,Central Park West & W 72 St,10023,Manhattan,Upper West Side,NY
+44,Rivington St & Chrystie St,10002,Manhattan,Lower Manhattan,NY
+45,Montrose Ave & Bushwick Ave,11206,Brooklyn,Williamsburg,NY
+46,Cadman Plaza E & Red Cross Pl,11201,Brooklyn,Downtown Brooklyn,NY
+47,Cadman Plaza West & Montague St,11201,Brooklyn,Downtown Brooklyn,NY
+48,W 20 St & 8 Ave,10011,Manhattan,Midtown,NY
+49,1 Ave & E 18 St,10003,Manhattan,Midtown,NY
+50,11 Ave & W 41 St,10036,Manhattan,Midtown,NY
+51,Allen St & Rivington St,10002,Manhattan,Lower Manhattan,NY
+52,Market St & Cherry St,10002,Manhattan,Lower Manhattan,NY
+53,E 10 St & 5 Ave,10011,Manhattan,Lower Manhattan,NY
+54,Graham Ave & Conselyea St,,Brooklyn,Williamsburg,NY
+55,University Pl & E 14 St,10003,Manhattan,Midtown,NY
+56,Lafayette St & E 8 St,10003,Manhattan,Lower Manhattan,NY
+57,Broadway & W 24 St,10010,Manhattan,Midtown,NY
+58,Avenue D & E 3 St,10009,Manhattan,Alphabet City,NY
+59,Carmine St & 6 Ave,10012,Manhattan,Lower Manhattan,NY
+60,W 4 St & 7 Ave S,10014,Manhattan,Lower Manhattan,NY
+61,Gallatin Pl & Livingston St,11201,Brooklyn,Downtown Brooklyn,NY
+62,Greenwich Ave & Charles St,10014,Manhattan,Lower Manhattan,NY
+63,Cleveland Pl & Spring St,10012,Manhattan,Lower Manhattan,NY
+64,W 52 St & 9 Ave,10019,Manhattan,Midtown,NY
+65,Metropolitan Ave & Meeker Ave,11211,Brooklyn,Williamsburg,NY
+66,Nassau St & Navy St,11201,Brooklyn,Fort Greene,NY
+67,E 33 St & 2 Ave,10016,Manhattan,Midtown,NY
+68,W 17 St & 8 Ave,10011,Manhattan,Midtown,NY
+69,E 19 St & 3 Ave,10003,Manhattan,Midtown,NY
+70,Lafayette Ave & Fort Greene Pl,11217,Brooklyn,Fort Greene,NY
+71,Metropolitan Ave & Bedford Ave,11211,Brooklyn,Williamsburg,NY
+72,E 7 St & Avenue A,10009,Manhattan,Lower Manhattan,NY
+73,W 45 St & 8 Ave,10036,Manhattan,Midtown,NY
+74,Allen St & E Houston St,10002,Manhattan,Lower Manhattan,NY
+75,6 Ave & Broome St,10013,Manhattan,Lower Manhattan,NY
+76,Lexington Ave & E 29 St,10016,Manhattan,Midtown,NY
+77,W 39 St & 9 Ave,10018,Manhattan,Midtown,NY
+78,9 Ave & W 45 St,10036,Manhattan,Midtown,NY
+79,Broadway & E 22 St,10010,Manhattan,Midtown,NY
+80,Great Jones St,10012,Manhattan,Lower Manhattan,NY
+81,Atlantic Ave & Fort Greene Pl,11217,Brooklyn,Fort Greene,NY
+82,E 15 St & 3 Ave,10003,Manhattan,Midtown,NY
+83,E 37 St & Lexington Ave,10016,Manhattan,Midtown,NY
+84,E 47 St & 2 Ave,10017,Manhattan,Midtown,NY
+85,Centre St & Chambers St,10013,Manhattan,Lower Manhattan,NY
+86,9 Ave & W 22 St,10011,Manhattan,Midtown,NY
+87,S 5 Pl & S 4 St,,Brooklyn,Williamsburg,NY
+88,W 53 St & 10 Ave,10019,Manhattan,Hell's Kitchen,NY
+89,W 33 St & 7 Ave,10001,Manhattan,Midtown,NY
+90,LaGuardia Pl & W 3 St,10012,Manhattan,Lower Manhattan,NY
+91,E 17 St & Broadway,10003,Manhattan,Midtown,NY
+92,St James Pl & Oliver St,10038,Manhattan,Lower Manhattan,NY
+93,Amsterdam Ave & W 73 St,10023,Manhattan,Upper West Side,NY
+94,W 56 St & 6 Ave,10019,Manhattan,Midtown West,NY
+95,E 27 St & 1 Ave,10016,Manhattan,Midtown,NY
+96,Pike St & Monroe St,10002,Manhattan,Lower Manhattan,NY
+97,Columbia St & Rivington St,10002,Manhattan,Lower Manhattan,NY
+98,W 49 St & 8 Ave,10019,Manhattan,Midtown,NY
+99,E 84 St & 1 Ave,10028,Manhattan,Yorkville,NY
+100,Leonard St & Church St,10013,Manhattan,Lower Manhattan,NY
+101,E 75 St & 3 Ave,10021,Manhattan,Upper East Side,NY
+102,E 53 St & Lexington Ave,10022,Manhattan,Midtown,NY
+103,Emerson Pl & Myrtle Ave,11205,Brooklyn,Clinton Hill,NY
+104,E 51 St & 1 Ave,10022,Manhattan,Midtown,NY
+105,E 39 St & 3 Ave,10016,Manhattan,Midtown,NY
+106,W 26 St & 8 Ave,10001,Manhattan,Midtown,NY
+107,Broadway & Berry St,11249,Brooklyn,Williamsburg,NY
+108,DeKalb Ave & Vanderbilt Ave,11205,Brooklyn,Clinton Hill,NY
+109,W 22 St & 10 Ave,10011,Manhattan,Midtown,NY
+110,W 52 St & 11 Ave,10019,Manhattan,Midtown,NY
+111,W 15 St & 7 Ave,10011,Manhattan,Midtown,NY
+112,E 55 St & Lexington Ave,10022,Manhattan,Midtown East,NY
+113,W 31 St & 7 Ave,10001,Manhattan,Midtown,NY
+114,W 14 St & The High Line,10014,Manhattan,Lower Manhattan,NY
+115,W 74 St & Columbus Ave,10023,Manhattan,Upper West Side,NY
+116,Mott St & Prince St,10012,Manhattan,Lower Manhattan,NY
+117,Washington Pl & 6 Ave,10011,Manhattan,Lower Manhattan,NY
+118,E 23 St & 1 Ave,10010,Manhattan,Midtown,NY
+119,6 Ave & Canal St,10013,Manhattan,Lower Manhattan,NY
+120,Shevchenko Pl & E 7 St,10003,Manhattan,Lower Manhattan,NY
+121,N 12 St & Bedford Ave,11211,Brooklyn,Williamsburg,NY
+122,6 Ave & W 33 St,10118,Manhattan,Midtown,NY
+123,Broadway & W 29 St,10001,Manhattan,Midtown,NY
+124,W 37 St & 5 Ave,10018,Manhattan,Midtown,NY
+125,John St & William St,10038,Manhattan,Lower Manhattan,NY
+126,Bayard St & Baxter St,10013,Manhattan,Lower Manhattan,NY
+127,Lawrence St & Willoughby St,11201,Brooklyn,Downtown Brooklyn,NY
+128,E 13 St & Avenue A,10009,Manhattan,Lower Manhattan,NY
+129,E 56 St & Madison Ave,10022,Manhattan,Midtown,NY
+130,E 20 St & 2 Ave,10010,Manhattan,Midtown,NY
+131,Forsyth St & Canal St,10002,Manhattan,Lower East Side,NY
+132,E 51 St & Lexington Ave,10022,Manhattan,Midtown,NY
+133,Stanton St & Chrystie St,10002,Manhattan,Lower Manhattan,NY
+134,Suffolk St & Stanton St,10002,Manhattan,Lower East Side,NY
+135,Pershing Square North,10168,Manhattan,Midtown,NY
+136,Greenwich Ave & 8 Ave,10011,Manhattan,Lower Manhattan,NY
+137,Wythe Ave & Metropolitan Ave,11249,Brooklyn,Williamsburg,NY
+138,DeKalb Ave & Hudson Ave,11201,Brooklyn,Downtown Brooklyn,NY
+139,W 59 St & 10 Ave,10023,Manhattan,Upper West Side,NY
+140,8 Ave & W 31 St,10001,Manhattan,Midtown,NY
+141,8 Ave & W 33 St,10001,Manhattan,Midtown,NY
+142,10 Ave & W 28 St,10001,Manhattan,Midtown,NY
+143,Perry St & Bleecker St,10014,Manhattan,Lower Manhattan,NY
+144,1 Ave & E 15 St,10009,Manhattan,Midtown,NY
+145,W 52 St & 5 Ave,10019,Manhattan,Midtown,NY
+146,9 Ave & W 18 St,10011,Manhattan,Midtown,NY
+147,Canal St & Rutgers St,10002,Manhattan,Lower Manhattan,NY
+148,E 3 St & 1 Ave,10009,Manhattan,East Village,NY
+149,2 Ave & E 58 St,10022,Manhattan,Midtown,NY
+150,Old Fulton St,10038,Brooklyn,Brooklyn Heights,NY
+151,Lewis Ave & Kosciuszko St,,Brooklyn,Bedford-Stuyvesant,NY
+152,Mercer St & Spring St,10012,Manhattan,Lower Manhattan,NY
+153,E 2 St & 2 Ave,10003,Manhattan,Lower Manhattan,NY
+154,Division St & Bowery,10038,Manhattan,Lower Manhattan,NY
+155,W 29 St & 9 Ave,10001,Manhattan,Midtown,NY
+156,Bushwick Ave & Powers St,11211,Brooklyn,Williamsburg,NY
+157,Hope St & Union Ave,,Brooklyn,Williamsburg,NY
+158,Riverside Dr & W 72 St,10023,Manhattan,Upper West Side,NY
+159,W 43 St & 6 Ave,10036,Manhattan,Midtown,NY
+160,Meserole Ave & Manhattan Ave,11222,Brooklyn,Greenpoint,NY
+161,Frost St & Meeker St,11211,Brooklyn,Williamsburg,NY
+162,Murray St & West St,10007,Manhattan,Lower Manhattan,NY
+163,Clinton St & Grand St,10002,Manhattan,Lower East Side,NY
+164,1 Ave & E 30 St,10016,Manhattan,Midtown,NY
+165,E 9 St & Avenue C,10009,Manhattan,Lower Manhattan,NY
+166,Allen St & Hester St,10002,Manhattan,Lower Manhattan,NY
+167,11 Ave & W 27 St,10001,Manhattan,Midtown,NY
+168,W 13 St & 7 Ave,10011,Manhattan,Lower Manhattan,NY
+169,Bus Slip & State St,10004,Manhattan,Lower Manhattan,NY
+170,Broadway & W 60 St,10023,Manhattan,Upper West Side,NY
+171,Jackson Ave & 46 Rd,11101,Queens,Long Island City,NY
+172,E 32 St & Park Ave,10016,Manhattan,Midtown,NY
+173,Macon St & Nostrand Ave,11216,Brooklyn,Bedford-Stuyvesant,NY
+174,E 31 St & 3 Ave,10016,Manhattan,Midtown,NY
+175,Leonard St & Grand St,11211,Brooklyn,Williamsburg,NY
+176,W Broadway & Spring St,10012,Manhattan,Lower Manhattan,NY
+177,Grand St & Greene St,10013,Manhattan,Lower Manhattan,NY
+178,Clark St & Henry St,11201,Brooklyn,Brooklyn Heights,NY
+179,Jay St & Tech Pl,11201,Brooklyn,Downtown Brooklyn,NY
+180,Hicks St & Montague St,11201,Brooklyn,Brooklyn Heights,NY
+181,Kent Ave & N 7 St,11249,Brooklyn,Williamsburg,NY
+182,Fulton St & Broadway,10007,Manhattan,Lower Manhattan,NY
+183,W 54 St & 9 Ave,10019,Manhattan,Midtown,NY
+184,E 24 St & Park Ave S,10010,Manhattan,Midtown,NY
+185,E 2 St & Avenue B,10009,Manhattan,Lower Manhattan,NY
+186,E 16 St & Irving Pl,10003,Manhattan,Midtown,NY
+187,Lafayette Ave & St James Pl,11238,Brooklyn,Clinton Hill,NY
+188,W 56 St & 10 Ave,10019,Manhattan,Hell's Kitchen,NY
+189,E 52 St & 2 Ave,10022,Manhattan,Midtown,NY
+190,S 4 St & Rodney St,,Brooklyn,Williamsburg,NY
+191,Nassau Ave & Russell St,11222,Brooklyn,Greenpoint,NY
+192,W 37 St & 10 Ave,10018,Manhattan,Midtown,NY
+193,E 10 St & Avenue A,10009,Manhattan,Lower Manhattan,NY
+194,Pitt St & Stanton St,10002,Manhattan,Lower East Side,NY
+195,Broadway & W 32 St,10001,Manhattan,Midtown,NY
+196,Cherry St,10002,Manhattan,Lower Manhattan,NY
+197,Milton St & Franklin St,11222,Brooklyn,Greenpoint,NY
+198,India St & Manhattan Ave,11222,Brooklyn,Greenpoint,NY
+199,FDR Drive & E 35 St,10016,Manhattan,Murray Hill,NY
+200,E 43 St & Vanderbilt Ave,10017,Manhattan,Midtown,NY
+201,Bond St & Schermerhorn St,11201,Brooklyn,Downtown Brooklyn,NY
+202,Madison St & Clinton St,10002,Manhattan,Lower Manhattan,NY
+203,Fulton St & Rockwell Pl,11201,Brooklyn,Fort Greene,NY
+204,W 25 St & 6 Ave,10010,Manhattan,Midtown,NY
+205,Broadway & W 58 St,10019,Manhattan,Midtown,NY
+206,W 27 St & 7 Ave,10001,Manhattan,Midtown,NY
+207,Old Slip & Front St,10005,Manhattan,Lower Manhattan,NY
+208,Broadway & W 55 St,10019,Manhattan,Midtown,NY
+209,Broad St & Bridge St,10004,Manhattan,Lower Manhattan,NY
+210,Elizabeth St & Hester St,10013,Manhattan,Lower Manhattan,NY
+211,E 20 St & Park Ave,10010,Manhattan,Midtown,NY
+212,Duffield St & Willoughby St,11201,Brooklyn,Downtown Brooklyn,NY
+213,W 16 St & The High Line,10011,Manhattan,Midtown,NY
+214,Myrtle Ave & Lewis Ave,11206,Brooklyn,Bedford-Stuyvesant,NY
+215,Hudson St & Reade St,10013,Manhattan,Lower Manhattan,NY
+216,Broadway & W 49 St,10019,Manhattan,Midtown,NY
+217,Myrtle Ave & Marcy Ave,11206,Brooklyn,Bedford-Stuyvesant,NY
+218,Broadway & W 51 St,10019,Manhattan,Midtown,NY
+219,Putnam Ave & Throop Ave,11221,Brooklyn,Bedford-Stuyvesant,NY
+220,W 20 St & 7 Ave,10011,Manhattan,Midtown,NY
+221,Grand Army Plaza & Central Park S,10019,Manhattan,Central Park,NY
+222,N 11 St & Wythe Ave,11249,Brooklyn,Williamsburg,NY
+223,E 43 St & 2 Ave,10017,Manhattan,Midtown,NY
+224,E 6 St & Avenue B,10009,Manhattan,Lower Manhattan,NY
+225,E 6 St & Avenue D,10009,Manhattan,Lower Manhattan,NY
+226,Franklin St & W Broadway,10013,Manhattan,Lower Manhattan,NY
+227,Avenue D & E 8 St,10009,Manhattan,Lower Manhattan,NY
+228,Banker St & Meserole Ave,11222,Brooklyn,Greenpoint,NY
+229,W 84 St & Broadway,10024,Manhattan,Upper West Side,NY
+230,York St & Jay St,11201,Brooklyn,Dumbo,NY
+231,W 43 St & 10 Ave,10036,Manhattan,Midtown,NY
+232,Pike St & E Broadway,10002,Manhattan,Lower Manhattan,NY
+233,Carlton Ave & Flushing Ave,11205,Brooklyn,Navy Yard,NY
+234,E 20 St & FDR Drive,10010,Manhattan,Midtown,NY
+235,E 48 St & 3 Ave,10017,Manhattan,Midtown East,NY
+236,3 Ave & E 62 St,10065,Manhattan,Upper East Side,NY
+237,Howard St & Centre St,10013,Manhattan,Lower Manhattan,NY
+238,Clinton Ave & Myrtle Ave,11205,Brooklyn,Clinton Hill,NY
+239,Henry St & Grand St,10002,Manhattan,Lower East Side,NY
+240,Barclay St & Church St,10007,Manhattan,Lower Manhattan,NY
+241,Lispenard St & Broadway,10013,Manhattan,Lower Manhattan,NY
+242,1 Ave & E 62 St,10065,Manhattan,Upper East Side,NY
+243,W 47 St & 10 Ave,10036,Manhattan,Hell's Kitchen,NY
+244,Columbus Ave & W 72 St,10023,Manhattan,Upper West Side,NY
+245,Concord St & Bridge St,11201,Brooklyn,Downtown Brooklyn,NY
+246,Queens Plaza North & Crescent St,11101,Queens,Long Island City,NY
+247,Little West St & 1 Pl,10004,Manhattan,Lower Manhattan,NY
+248,1 Ave & E 78 St,10010,Manhattan,Upper East Side,NY
+249,W 84 St & Columbus Ave,10024,Manhattan,Upper West Side,NY
+250,Broadway & Battery Pl,10004,Manhattan,Lower Manhattan,NY
+251,E 33 St & 5 Ave,10016,Manhattan,Midtown,NY
+252,Cliff St & Fulton St,10038,Manhattan,Lower Manhattan,NY
+253,E 84 St & Park Ave,10028,Manhattan,Upper East Side,NY
+254,Monroe St & Classon Ave,11238,Brooklyn,Bedford-Stuyvesant,NY
+255,E 55 St & 2 Ave,10022,Manhattan,Midtown,NY
+256,Cumberland St & Lafayette Ave,11238,Brooklyn,Fort Greene,NY
+257,Broadway & W 41 St,10036,Manhattan,Midtown,NY
+258,E 82 St & 2 Ave,10028,Manhattan,Upper East Side,NY
+259,Watts St & Greenwich St,10013,Manhattan,Lower Manhattan,NY
+260,Bank St & Hudson St,10014,Manhattan,Lower Manhattan,NY
+261,W 11 St & 6 Ave,10011,Manhattan,Lower Manhattan,NY
+262,Franklin St & Dupont St,11222,Brooklyn,Greenpoint,NY
+263,W 67 St & Broadway,10023,Manhattan,Lincoln Square,NY
+264,Madison St & Montgomery St,10002,Manhattan,Lower Manhattan,NY
+265,State St & Smith St,11201,Brooklyn,Boerum Hill,NY
+266,South St & Whitehall St,10004,Manhattan,Lower Manhattan,NY
+267,E 72 St & York Ave,10021,Manhattan,Upper East Side,NY
+268,West St & Chambers St,12534,Manhattan,Lower Manhattan,NY
+269,W 21 St & 6 Ave,10010,Manhattan,Midtown,NY
+270,Willoughby Ave & Tompkins Ave,11206,Brooklyn,Bedford-Stuyvesant,NY
+271,Central Park West & W 76 St,10023,Manhattan,Central Park,NY
+272,12 Ave & W 40 St,10036,Manhattan,Midtown,NY
+273,E 81 St & Park Ave,10028,Manhattan,Upper East Side,NY
+274,Dean St & 4 Ave,11217,Brooklyn,Boerum Hill,NY
+275,E 85 St & York Ave,10028,Manhattan,Upper East Side,NY
+276,Front St & Maiden Ln,10038,Manhattan,Lower Manhattan,NY
+277,E 30 St & Park Ave S,10016,Manhattan,Midtown,NY
+278,E 25 St & 2 Ave,10010,Manhattan,Midtown,NY
+279,West Thames St,10280,Manhattan,Lower Manhattan,NY
+280,Maiden Ln & Pearl St,10038,Manhattan,Lower Manhattan,NY
+281,Johnson St & Gold St,11201,Brooklyn,Downtown Brooklyn,NY
+282,46 Ave & 5 St,11101,Queens,Long Island City,NY
+283,Central Park S & 6 Ave,10019,Manhattan,Midtown,NY
+284,E 58 St & 3 Ave,10022,Manhattan,Midtown East,NY
+285,Grand St & Havemeyer St,11211,Brooklyn,Williamsburg,NY
+286,Hanson Pl & St Felix St,11217,Brooklyn,Fort Greene,NY
+287,Monroe St & Bedford Ave,11216,Brooklyn,Bedford-Stuyvesant,NY
+288,Adelphi St & Myrtle Ave,11205,Brooklyn,Fort Greene,NY
+289,E 55 St & 3 Ave,10022,Manhattan,Midtown East,NY
+290,S 3 St & Bedford Ave,11249,Brooklyn,Williamsburg,NY
+291,E 67 St & Park Ave,10065,Manhattan,Upper East Side,NY
+292,E 5 St & Avenue C,10009,Manhattan,Lower Manhattan,NY
+293,Roebling St & N 4 St,11211,Brooklyn,Williamsburg,NY
+294,E 47 St & Park Ave,10017,Manhattan,Midtown,NY
+295,Riverside Dr & W 82 St,10024,Manhattan,Upper West Side,NY
+296,Lafayette Ave & Classon Ave,11238,Brooklyn,Bedford-Stuyvesant,NY
+297,Scholes St & Manhattan Ave,11206,Brooklyn,Williamsburg,NY
+298,Pershing Square South,10168,Manhattan,Midtown,NY
+299,Duane St & Greenwich St,10013,Manhattan,Lower Manhattan,NY
+300,St James Pl & Pearl St,10038,Manhattan,Lower Manhattan,NY
+301,McGuinness Blvd & Eagle St,11222,Brooklyn,Greenpoint,NY
+302,Clinton St & Joralemon St,11201,Brooklyn,Brooklyn Heights,NY
+303,Christopher St & Greenwich St,10014,Manhattan,Lower Manhattan,NY
+304,William St & Pine St,10005,Manhattan,Lower Manhattan,NY
+305,E 53 St & Madison Ave,10022,Manhattan,Midtown,NY
+306,E 85 St & 3 Ave,10028,Manhattan,Upper East Side,NY
+307,Front St & Washington St,11201,Brooklyn,Dumbo,NY
+308,Riverside Dr & W 78 St,10024,Manhattan,Upper West Side,NY
+309,E 16 St & 5 Ave,10011,Manhattan,Midtown,NY
+310,Greenwich St & Warren St,10282,Manhattan,Lower Manhattan,NY
+311,E 72 St & Park Ave,10021,Manhattan,Upper East Side,NY
+312,W 82 St & Central Park West,10024,Manhattan,Central Park,NY
+313,W 24 St & 7 Ave,10011,Manhattan,Midtown,NY
+314,Greene Ave & Nostrand Ave,11216,Brooklyn,Bedford-Stuyvesant,NY
+315,W 46 St & 11 Ave,10036,Manhattan,Midtown,NY
+316,Fulton St & Grand Ave,11238,Brooklyn,Clinton Hill,NY
+317,W 45 St & 6 Ave,10036,Manhattan,Midtown West,NY
+318,E 11 St & Broadway,10003,Manhattan,Lower Manhattan,NY
+319,Broadway & W 36 St,10018,Manhattan,Midtown,NY
+320,Broadway & W 39 St,10018,Manhattan,Midtown,NY
+321,Penn Station Valet,10001,Manhattan,Midtown,NY
+322,DeKalb Ave & S Portland Ave,11217,Brooklyn,Fort Greene,NY
+323,Washington St & Gansevoort St,10014,Manhattan,Lower Manhattan,NY
+324,W 34 St & 11 Ave,10001,Manhattan,Midtown,NY
+325,Avenue D & E 12 St,10009,Manhattan,Lower Manhattan,NY
+326,Greenwich St & N Moore St,10013,Manhattan,Lower Manhattan,NY
+327,Washington Ave & Greene Ave,11238,Brooklyn,Clinton Hill,NY
+328,Central Park West & W 68 St,10023,Manhattan,Upper West Side,NY
+329,5 Ave & E 73 St,10021,Manhattan,Upper East Side,NY
+330,Broadway & W 37 St,10018,Manhattan,Midtown,NY
+331,E 81 St & 3 Ave,10028,Manhattan,Upper East Side,NY
+332,Driggs Ave & Lorimer St,11222,Brooklyn,Greenpoint,NY
+333,Willoughby St & Fleet St,11201,Brooklyn,Downtown Brooklyn,NY
+334,Pearl St & Hanover Square,10005,Manhattan,Lower Manhattan,NY
+335,Catherine St & Monroe St,10002,Manhattan,Lower Manhattan,NY
+336,Front St & Gold St,11201,Brooklyn,Vinegar Hill,NY
+337,MacDougal St & Washington Sq,10011,Manhattan,Lower Manhattan,NY
+338,Warren St & Church St,10007,Manhattan,Lower Manhattan,NY
+339,Washington Park,11201,Brooklyn,Fort Greene,NY
+340,W 64 St & West End Ave,10023,Manhattan,Lincoln Square,NY
+341,E 25 St & 1 Ave,10010,Manhattan,Midtown,NY
+342,Columbia Heights & Cranberry St,11201,Brooklyn,Brooklyn Heights,NY
+343,W 18 St & 6 Ave,10011,Manhattan,Midtown,NY
+344,Broadway & W 53 St,10019,Manhattan,Midtown,NY
+345,E 60 St & York Ave,10065,Manhattan,Upper East Side,NY
+346,Clermont Ave & Park Ave,11205,Brooklyn,Fort Greene,NY
+347,W 13 St & 5 Ave,10011,Manhattan,Lower Manhattan,NY
+348,Bialystoker Pl & Delancey St,10002,Manhattan,Lower Manhattan,NY
+349,W 13 St & 6 Ave,10011,Manhattan,Lower Manhattan,NY
+350,Leonard St & Boerum St,11206,Brooklyn,Williamsburg,NY
+351,Henry St & Atlantic Ave,11201,Brooklyn,Brooklyn Heights,NY
+352,Fulton St & William St,10038,Manhattan,Lower Manhattan,NY
+353,South St & Gouverneur Ln,10005,Manhattan,Lower Manhattan,NY
+354,Union Ave & Jackson St,,Brooklyn,Williamsburg,NY
+355,Fulton St & Clermont Ave,11238,Brooklyn,Fort Greene,NY
+356,Washington Ave & Park Ave,11205,Brooklyn,Clinton Hill,NY
+357,Park Ave & St Edwards St,11201,Brooklyn,Fort Greene,NY
+358,W 44 St & 5 Ave,10036,Manhattan,Midtown,NY
+359,Norfolk St & Broome St,10002,Manhattan,Lower East Side,NY
+360,Atlantic Ave & Furman St,11201,Brooklyn,Brooklyn Heights,NY
+361,Driggs Ave & N Henry St,11222,Brooklyn,Greenpoint,NY
+362,N 6 St & Bedford Ave,11249,Brooklyn,Williamsburg,NY
+363,Cambridge Pl & Gates Ave,11238,Brooklyn,Clinton Hill,NY
+364,Spruce St & Nassau St,10038,Manhattan,Lower Manhattan,NY
+365,E 59 St & Madison Ave,10022,Manhattan,Midtown,NY
+366,Liberty St & Broadway,10038,Manhattan,Lower Manhattan,NY
+367,Lewis Ave & Madison St,,Brooklyn,Bedford-Stuyvesant,NY
+368,W 20 St & 11 Ave,10011,Manhattan,Midtown,NY
+369,S 4 St & Wythe Ave,,Brooklyn,Williamsburg,NY
+370,W 51 St & 6 Ave,10020,Manhattan,Midtown West,NY
+371,Fulton St & Washington Ave,11238,Brooklyn,Clinton Hill,NY
+372,Stanton St & Mangin St,10002,Manhattan,Lower Manhattan,NY
+373,Hancock St & Bedford Ave,11216,Brooklyn,Bedford-Stuyvesant,NY
+374,E 45 St & 3 Ave,10017,Manhattan,Midtown East,NY
+375,Vernon Blvd & 50 Ave,11101,Queens,Long Island City,NY
+376,Willoughby Ave & Hall St,11205,Brooklyn,Clinton Hill,NY
+377,DeKalb Ave & Skillman St,11205,Brooklyn,Bedford-Stuyvesant,NY
+378,Lefferts Pl & Franklin Ave,11238,Brooklyn,Bedford-Stuyvesant,NY
+379,Lafayette St & Jersey St,10012,Manhattan,Lower Manhattan,NY
+380,India St & East River,11222,Brooklyn,Greenpoint,NY
+381,11 Ave & W 59 St,10019,Manhattan,Midtown,NY
+382,Halsey St & Tompkins Ave,11216,Brooklyn,Bedford-Stuyvesant,NY
+383,McKibbin St & Manhattan Ave,11206,Brooklyn,Williamsburg,NY
+384,Carlton Ave & Park Ave,11205,Brooklyn,Fort Greene,NY
+385,Water - Whitehall Plaza,10004,Manhattan,Lower Manhattan,NY
+386,Humboldt St & Varet St,11206,Brooklyn,Williamsburg,NY
+387,W 13 St & Hudson St,10014,Manhattan,Lower Manhattan,NY
+388,Greenwich St & W Houston St,10014,Manhattan,Lower Manhattan,NY
+389,Greene Ave & Throop Ave,11221,Brooklyn,Bedford-Stuyvesant,NY
+390,Leonard St & Bayard St,11222,Brooklyn,Williamsburg,NY
+391,Clinton St & Tillary St,11201,Brooklyn,Downtown Brooklyn,NY
+392,Sands St & Navy St,11201,Brooklyn,Navy Yard,NY
+393,5 Ave & E 63 St,10065,Manhattan,Upper East Side,NY
+394,S Portland Ave & Hanson Pl,11217,Brooklyn,Fort Greene,NY
+395,Norman Ave & Leonard St,11222,Brooklyn,Greenpoint,NY
+396,3 Ave & Schermerhorn St,11217,Brooklyn,Fort Greene,NY
+397,N Henry St & Richardson St,11222,Brooklyn,Williamsburg,NY
+398,Centre St & Worth St,10013,Manhattan,Lower Manhattan,NY
+399,Kosciuszko St & Tompkins Ave,,Brooklyn,Bedford-Stuyvesant,NY
+400,Willoughby Ave & Walworth St,11205,Brooklyn,Bedford-Stuyvesant,NY
+401,Greenpoint Ave & Manhattan Ave,11222,Brooklyn,Greenpoint,NY
+402,Albany Ave & Fulton St,11213,Brooklyn,Bedford-Stuyvesant,NY
+403,Division Ave & Hooper St,,Brooklyn,Williamsburg,NY
+404,Graham Ave & Herbert St,,Brooklyn,Williamsburg,NY
+405,Marcus Garvey Blvd & Macon St,,Brooklyn,Bedford-Stuyvesant,NY
+406,44 Dr & Jackson Ave,11101,Queens,Long Island City,NY
+407,Marcy Ave & Lafayette Ave,11216,Brooklyn,Bedford-Stuyvesant,NY
+408,Stagg St & Union Ave,,Brooklyn,Williamsburg,NY
+409,9 St & 44 Rd,11101,Queens,Long Island City,NY
+410,Cadman Plaza E & Tillary St,11201,Brooklyn,Downtown Brooklyn,NY
+411,Pearl St & Anchorage Pl,11201,Brooklyn,Dumbo,NY
+412,Clinton Ave & Flushing Ave,11205,Brooklyn,Navy Yard,NY
+413,Union Ave & Wallabout St,,Brooklyn,Williamsburg,NY
+414,31 St & Thomson Ave,11101,Queens,Long Island City,NY
+415,Putnam Ave & Nostrand Ave,11216,Brooklyn,Bedford-Stuyvesant,NY
+416,Bedford Ave & S 9 St,11211,Brooklyn,Williamsburg,NY
+417,Lexington Ave & Classon Ave,11238,Brooklyn,Bedford-Stuyvesant,NY
+418,Lorimer St & Broadway,11206,Brooklyn,Williamsburg,NY
+419,21 St & 43 Ave,11101,Queens,Long Island City,NY
+420,Cadman Plaza W & Pierrepont St,11201,Brooklyn,Brooklyn Heights,NY
+421,Brooklyn Bridge Park - Pier 2,,Brooklyn,Brooklyn Heights,NY
+422,Devoe St & Leonard St,11211,Brooklyn,Williamsburg,NY
+423,Laight St & Hudson St,10013,Manhattan,Lower Manhattan,NY
+424,Myrtle Ave & St Edwards St,11201,Brooklyn,Fort Greene,NY
+425,45 Rd & 11 St,11101,Queens,Long Island City,NY
+426,Kosciuszko St & Nostrand Ave,11216,Brooklyn,Bedford-Stuyvesant,NY
+427,Fulton St & Utica Ave,11233,Brooklyn,Bedford-Stuyvesant,NY
+428,Throop Ave & Myrtle Ave,11206,Brooklyn,Bedford-Stuyvesant,NY
+429,Lewis Ave & Decatur St,,Brooklyn,Bedford-Stuyvesant,NY
+430,Bond St & Fulton St,11201,Brooklyn,Downtown Brooklyn,NY
+431,Kingston Ave & Herkimer St,11213,Brooklyn,Bedford-Stuyvesant,NY
+432,Boerum St & Broadway,11206,Brooklyn,Williamsburg,NY
+433,Franklin Ave & Myrtle Ave,11205,Brooklyn,Bedford-Stuyvesant,NY
+434,N 15 St & Wythe Ave,11222,Brooklyn,Greenpoint,NY
+435,Tompkins Ave & Hopkins St,,Brooklyn,Bedford-Stuyvesant,NY
+436,Nostrand Ave & Myrtle Ave,11205,Brooklyn,Bedford-Stuyvesant,NY
+437,47 Ave & 31 St,11101,Queens,Long Island City,NY
+438,Pulaski St & Marcus Garvey Blvd,,Brooklyn,Bedford-Stuyvesant,NY
+439,Park Ave & Marcus Garvey Blvd,11206,Brooklyn,Bedford-Stuyvesant,NY
+440,Railroad Ave & Kay Ave,11249,Brooklyn,Navy Yard,NY
+441,48 Ave & 5 St,11109,Queens,Long Island City,NY
+442,Marcy Ave & MacDonough St,11216,Brooklyn,Bedford-Stuyvesant,NY
+443,1 Ave & E 44 St,10017,Manhattan,Midtown,NY
+444,Central Park West & W 85 St,10024,Manhattan,Upper West Side,NY
+445,E 47 St & 1 Ave,10017,Manhattan,Midtown,NY
+446,W 76 St & Columbus Ave,10023,Manhattan,Upper West Side,NY
+447,5 Ave & E 78 St,10075,Manhattan,Upper East Side,NY
+448,East End Ave & E 86 St,10028,Manhattan,Upper East Side,NY
+449,Huron St & Franklin St,11222,Brooklyn,Greenpoint,NY
+450,W 78 St & Broadway,10024,Manhattan,Upper West Side,NY
+451,E 48 St & Madison Ave,10017,Manhattan,Midtown,NY
+452,Riverside Blvd & W 67 St,10069,Manhattan,Lincoln Square,NY
+453,Henry St & Poplar St,11201,Brooklyn,Brooklyn Heights,NY
+454,E 48 St & 5 Ave,10017,Manhattan,Midtown East,NY
+455,Lexington Ave & E 63 St,10065,Manhattan,Upper East Side,NY
+456,Amsterdam Ave & W 82 St,10024,Manhattan,Upper West Side,NY
+457,E 41 St & Madison Ave,10017,Manhattan,Midtown,NY
+458,E 40 St & Madison Ave,10016,Manhattan,Midtown,NY
+459,Leonard St & Manhattan Ave,11222,Brooklyn,Williamsburg,NY
+460,21 St & Queens Plaza North,11101,Queens,Long Island City,NY
+461,21 St & 41 Ave,11101,Queens,Long Island City,NY
