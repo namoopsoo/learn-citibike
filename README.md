@@ -30,6 +30,7 @@ influence my learning algorithm, so I added some more [transformations](#time-bu
 * I ended up getting some good gains by [binarizing my inputs](#binarizing-the-inputs)
 * I ended up using a [different evaluation metric](#changing-my-metric-one-more-time) again to get a different perspective on this problem.
 * Maybe a year or more later I came back to this problem from the point of view of experimenting with [AWS approaches to training models](#sagemaker-approach) , including Docker and SageMaker.
+* Thoughts for [future improvements](#future-improvements)
 
 #### More on this data
 * When I started looking at this data, there were 400+ stations for docking your citibike.
@@ -398,6 +399,9 @@ ipdb> pp geocoding_result
  ```
 * And of course I also ended up stepping on my own foot as well. I found I had created an unfortinate [git commit](https://github.com/namoopsoo/learn-citibike/commit/438e425482db1c105ae6a22b8248696d0f91dfef) where I accidentally undid the url-encoding and intersections with `&` are I think treated as query string parameters , , which ended up being a reason why some of my data was coming back as just the geolocation for a single street (`route`) and not an actual intersection. 
 
-#### Follow on..
-Hoping to come back to this and continue to iterate the approach.
-In particular, I would like to continue to explore model degradation over time. 
+#### Future Improvements
+* I am hoping to come back to this and continue to iterate the approach.
+* In particular, I would like to continue to explore model degradation over time. 
+* And in discussing with a few colleagues, seasonality would also be a really good feature to consider. Time bucketing was explored to a limited extent, but the day of the week nor the month of the year was not explored. 
+* There may also be many other datasets which can be joined with this one to bolster the information available, including information about the weather or perhaps other demographic attributes available. 
+* A more thorough comparison of algorithms should also be considered.
