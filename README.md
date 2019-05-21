@@ -69,7 +69,7 @@ width="435" height="307"  >
 #### Need additional location data
 * With the 400+ stations, trying to predict a multi-class problem of this sort with basic machine learning algorithms
 would not be a way to get quick results to help keep the project going, so I decided to constrain the problem. I ended up
-turning to the Google Geocoding API. Using this data because a side project in its own right, because parsing through 
+turning to the Google Geocoding API. Using this data became its own side project, because parsing through 
 the Google geolocation data can get pretty hairy! 
 
 _The meat of the output can look like this, for the docking station "1st Avenue & E 15th St"_
@@ -121,7 +121,6 @@ edge cases! The Neighborhood would come back blank and I ended up having to fill
 
 <img src="https://github.com/namoopsoo/learn-citibike/blob/master/notes/assets/Screen%20Shot%202018-12-04%20at%2012.11.42%20PM.png"
 width="457" height="328">
-1830 × 1314
 
 * Also the data calls were not free and I ended up building a small _caching layer_ with _redis_ . 
 * The other reason I had done that was that I would often work out of cafes where the Wifi was spotty and I didn't want an internet
