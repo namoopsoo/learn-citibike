@@ -1,3 +1,4 @@
+```python
 [{u'address_components': [{u'long_name': u'East 3rd Street',
                            u'short_name': u'E 3rd St',
                            u'types': [u'route']},
@@ -33,3 +34,4 @@
                                              u'lng': -73.99186399999999}}},
   u'place_id': u'ChIJuWov94JZwokRy-aQnT-VklI',
   u'types': [u'route']}]
+```
