@@ -1,0 +1,56 @@
+FROM ubuntu:16.04
+
+
+
+
+RUN apt-get -y update && apt-get install -y --no-install-recommends \
+         wget \
+         #python \
+         nginx \
+         bzip2 \
+         ca-certificates \
+         vim \
+    && rm -rf /var/lib/apt/lists/*
+
+
+# 
+# RUN apt-get -y install apt-transport-https iproute2
+# iproute2 , includes the 'ss' utility , 
+#        ss - another utility to investigate sockets
+# netstat 
+
+
+
+# note from https://docs.datascience.com/en/master/appendix-1/dockerfile-basics-and-best-practices-1.html , 
+
+RUN wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+/bin/bash Miniconda3-latest-Linux-x86_64.sh -f -b -p /opt/conda && \
+rm Miniconda3-latest-Linux-x86_64.sh
+ENV PATH /opt/conda/bin:$PATH
+
+RUN conda install python=3.7 numpy scipy scikit-learn pandas py-xgboost-cpu
+RUN pip install ipdb flask gevent gunicorn jupyter 
+RUN pip install matplotlib
+RUN pip install ipython
+
+WORKDIR /opt/program
+
+
+
+
+# Set some environment variables. PYTHONUNBUFFERED keeps Python from buffering our standard
+# output stream, which means that logs can be delivered to the user quickly. PYTHONDONTWRITEBYTECODE
+# keeps Python from writing the .pyc files which are unnecessary in this case. We also update
+# PATH so that the train and serve programs are found when the container is invoked.
+
+ENV PYTHONUNBUFFERED=TRUE
+ENV PYTHONDONTWRITEBYTECODE=TRUE
+
+
+ENV PATH="/opt/program:${PATH}"
+
+# Set up the program in the image
+# WORKDIR /opt/program
+
+
+
