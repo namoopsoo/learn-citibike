@@ -4,6 +4,7 @@ import pytz
 import os
 import numpy as np
 from sklearn.metrics import log_loss
+from joblib import Parallel, delayed
 
 
 def utc_ts():
@@ -56,13 +57,22 @@ def get_partitions(vec, slice_size, keep_remainder=True):
     return slices
 
 
-def big_logloss(y, y_prob, labels):
+def big_logloss(y, y_prob, labels, parallel=True):
     # calc logloss w/o kernel crashing
 
+    if parallel:
+        losses_vec = Parallel(n_jobs=5)(delayed(log_loss)(y[part[0]:part[-1]], 
+                                                   y_prob[part[0]:part[-1]], 
+                                                   labels=labels) 
+                                                   for part in get_partitions(list(range(len(y_prob))), 
+                                                                              slice_size=1000))
+        return np.mean(losses_vec)
+
+    # else..
     losses_vec = []
     for part in get_partitions(list(range(len(y_prob))), slice_size=1000):
         i, j = part[0], part[-1]   
-        losses_vec.append(log_loss(y[i:j], y_prob[i:j], labels=labels))
+        losses_vec.append(log_loss(y[part[0]:part[-1]], y_prob[part[0]:part[-1]], labels=labels))
     return np.mean(losses_vec)
 
 def log(workdir, what):
