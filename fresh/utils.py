@@ -113,3 +113,14 @@ def save_libsvm(X, y=None, outpath=None):
                       [str(int(y[j])) if y is not None else ''] + ["{}:{}".format(i, X[j][i]) 
                       for i in range(X.shape[1]) if X[j][i] != 0]) + '\n')
 
+
+def get_my_memory():
+    mypid = os.getpid()
+    out = subprocess.check_output(["ps", "-p", f"{mypid}", "-o", "pid,ppid,pmem,rss"])
+
+    pid, ppid, pmem, rss = out.decode('utf-8').split('\n')[1].strip().split()
+    # print(f'{pid}, {pmem}, {rss}')
+    gigs = int(rss)/1024/1024
+    assert int(pid) == mypid
+    return {'pmem': pmem, 'rss': gigs}
+
