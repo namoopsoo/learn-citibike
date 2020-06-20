@@ -84,19 +84,19 @@ def big_logloss(y, y_prob, labels, parallel=True):
         losses_vec.append(log_loss(y[part[0]:part[-1]], y_prob[part[0]:part[-1]], labels=labels))
     return np.mean(losses_vec)
 
-def _predict_worker(X, model_loc):
-    bundle = load(model_loc)
+def _predict_worker(X, bundle_loc):
+    bundle = load(bundle_loc)
     return bundle['model'].predict_proba(X)
 
-def predict_proba(X, model_loc, slice_size=1000, parallel=True):
+def predict_proba(X, bundle_loc, slice_size=1000, parallel=True):
     if parallel:
         # chop it up
         slices = get_slices(list(range(X.shape[0])), slice_size=slice_size)
-        vec = Parallel(n_jobs=5)(delayed(_predict_worker)(X[a:b], model_loc)
+        vec = Parallel(n_jobs=5)(delayed(_predict_worker)(X[a:b], bundle_loc)
                                                          for (a, b) in slices)
         return np.concatenate(vec)
     else:
-        return _predict_worker(X, model_loc)
+        return _predict_worker(X, bundle_loc)
 
 
 def log(workdir, what):
