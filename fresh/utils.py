@@ -4,7 +4,7 @@ import pytz
 import os
 import numpy as np
 from sklearn.metrics import log_loss
-from joblib import Parallel, delayed, load, save
+from joblib import Parallel, delayed, load, dump
 
 
 def utc_ts():
@@ -14,6 +14,10 @@ def utc_ts():
 def utc_log_ts():
     return datetime.datetime.utcnow(
         ).replace(tzinfo=pytz.UTC).strftime('%Y-%m-%d %H:%M:%SZ')
+
+def do_walltime(start):
+    return (datetime.datetime.now() - start).total_seconds()
+
     
 def make_work_dir():
     ts = utc_ts()
@@ -58,7 +62,7 @@ def get_partitions(vec, slice_size, keep_remainder=True):
 
 
 def get_slices(vec, slice_size, keep_remainder=True):
-    return [[part[0], part[-1]] 
+    return [[part[0], part[-1] + 1] 
             for part in get_partitions(vec, slice_size, keep_remainder)]
 
 
@@ -84,10 +88,10 @@ def _predict_worker(X, model_loc):
     bundle = load(model_loc)
     return bundle['model'].predict_proba(X)
 
-def predict_proba(X, model_loc, parallel=True):
+def predict_proba(X, model_loc, slice_size=1000, parallel=True):
     if parallel:
         # chop it up
-        slices = get_slices(list(range(X.shape[0])), slice_size=1000)
+        slices = get_slices(list(range(X.shape[0])), slice_size=slice_size)
         vec = Parallel(n_jobs=5)(delayed(_predict_worker)(X[a:b], model_loc)
                                                          for (a, b) in slices)
         return np.concatenate(vec)
