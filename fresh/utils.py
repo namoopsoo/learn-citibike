@@ -4,7 +4,7 @@ import pytz
 import os
 import numpy as np
 from sklearn.metrics import log_loss
-from joblib import Parallel, delayed
+from joblib import Parallel, delayed, load, save
 
 
 def utc_ts():
@@ -57,6 +57,11 @@ def get_partitions(vec, slice_size, keep_remainder=True):
     return slices
 
 
+def get_slices(vec, slice_size, keep_remainder=True):
+    return [[part[0], part[-1]] 
+            for part in get_partitions(vec, slice_size, keep_remainder)]
+
+
 def big_logloss(y, y_prob, labels, parallel=True):
     # calc logloss w/o kernel crashing
 
@@ -74,6 +79,21 @@ def big_logloss(y, y_prob, labels, parallel=True):
         i, j = part[0], part[-1]   
         losses_vec.append(log_loss(y[part[0]:part[-1]], y_prob[part[0]:part[-1]], labels=labels))
     return np.mean(losses_vec)
+
+def _predict_worker(X, model_loc):
+    bundle = load(model_loc)
+    return bundle['model'].predict_proba(X)
+
+def predict_proba(X, model_loc, parallel=True):
+    if parallel:
+        # chop it up
+        slices = get_slices(list(range(X.shape[0])), slice_size=1000)
+        vec = Parallel(n_jobs=5)(delayed(_predict_worker)(X[a:b], model_loc)
+                                                         for (a, b) in slices)
+        return np.concatenate(vec)
+    else:
+        return _predict_worker(X, model_loc)
+
 
 def log(workdir, what):
     ts = utc_log_ts()
