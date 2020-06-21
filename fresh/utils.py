@@ -1,4 +1,5 @@
 import datetime
+import subprocess
 import math
 import pytz
 import os
@@ -99,10 +100,11 @@ def predict_proba(X, bundle_loc, slice_size=1000, parallel=True):
         return _predict_worker(X, bundle_loc)
 
 
-def log(workdir, what):
+def log(workdir, *what):
     ts = utc_log_ts()
+    stuff = ', '.join(what)
     with open(f'{workdir}/work.log', 'a') as fd:
-        fd.write(f'{ts}, {what}\n')
+        fd.write(f'{ts}, {stuff}\n')
 
 
 def save_libsvm(X, y=None, outpath=None):
@@ -122,5 +124,5 @@ def get_my_memory():
     # print(f'{pid}, {pmem}, {rss}')
     gigs = int(rss)/1024/1024
     assert int(pid) == mypid
-    return {'pmem': pmem, 'rss': gigs}
+    return {'pmem': pmem, 'rss': f'{round(gigs, 3)} GiB'}
 
