@@ -181,13 +181,24 @@ for (i, (train_index, test_index)) in enumerate(kf.split(X)):
 - But this batching technique in the `do_train` func is not at all what happened. The first "2020-06-20" model fit took about `7 min` , but this fit here with `43` batches took from `05:17` to `11:23` , then `14:01` to `15:29` , maybe about `8 hours` . 
 - The first "2020-06-20" model  per [here](https://github.com/namoopsoo/learn-citibike/blob/2020-revisit/notes/2020-06-20.md#log-dump) was about `2.9M` but this one, `105M` 
 - This `43*2.9 = 124.7` so perhaps these `43` iterations are scaling the size roughly linearly.
-- But this time around I was tracking the memory of my notebook and I made a habit of killing any previous notebooks. So I feel confident the slowness is related to whatever is happening in this step..
+- But this time around I was tracking the memory of my notebook (looks fine) and I made a habit of killing any previous notebooks. So I feel confident the slowness is related to whatever is happening in this step..
 
 ```
 model.fit(X[part], y[part], xgb_model=prev_model_loc)
 ```
 
 - If the predict parts took `5min` in "2020-06-20" then here (I'm still waiting for it as I write this `55minutes` in ) I may need to wait several hours .
+
+#### What is next
+- As long as I don't do that kind of batching, with at worst under an hour training cycle, I can run through a bunch of experiments, but as I am adding more and more data, I am sure I will run into more problems, so eventually I need to solve this batching issue.
+- I'm wondering hmm maybe it is better to just train a new model for each batch, to make an ensemble of all the models in the batch. That's better than this slow process . [this answer](https://datascience.stackexchange.com/a/47537) seems to hint that yea, the additional `xgb_model` parameter to the `fit` method is not equivalent to just having taken in all the data at once. 
+- Or also, perhaps the native `xgb.train` approach 
+- [this answer](https://stackoverflow.com/a/44922590)  around pickling/unpickling seems to even say incremental learning with the sklearn API is not possible. So indeed I feel like I want to try it with the functional API.
+
+#### num class self reminder
+- [this tip](https://stackoverflow.com/questions/39386966/multiclass-classification-in-xgboost-python#39387627) about `num_class` was helpful but this implicitness means the first data which hits the classifier needs to have all the classes 
+- oh right or just need to handle missing right.
+
 
 
 #### Initial false start log..
