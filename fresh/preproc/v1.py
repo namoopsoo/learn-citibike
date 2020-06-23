@@ -6,9 +6,11 @@ def preprocess(X, y, neighborhoods):
     # Initially assuming labeled=True
     labeled = True
     genders = [0, 1, 2]
+    user_types = ['Subscriber', 'Customer']
+    time_of_day = [0, 1, 2, 3, 4]
 
     enc = OneHotEncoder(handle_unknown='error', 
-                        categories=[neighborhoods, genders])
+                        categories=[neighborhoods, genders, time_of_day])
     enc.fit(X)
     X_transformed = enc.transform(X)
     

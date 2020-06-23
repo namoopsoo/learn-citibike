@@ -1,4 +1,5 @@
 import datetime
+import pytz
 import subprocess
 import math
 import pytz
@@ -29,7 +30,8 @@ def make_work_dir():
 def prepare_data(tripsdf, stationsdf):
     
     # Step 1, merge w/ stationsdf to get neighborhood data
-    mdf = tripsdf[['start station name', 'end station name', 'gender']
+    mdf = tripsdf[['start station name', 'end station name', 'gender',
+                   'starttime', 'usertype']
             ].merge(stationsdf[['station_name', 'neighborhood']], 
                     left_on='start station name',
                     right_on='station_name'
@@ -40,11 +42,34 @@ def prepare_data(tripsdf, stationsdf):
                                   ).rename(columns={'neighborhood': 'end_neighborhood'})
     
     neighborhoods = sorted(stationsdf.neighborhood.unique().tolist())
+
+    prepare_weekday_feature(mdf)
+    time_of_day_feature(mdf)
     
-    X, y = (mdf[['start_neighborhood', 'gender']].values, 
+    X, y = (mdf[['start_neighborhood', 'gender', 'time_of_day', 'usertype', 'weekday', ]].values, 
             np.array(mdf['end_neighborhood'].tolist()))
     return X, y, neighborhoods
-    
+
+
+def prepare_weekday_feature(df):
+    df['start_dt'] = df['starttime'].map(
+                lambda x: datetime.datetime.strptime(
+                    x, '%Y-%m-%d %H:%M:%S'
+                    ).replace(tzinfo=pytz.timezone('US/Eastern')))
+    weekdays = set(['Monday', 'Tuesday', 'Wednesday', 
+                    'Thursday', 'Friday'])
+    df['weekday'] = df['start_dt'].map(
+                lambda x: int(x.strftime('%A') in weekdays))
+
+
+def time_of_day_feature(df):
+    hours = {'06': 0, '07': 0, '08': 0, '09': 0,
+         '10': 1, '11': 1, '12': 1, '13': 1,
+         '14': 2, '15': 2, '16': 2,
+         '17': 3, '18': 3, '19': 3, '20': 3, '21': 3,
+         '22': 4, '23': 4, '00': 4, '01': 4, '02': 4, '03': 4, '04': 4, '05': 4 }
+    df['time_of_day'] = df['starttime'].map(lambda x: hours.get(x[11:13]))
+
 
 def get_partitions(vec, slice_size, keep_remainder=True):
     try:
