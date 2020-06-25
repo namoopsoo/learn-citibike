@@ -72,11 +72,7 @@ def time_of_day_feature(df):
 
 
 def get_partitions(vec, slice_size, keep_remainder=True):
-    try:
-        size = len(vec)
-    except:
-        size = vec.shape[0]
-
+    size = _size(vec) 
     assert slice_size > 0
     num_slices = int(math.floor(size/slice_size))
     size_remainder = size - num_slices*slice_size
@@ -87,10 +83,20 @@ def get_partitions(vec, slice_size, keep_remainder=True):
     return slices
 
 
-def get_slices(vec, slice_size, keep_remainder=True):
+def get_slices(vec, slice_size=None, num_slices=None, keep_remainder=True):
+    if num_slices:
+        size = _size(vec) 
+        slice_size = size//num_slices
     return [[part[0], part[-1] + 1] 
             for part in get_partitions(vec, slice_size, keep_remainder)]
 
+
+def _size(vec):
+    try:
+        size = len(vec)
+    except:
+        size = vec.shape[0]
+    return size
 
 def big_logloss(y, y_prob, labels, parallel=True):
     # calc logloss w/o kernel crashing

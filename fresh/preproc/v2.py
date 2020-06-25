@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 import fresh.utils as fu
 
@@ -42,14 +43,21 @@ def xform(proc_bundle, X, y=None):
     # , for which need to also handle missing..
     #
     num_rows = X.shape[0]
-    X_transformed = np.hstack((
-        proc_bundle['enc'].transform(X[:, :3]).toarray(),
-        np.resize(
-            proc_bundle['usertype_le'].transform(X[:, 3]),
-            (num_rows, 1)
-            ),
-        X[:, 4:5]
-        ))
+    slices = fu.get_slices(list(range(num_rows)), num_slices=10)
+
+    X_transformed_parts = []
+    for a, b in tqdm(slices):
+        X_transformed = np.hstack((
+            proc_bundle['enc'].transform(X[a:b, :3]).toarray(),
+            np.resize(
+                proc_bundle['usertype_le'].transform(X[a:b, 3]),
+                ((b - a), 1)
+                ),
+            X[a:b, 4:5]
+            ))
+        X_transformed_parts.append(X_transformed)
+    X_transformed = np.concatenate(X_transformed_parts)
+
     if y is not None:
         y_enc = proc_bundle['le'].transform(y)    
     else:
