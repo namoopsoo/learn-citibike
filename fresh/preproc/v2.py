@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+import fresh.utils as fu
 
 # dataset v2: start neighborhod and gender
 #   and weeday|weekend
