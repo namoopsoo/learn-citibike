@@ -8,7 +8,7 @@ import fresh.utils as fu
 #   and customer|subscriber
 #   and birth year one hot..
 
-def preprocess(X, y, neighborhoods, labeled, proc_bundle=None):
+def preprocess(X, y, neighborhoods, labeled, proc_bundle=None, workdir=None):
     num_rows = X.shape[0]
 
     if proc_bundle:
@@ -32,12 +32,12 @@ def preprocess(X, y, neighborhoods, labeled, proc_bundle=None):
         le = LabelEncoder()
         le.fit(y)  # previously had used neighborhoods here
         proc_bundle = {'enc': enc, 'usertype_le': usertype_le, 'le': le}
-        X_transformed, y_enc = xform(proc_bundle, X, y)
+        X_transformed, y_enc = xform(proc_bundle, X, y, workdir)
         
         return X_transformed, y_enc, proc_bundle
         
 
-def xform(proc_bundle, X, y=None):
+def xform(proc_bundle, X, y=None, workdir):
     '''Apply preprocessing to X, y.  '''
     # TODO ... also the y_enc part, 
     # , for which need to also handle missing..
