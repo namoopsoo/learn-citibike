@@ -84,5 +84,5 @@ def to_csv(X, y, outfile):
 
 def to_libsvm(X, y, outfile):
     with open(outfile, 'ab') as fd:
-        dump_svmlight_file(X, y, outfile)
+        dump_svmlight_file(X, y, fd)
 
