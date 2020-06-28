@@ -18,10 +18,9 @@ If given (workdir, dataset_name), write the result there.
 
     '''
     num_rows = X.shape[0]
-
     if proc_bundle:
-        X_transformed, y_enc = xform(proc_bundle, X, y, workdir, dataset_name, filetype='libsvm')
-        return X_transformed, y_enc
+        outfile = xform(proc_bundle, X, y, workdir, dataset_name, filetype='libsvm')
+        return outfile
     else:
         genders = [0, 1, 2]
         user_types = ['Subscriber', 'Customer']
