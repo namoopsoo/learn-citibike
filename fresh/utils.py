@@ -157,3 +157,15 @@ def get_my_memory():
     assert int(pid) == mypid
     return {'pmem': pmem, 'rss': f'{round(gigs, 3)} GiB'}
 
+def rebalance_proportions(proportions):
+
+    # a = np.array([.1, .2, .3, .4])
+    assert sum(proportions) == 1.
+
+    average = 1/proportions.shape[0]
+
+    b = average/proportions
+    new_norm = np.sum(b)
+    c = b/new_norm
+    return c
+
