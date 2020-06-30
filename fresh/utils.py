@@ -1,4 +1,5 @@
 import datetime
+from collections import Counter
 import pytz
 import subprocess
 import math
@@ -169,3 +170,14 @@ def rebalance_proportions(proportions):
     c = b/new_norm
     return c
 
+def balance_dataset(X, y):
+    # Balance before encoding
+
+    dd = dict(Counter(y)).items()
+    vv = rebalance_proportions()
+'''
+X, y, neighborhoods = fu.prepare_data(tripsdf, stationsdf)
+
+X, y = balance_dataset(X, y)
+
+'''
