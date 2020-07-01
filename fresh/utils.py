@@ -170,14 +170,26 @@ def rebalance_proportions(proportions):
     c = b/new_norm
     return c
 
-def balance_dataset(X, y):
+def balance_dataset(X, y, shrinkage=1.0):
     # Balance before encoding
+    size = y.shape[0]
+    dd = list(dict(Counter(y)).items())
+    counts = dict(Counter(y))
+    total = sum([x[1] for x in dd])
+    dd2 = rebalance_proportions(np.array([x[1]/total for x in dd]))
+    newprop = dict([[dd[i], dd2[i]] for i, _ in enumerate(dd)])
 
-    dd = dict(Counter(y)).items()
-    vv = rebalance_proportions()
+    weights = [newprop[blarp]/(counts[blarp]) for blarp in y]
+    new_size = size*shrinkage
+    indices = np.random.choice(range(size), replace=False, p=weights, size=new_size)
+
+    return X[indices], y[indices]
+    
 '''
 X, y, neighborhoods = fu.prepare_data(tripsdf, stationsdf)
 
 X, y = balance_dataset(X, y)
 
 '''
+
+
