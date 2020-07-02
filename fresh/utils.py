@@ -170,17 +170,23 @@ def rebalance_proportions(proportions):
     c = b/new_norm
     return c
 
+def get_proportions(y):
+    size = y.shape[0]
+    return {k: v/size for (k, v) in dict(Counter(y)).items()}
+
+
 def balance_dataset(X, y, shrinkage=1.0):
     # Balance before encoding
     size = y.shape[0]
-    dd = list(dict(Counter(y)).items())
+    dd = get_proportions(y)
+    classes = list(sorted(set(y)))
     counts = dict(Counter(y))
-    total = sum([x[1] for x in dd])
-    dd2 = rebalance_proportions(np.array([x[1]/total for x in dd]))
-    newprop = dict([[dd[i], dd2[i]] for i, _ in enumerate(dd)])
+    newprops = rebalance_proportions(np.array([dd[k] for k in classes]))
+    dd2 = {k: newprops[i] for (i, k) in enumerate(classes)}
+    #newprop = dict([[dd[i][0], dd2[i]] for k in classes])
 
-    weights = [newprop[blarp]/(counts[blarp]) for blarp in y]
-    new_size = size*shrinkage
+    weights = [dd2[blarp]/(counts[blarp]) for blarp in y]
+    new_size = int(size*shrinkage)
     indices = np.random.choice(range(size), replace=False, p=weights, size=new_size)
 
     return X[indices], y[indices]
