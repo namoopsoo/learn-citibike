@@ -12,7 +12,8 @@ def test_foo():
 
     _, newy = fu.balance_dataset(newarray, newarray, shrinkage=.5)
 
-    print(fu.get_proportions(newy))
+    newprop = fu.get_proportions(newy)
+    print(newy)
     print('size after', newy.shape)
 
     # TODO ... some func asserts the new proportions are roughly balanced
