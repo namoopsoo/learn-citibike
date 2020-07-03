@@ -22,9 +22,9 @@ def do_walltime(start):
     return (datetime.datetime.now() - start).total_seconds()
 
     
-def make_work_dir():
+def make_work_dir(localdir):
     ts = utc_ts()
-    workdir = f'/opt/program/artifacts/{ts}' 
+    workdir = f'{localdir}/artifacts/{ts}' 
     os.mkdir(workdir)
     return workdir
 
