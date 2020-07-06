@@ -170,32 +170,69 @@ def rebalance_proportions(proportions):
     c = b/new_norm
     return c
 
+def rebalance_proportions_v2(proportions):
+    # a = np.array([.1, .2, .3, .4])
+    assert sum(proportions) == 1.
+    average = 1/proportions.shape[0]
+
+    b = average/proportions
+    new_average = np.mean(b)
+
+    # mini correction.
+    f = np.vectorize((lambda x: max(x, np.mean(b))))
+    c = f(b)
+
+    new_norm = np.sum(c)
+    d = c/new_norm
+    return d
+
+
+
 def get_proportions(y):
     size = y.shape[0]
     return {k: v/size for (k, v) in dict(Counter(y)).items()}
 
 
 def balance_dataset(X, y, shrinkage=1.0):
+    '''
+    X, y, neighborhoods = fu.prepare_data(tripsdf, stationsdf)
+    X, y = balance_dataset(X, y)
+    '''
     # Balance before encoding
     size = y.shape[0]
     dd = get_proportions(y)
     classes = list(sorted(set(y)))
     counts = dict(Counter(y))
     newprops = rebalance_proportions(np.array([dd[k] for k in classes]))
-    dd2 = {k: newprops[i] for (i, k) in enumerate(classes)}
-    #newprop = dict([[dd[i][0], dd2[i]] for k in classes])
+    new_class_weights = {k: newprops[i] for (i, k) in enumerate(classes)}
 
-    weights = [dd2[blarp]/(counts[blarp]) for blarp in y]
-    new_size = int(size*shrinkage)
+    return re_sample(X, y, new_class_weights, shrinkage=shrinkage)
+
+
+def re_sample(X, y, new_class_weights, shrinkage=None):
+    size = y.shape[0]
+    counts = dict(Counter(y))
+
+    weights = [new_class_weights[blarp]/(counts[blarp]) for blarp in y]
+    if shrinkage:
+        new_size = int(size*shrinkage)
+    else:
+        new_size = size
+
     indices = np.random.choice(range(size), replace=False, p=weights, size=new_size)
 
     return X[indices], y[indices]
-    
-'''
-X, y, neighborhoods = fu.prepare_data(tripsdf, stationsdf)
 
-X, y = balance_dataset(X, y)
 
-'''
+def balance_dataset_v2(X, y):
+    size = y.shape[0]
+    counts = dict(Counter(y))
+    lowest_count_class, lowest_count = min(counts.items(), key=lambda x:x[1])[0]
+
+
+
+    new_class_weights = {k: newprops[i] for (i, k) in enumerate(classes)}
+
+    return re_sample(X, y, new_class_weights)
 
 
