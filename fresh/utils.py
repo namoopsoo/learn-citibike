@@ -223,16 +223,21 @@ def re_sample(X, y, new_class_weights, shrinkage=None):
     return X[indices], y[indices]
 
 
-def balance_dataset_v2(X, y):
+def balance_dataset_v2(X, y, shrinkage=1.0):
+    '''
+    X, y, neighborhoods = fu.prepare_data(tripsdf, stationsdf)
+    X, y = balance_dataset(X, y)
+    '''
+    # NOTE , copy pasta of balance_dataset, perhaps can refactor this...
+    # Balance before encoding
     size = y.shape[0]
+    dd = get_proportions(y)
+    classes = list(sorted(set(y)))
     counts = dict(Counter(y))
-    lowest_count_class, lowest_count = min(counts.items(), key=lambda x:x[1])[0]
-
-
-
+    newprops = rebalance_proportions_v2(np.array([dd[k] for k in classes]))
     new_class_weights = {k: newprops[i] for (i, k) in enumerate(classes)}
 
-    return re_sample(X, y, new_class_weights)
+    return re_sample(X, y, new_class_weights, shrinkage=shrinkage)
 
 
 def assess_balance(arr):
