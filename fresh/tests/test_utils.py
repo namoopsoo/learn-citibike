@@ -1,7 +1,7 @@
 import numpy as np
 
 import fresh.utils as fu
-import fresh.test.utils as ftu
+import fresh.tests.utils as ftu
 
 
 def test_foo():

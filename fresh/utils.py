@@ -172,7 +172,7 @@ def rebalance_proportions(proportions):
 
 def rebalance_proportions_v2(proportions):
     # a = np.array([.1, .2, .3, .4])
-    assert sum(proportions) == 1.
+    assert sum(proportions) - 1.  < 0.01
     average = 1/proportions.shape[0]
 
     b = average/proportions
@@ -234,5 +234,12 @@ def balance_dataset_v2(X, y):
     new_class_weights = {k: newprops[i] for (i, k) in enumerate(classes)}
 
     return re_sample(X, y, new_class_weights)
+
+
+def assess_balance(arr):
+    std = np.std(arr)
+
+    # also perhaps logloss against the average..
+    # and something w.r.t. rmse...
 
 
