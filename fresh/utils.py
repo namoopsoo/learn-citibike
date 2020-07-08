@@ -159,9 +159,8 @@ def get_my_memory():
     return {'pmem': pmem, 'rss': f'{round(gigs, 3)} GiB'}
 
 def rebalance_proportions(proportions):
-
     # a = np.array([.1, .2, .3, .4])
-    assert sum(proportions) == 1.
+    assert sum(proportions) - 1.  < 0.01
 
     average = 1/proportions.shape[0]
 
