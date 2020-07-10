@@ -19,5 +19,7 @@ def kth_area(y_test, y_prob,
     topk = np.array([cumulative_correct_kth(k, correct_kth_proportions, size)
             for k in range(num_classes)])
 
-    return (topk/num_classes).sum()
+    area = (topk/num_classes).sum()
+    return correct_kth, area
+
 
