@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
+from functools import reduce
 
-def compare_tuning(df, feature_col_1, feature_col_2, metric_col):
-
+def compare_tuning(df1, feature_col_1, feature_col_2, metric_col, keep_fixed):
+    df = df1[reduce(lambda x, y: x&y, 
+        [df1[col] == val for (col, val) in keep_fixed.items()])]
     feature_col_1_values = df[feature_col_1].unique().tolist()
 
     colors = ['blue', 'green', 'orange', 'red', 'black']
