@@ -1,6 +1,7 @@
 import boto3
+import os
 import pandas as pd
-from functools import reduce
+from functools import reduce, partial
 
 try:
     from StringIO import StringIO #python2
@@ -9,11 +10,13 @@ except:
 
 
 def make_s3_resource():
-    s3 = boto3.resource('s3',
-            # aws_access_key_id=os.getenv('S3_BLOG_UPLOAD_ACCESS_KEY'),
-            # aws_secret_access_key=os.getenv('S3_BLOG_UPLOAD_SECRET'),
+    access_key, secret = os.getenv('MY_ACCESS_KEY_ID'), os.getenv('MY_SECRET_ACCESS_KEY')
+    f = partial(boto3.resource, 's3',
             region_name='us-east-1')
-    return s3
+    if access_key:
+        return f(aws_access_key_id=access_key, aws_secret_access_key=secret)
+    else:
+        return f()
 
 
 def write_s3_file(bucket_name, s3_filename, content):
@@ -27,6 +30,11 @@ def read_s3_file(bucket_name, s3_filename):
     # try:
     return s3conn.Object(bucket_name, s3_filename).get()["Body"].read()
     # except botocore.exceptions.ClientError as e:
+
+
+def s3uri_to_parts(s3uri):
+    parts =  s3uri.split('/')
+    return parts[2], '/'.join(parts[3:])
 
 
 def s3_csv_to_df(bucket_name, s3_filename):
