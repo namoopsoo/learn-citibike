@@ -33,9 +33,9 @@ RUN pip install ipdb flask gevent gunicorn jupyter
 RUN pip install matplotlib
 RUN pip install ipython
 
-WORKDIR /opt/program
 
-
+# change for default serve behavior.
+WORKDIR /opt/server
 
 
 # Set some environment variables. PYTHONUNBUFFERED keeps Python from buffering our standard
@@ -50,7 +50,9 @@ ENV PYTHONDONTWRITEBYTECODE=TRUE
 ENV PATH="/opt/program:${PATH}"
 
 # Set up the program in the image
-# WORKDIR /opt/program
+
+
+COPY sagemaker/src /opt/server
 
 
 

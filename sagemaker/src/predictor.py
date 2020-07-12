@@ -1,24 +1,25 @@
 # This is the file that implements a flask server to do inferences. It's the file that you will modify to
 # implement the scoring for your own algorithm.
 
-from __future__ import print_function
 
 import os
 import json
 import pickle
-import StringIO
 import sys
 import signal
 import traceback
-
+import joblib
 import flask
 
 import pandas as pd
 
-import bikelearn.classify as blc
-import bikelearn.settings as s
+# import bikelearn.classify as blc
+# import bikelearn.settings as s
+# import utils as ut
 
-import utils as ut
+
+
+from io import StringIO
 
 
 # A singleton for holding the model. This simply loads the model and holds it.
@@ -78,10 +79,10 @@ class ScoringService(object):
             input (a pandas dataframe): The data on which to do the predictions. There will be
                 one prediction per row in the dataframe"""
         bundle = cls.get_model()
-        print ('DEBUG, csvdata[:1000], {}'.format(csvdata[:1000]))
+        print('DEBUG, csvdata[:1000], {}'.format(csvdata[:1000]))
 
         out = predict_or_validation(bundle, csvdata)
-        print ('DEBUG, out, {}'.format(out))
+        print('DEBUG, out, {}'.format(out))
         return out
 
 # The flask app for serving predictions
@@ -91,7 +92,8 @@ app = flask.Flask(__name__)
 def ping():
     """Determine if the container is working and healthy. In this sample container, we declare
     it healthy if we can load the model successfully."""
-    health = ScoringService.get_model() is not None  # You can insert a health check here
+    #health = ScoringService.get_model() is not None  # You can insert a health check here
+    health = True
 
     status = 200 if health else 500 # why was this 404 prior?
     return flask.Response(response='\n', status=status, mimetype='application/json')

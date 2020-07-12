@@ -18,3 +18,17 @@ docker run -p 8889:8889 -i -t -v $(pwd):/opt/program \
 ```
 jupyter notebook --ip 0.0.0.0 --port 8889 --no-browser --allow-root
 ```
+
+
+#### Adding in model serving too
+
+
+```
+my_local_data_directory=/Users/me/blah/blah/blah/data/citibike
+docker run -p 8889:8889 -p 8080:8080 -i -t -v $(pwd):/opt/program \
+            -v ${my_local_data_directory}:/opt/data \
+            -v   ~/Downloads:/opt/downloads \
+            citibike-learn:latest
+
+
+```
