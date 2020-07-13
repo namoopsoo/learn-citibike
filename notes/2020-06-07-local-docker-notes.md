@@ -32,3 +32,17 @@ docker run -p 8889:8889 -p 8080:8080 -i -t -v $(pwd):/opt/program \
 
 
 ```
+
+
+* Got to make sure i have that proc bundle i've been using for my testing... oops?
+
+```python
+# datadir..
+# /home/ec2-user/SageMaker/learn-citibike/artifacts/2020-07-08T143732Z
+
+procbundle = 's3://{mybucket}/bikelearn/artifacts/2020-07-08T143732Z/proc_bundle.joblib'
+
+# copy procbundle to the workdir i'm using for the hyperparameter tuning ..
+workdirblah = '/home/ec2-user/SageMaker/learn-citibike/artifacts/2020-07-10T135910Z/work.log'
+```
+* 
