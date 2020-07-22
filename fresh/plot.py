@@ -17,6 +17,23 @@ def compare_tuning(df1, feature_col_1, feature_col_2, metric_col, keep_fixed):
     plt.xlabel(feature_col_2)
     plt.ylabel(metric_col)
 
+
+def compare_train_test(df1, feature_col, metric_cols, keep_fixed):
+    # Draft.
+    df = df1[reduce(lambda x, y: x&y, 
+        [df1[col] == val for (col, val) in keep_fixed.items()])]
+
+    colors = ['blue', 'green', 'orange', 'red', 'black']
+    for i, x in enumerate(metric_cols):
+        plt.plot(df[feature_col], 
+                 df[metric_cols[i]], 
+                 label=f'{metric_cols[i]}', color=colors[i%len(colors)])
+    plt.title(f'{feature_col} against {metric_cols}')
+    plt.legend()
+    plt.xlabel(feature_col)
+    plt.ylabel('accuracies')
+
+
 def compare_two_features_3D(df1, feature_col_1, feature_col_2, metric_col, keep_fixed):
     # https://towardsdatascience.com/an-easy-introduction-to-3d-plotting-with-matplotlib-801561999725
     df = df1[reduce(lambda x, y: x&y, 
