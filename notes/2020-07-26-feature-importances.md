@@ -8,6 +8,7 @@ Actually... would be kind of cool to try to plot top features against accuracy
 import pandas as pd
 import numpy as np
 import datetime; import pytz
+from collections import Counter
 import matplotlib.pyplot as plt
 from joblib import dump, load
 import joblib
@@ -15,6 +16,7 @@ import os
 from tqdm import tqdm
 from sklearn.datasets import load_svmlight_file
 from sklearn.metrics import accuracy_score, balanced_accuracy_score
+from scipy.stats import spearmanr
 from functools import reduce
 import fresh.s3utils as fs3
 from importlib import reload
@@ -25,6 +27,11 @@ import fresh.metrics as fm
 
 import fresh.utils as fu
 
+```
+
+
+```python
+%matplotlib inline
 ```
 
 
@@ -720,6 +727,10 @@ alldf.
 
 
 
+For those `1253` models, collect their feature importances and hopefully I can use that to broadcast them against the model performance, to suss out maybe which importances are genuine or in common among the top models.
+
+One more thought on this is that perhaps they're all real as long as the models do not indicate signs of overfitting (train error << test error)
+
 
 ```python
 # bundle feature access..
@@ -870,7 +881,7 @@ plt.show()
 ```
 
 
-![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_21_0.png)
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_23_0.png)
 
 
 This is an attempt to see which features being important correlates with higher accuracy. I guess this is another way of asking the question, given the higher accuracy models, do they share some of the top features?
@@ -1097,10 +1108,531 @@ ax.barh(x, y)
 
 
 
-![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_32_1.png)
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_34_1.png)
+
+
+### 2020-08-02
+
+#### how to otherwise visualize those top features 
+
+Rank features ..?
+
+Hmm one at a time, I plotted each feature , with feature importance against accuracy, 
+and surprisingly most features look basically not useful. 
+
+And the features I was really hoping to be useful namely `weekday` and `time_of_day` , are not  really doing anything. 
+
+There were `7` features that visually stood out in these plots however, and they were all "source neighborhood" style features. All other `75` other features visually basically dont look "interesting" and spearman correlation aligns with that visual signal as well.
+
+(And a fun question comes to mind is whether these locations are just more common in the training data)
+
+
+```python
+def plot_feature_importance(foodf, feature):
+    out = spearmanr(foodf[feature], foodf['acc'])
+    round(out.correlation, 2), round(out.pvalue, 2)
+    plt.scatter(foodf[feature], foodf['acc'], marker='.')
+    plt.title(f'{feature_map.get(feature)} ({feature})\n '
+              f' (spearman={round(out.correlation, 2)} , pvalue={round(out.pvalue, 2)})' )
+    plt.xlabel('feature importance (xgboost gain)')
+    plt.ylabel('acc')
+    plt.show()
+
+```
+
+
+```python
+# For example... 
+for x in ['f65', 'f62', 'f40', 'f49', 'f53', 'f60',   'f68']:
+    plot_feature_importance(foodf, feature=x)
+```
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_37_0.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_37_1.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_37_2.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_37_3.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_37_4.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_37_5.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_37_6.png)
 
 
 
 ```python
-# this figure looks interesting 
+%matplotlib inline
 ```
+
+#### All the plots 
+
+
+```python
+for x in list(feature_map.keys()):
+    plot_feature_importance(foodf, feature=x)
+```
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_0.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_1.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_2.png)
+
+
+    /opt/conda/lib/python3.7/site-packages/numpy/lib/function_base.py:2534: RuntimeWarning: invalid value encountered in true_divide
+      c /= stddev[:, None]
+    /opt/conda/lib/python3.7/site-packages/numpy/lib/function_base.py:2535: RuntimeWarning: invalid value encountered in true_divide
+      c /= stddev[None, :]
+    /opt/conda/lib/python3.7/site-packages/scipy/stats/_distn_infrastructure.py:903: RuntimeWarning: invalid value encountered in greater
+      return (a < x) & (x < b)
+    /opt/conda/lib/python3.7/site-packages/scipy/stats/_distn_infrastructure.py:903: RuntimeWarning: invalid value encountered in less
+      return (a < x) & (x < b)
+    /opt/conda/lib/python3.7/site-packages/scipy/stats/_distn_infrastructure.py:1912: RuntimeWarning: invalid value encountered in less_equal
+      cond2 = cond0 & (x <= _a)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_4.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_5.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_6.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_7.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_8.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_9.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_10.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_11.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_12.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_13.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_14.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_15.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_16.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_17.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_18.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_19.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_20.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_21.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_22.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_23.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_24.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_25.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_26.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_27.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_28.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_29.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_30.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_31.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_32.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_33.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_34.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_35.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_36.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_37.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_38.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_39.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_40.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_41.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_42.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_43.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_44.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_45.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_46.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_47.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_48.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_49.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_50.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_51.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_52.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_53.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_54.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_55.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_56.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_57.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_58.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_59.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_60.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_61.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_62.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_63.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_64.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_65.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_66.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_67.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_68.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_69.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_70.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_71.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_72.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_73.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_74.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_75.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_76.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_77.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_78.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_79.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_80.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_81.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_82.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_83.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_84.png)
+
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_40_85.png)
+
+
+#### most common sources  perhaps influencing top features?
+
+
+```python
+# artifactsdir = '/opt/program/artifacts/2020-07-10T135910Z'
+train_loc = 'artifacts/2020-07-08T143732Z/train.libsvm'
+
+train_data = load_svmlight_file(train_loc)
+X_train = train_data[0].toarray()
+y_train = train_data[1]
+```
+
+
+```python
+X_train.shape, y_train.shape
+```
+
+
+
+
+    ((316281, 85), (316281,))
+
+
+
+
+```python
+X_train[0].shape, X_train[:, :75].shape
+```
+
+
+
+
+    ((85,), (316281, 75))
+
+
+
+
+```python
+# just quickly plot which source more common... 
+source_neighborhood = np.argmax(X_train[:, :75], axis=1)
+source_neighborhood
+```
+
+
+
+
+    array([23, 57,  8, ..., 27, 12, 27])
+
+
+
+
+```python
+plt.hist(source_neighborhood, bins=100)
+plt.show()
+```
+
+
+![png](2020-07-26-feature-importances_files/2020-07-26-feature-importances_46_0.png)
+
+
+
+```python
+
+```
+
+
+```python
+# So per earlier, these are the top 7 features 
+# from the perspective of correlating with the best accuracy,
+['f65', 'f62', 'f40', 'f49', 'f53', 'f60',   'f68']
+
+# But per the below, none of them appear in the top ten most frequent sources
+# in the training set, so indeed these must be helpful
+```
+
+
+```python
+c = Counter(source_neighborhood)
+c.most_common(10)
+```
+
+
+
+
+    [(12, 31276),
+     (32, 14813),
+     (46, 14619),
+     (64, 13896),
+     (23, 13232),
+     (72, 12213),
+     (33, 11967),
+     (42, 10645),
+     (47, 10505),
+     (45, 9117)]
+
+
