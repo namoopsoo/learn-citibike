@@ -2,7 +2,7 @@
 
 * [here](https://github.com/namoopsoo/learn-citibike/blob/2020-revisit/notes/2020-07-26-feature-importances.md) I also have code around the proc bundle and associating feature names to features helpfully, which I did not have earlier
 
-```
+```python
 datadir = f'/opt/program/artifacts/2020-07-08T143732Z'
 proc_bundle = joblib.load(f'{datadir}/proc_bundle.joblib')
 
@@ -50,8 +50,7 @@ train_test_acc_delta       9.16906e-05
 Name: 0, dtype: object
 
 
-In [36]: alldf.sort_values(by='karea', ascending=False)[['i', 'karea', 'acc', 'train_acc', 'train_balanced_acc', 'num_
-    ...: round']].iloc[:5]                                                                                            
+In [36]: alldf.sort_values(by='karea', ascending=False)[['i', 'karea', 'acc', 'train_acc', 'train_balanced_acc', 'num_round']].iloc[:5]                                                                                            
 Out[36]:
          i     karea       acc  train_acc  train_balanced_acc  num_round
 1253  1187  0.760827  0.121715   0.126969            0.110183        100
@@ -64,8 +63,8 @@ Out[36]:
 
 ```
 * prediction,
-```
-i = 0
+```python
+i = 1187
 bundle = joblib.load(f'{artifactsdir}/{i}_bundle_with_metrics.joblib')
 model = bundle['xgb_model']
 
@@ -76,4 +75,6 @@ predictions = np.argmax(y_prob_vec, axis=1)
 ```
 
 #### Ok so what is missing?
-* What is the top model?
+* What the top model per above, is `i=1187`
+* make an end to end predict script using these bundles
+* and make a bundle that includes both preproc plus model bundle
