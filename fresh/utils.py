@@ -28,28 +28,38 @@ def make_work_dir(localdir):
     os.mkdir(workdir)
     return workdir
 
-def prepare_data(tripsdf, stationsdf):
+def prepare_data(tripsdf, stationsdf, labelled):
     
-    # Step 1, merge w/ stationsdf to get neighborhood data
-    mdf = tripsdf[['start station name', 'end station name', 'gender',
+    if labelled:
+        cols = ['start station name', 'end station name', 'gender',
                    'starttime', 'usertype']
+    else:
+        cols = ['start station name', 'gender', 'starttime', 'usertype']
+    # Step 1, merge w/ stationsdf to get neighborhood data
+    mdf = tripsdf[cols
             ].merge(stationsdf[['station_name', 'neighborhood']], 
                     left_on='start station name',
                     right_on='station_name'
                    ).rename(columns={'neighborhood': 'start_neighborhood'}
-                           ).merge(stationsdf[['station_name', 'neighborhood']],
+                           )
+    if labelled:
+        mdf = mdf.merge(stationsdf[['station_name', 'neighborhood']],
                                   left_on='end station name',
                                    right_on='station_name'
                                   ).rename(columns={'neighborhood': 'end_neighborhood'})
-    
-    neighborhoods = sorted(stationsdf.neighborhood.unique().tolist())
-
     prepare_weekday_feature(mdf)
     time_of_day_feature(mdf)
     
-    X, y = (mdf[['start_neighborhood', 'gender', 'time_of_day', 'usertype', 'weekday', ]].values, 
-            np.array(mdf['end_neighborhood'].tolist()))
-    return X, y, neighborhoods
+    X = mdf[['start_neighborhood', 'gender', 'time_of_day', 'usertype', 'weekday', ]].values
+    if labelled:
+        y = np.array(mdf['end_neighborhood'].tolist())
+        return X, y
+    else:
+        return X
+
+
+def neighborhoods_from_stations(stationsdf):
+    return sorted(stationsdf.neighborhood.unique().tolist())
 
 
 def prepare_weekday_feature(df):
