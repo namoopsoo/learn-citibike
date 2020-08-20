@@ -64,6 +64,12 @@ Out[36]:
 ```
 * prediction,
 ```python
+import pandas as pd
+repodir = '/Users/michal/LeDropbox/Dropbox/Code/repo'
+tripsdf = pd.read_csv(f'{repodir}/data/citibike/2013-07 - Citi Bike trip data.csv')
+stationsdf = pd.read_csv(f'{repodir}/learn-citibike/datas/stations/stations-2018-12-04-c.csv',
+                        index_col=0)
+
 i = 1187
 bundle = joblib.load(f'{artifactsdir}/{i}_bundle_with_metrics.joblib')
 model = bundle['xgb_model']
@@ -77,4 +83,4 @@ predictions = np.argmax(y_prob_vec, axis=1)
 #### Ok so what is missing?
 * What the top model per above, is `i=1187`
 * make an end to end predict script using these bundles
-* and make a bundle that includes both preproc plus model bundle
+* and make a bundle that includes both preproc plus model bundle plus the station bundle

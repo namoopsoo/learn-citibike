@@ -98,7 +98,10 @@ def get_partitions(vec, slice_size, keep_remainder=True):
 def get_slices(vec, slice_size=None, num_slices=None, keep_remainder=True):
     if num_slices:
         size = _size(vec) 
-        slice_size = size//num_slices
+        if size < num_slices:
+            slice_size = size
+        else:
+            slice_size = size//num_slices
     return [[part[0], part[-1] + 1] 
             for part in get_partitions(vec, slice_size, keep_remainder)]
 
