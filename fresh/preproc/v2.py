@@ -19,8 +19,11 @@ If given (workdir, dataset_name), write the result there.
     '''
     num_rows = X.shape[0]
     if proc_bundle:
-        outfile = xform(proc_bundle, X, y, workdir, dataset_name, filetype='libsvm')
-        return outfile
+        if y is not None:
+            outfile = xform(proc_bundle, X, y, workdir, dataset_name, filetype='libsvm')
+            return outfile
+        else:
+            return xform(proc_bundle, X)
     else:
         genders = [0, 1, 2]
         user_types = ['Subscriber', 'Customer']
@@ -45,7 +48,7 @@ If given (workdir, dataset_name), write the result there.
 def xform(proc_bundle, X, y=None, workdir=None, dataset_name=None, filetype=None):
     '''Apply preprocessing to X, y.  '''
     num_rows = X.shape[0]
-    slices = fu.get_slices(list(range(num_rows)), num_slices=10)
+    slices = fu.get_slices(list(range(num_rows)), num_slices=1) # NOTE hmm I think this is a bug if more than 1 slice 
     for a, b in tqdm(slices):
         slice_size = b - a
         stacks = [
@@ -67,6 +70,9 @@ def xform(proc_bundle, X, y=None, workdir=None, dataset_name=None, filetype=None
             to_csv(X_transformed, y_enc, outfile)
         elif filetype == 'libsvm':
             to_libsvm(X_transformed, y_enc, outfile)
+        elif filetype is None:
+            # FIXME returning in for loop
+            return X_transformed
     return outfile
 
 
