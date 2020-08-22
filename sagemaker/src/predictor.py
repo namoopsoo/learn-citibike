@@ -16,10 +16,40 @@ import pandas as pd
 # import bikelearn.classify as blc
 # import bikelearn.settings as s
 # import utils as ut
-
+import fresh.utils as fu
+import fresh.predict_utils as fpu
 
 
 from io import StringIO
+
+bundle_loc = '/opt/program/artifacts/2020-08-19T144654Z/all_bundle.joblib'
+print('bundle_loc', bundle_loc)
+
+bundle = fpu.load_bundle(bundle_loc)
+
+record = {
+ 'starttime': '2013-07-01 00:00:00',
+ 'start station id': 164,
+ 'start station name': 'E 47 St & 2 Ave',
+ 'start station latitude': 40.75323098,
+ 'start station longitude': -73.97032517,
+# unknown
+# 'end station id': 504,
+# 'end station name': '1 Ave & E 15 St',
+# 'end station latitude': 40.73221853,
+# 'end station longitude': -73.98165557,
+# 'stoptime': '2013-07-01 00:10:34',
+# 'tripduration': 634,
+ 'bikeid': 16950,
+ 'usertype': 'Customer',
+ 'birth year': '\\N',
+ 'gender': 0}
+
+
+out = fpu.full_predict(bundle, record)
+print('predict out', out)
+
+
 
 
 # A singleton for holding the model. This simply loads the model and holds it.

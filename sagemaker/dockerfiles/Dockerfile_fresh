@@ -32,6 +32,7 @@ RUN conda install python=3.7 numpy scipy scikit-learn pandas py-xgboost-cpu
 RUN pip install ipdb flask gevent gunicorn jupyter 
 RUN pip install matplotlib
 RUN pip install ipython
+RUN pip install tqdm
 
 
 # change for default serve behavior.
@@ -53,6 +54,6 @@ ENV PATH="/opt/program:${PATH}"
 
 
 COPY sagemaker/src /opt/server
-
+COPY fresh /opt/server/fresh
 
 

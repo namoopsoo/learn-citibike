@@ -42,6 +42,7 @@ def load_bundle(loc):
 
     # fix bundle... 
     bundle['proc_bundle']['bundle']['proc_bundle']['enc'].drop = None
+    return bundle
 
 record = {
  'starttime': '2013-07-01 00:00:00',
@@ -62,5 +63,4 @@ record = {
  'gender': 0}
 
 
-full_predict(bundle, record)
 

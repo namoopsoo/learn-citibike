@@ -17,6 +17,29 @@ def example_url():
                 f'key={API_KEY}']
     return '&'.join(parts)
 
+
+def escape_url(url):
+    return url.replace('&', '&amp;')
+
+
+def make_img_tag(url):
+    return f'<img border="0" src="{url}">'
+
+    
+def make_url_from_locations(locations):
+    colors = ['blue', 'green', 'red']
+    location_parts = [f'markers=color:{colors[i]}%7Clabel:{i}%7C{x["latlng"]}' 
+            for i, x in enumerate(locations)]
+
+
+    API_KEY = os.getenv('GOOGLE_GEO_API_KEY')
+    parts = ['https://maps.googleapis.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY',
+                'zoom=13',
+                'size=600x300',
+                'maptype=roadmap'] + location_parts + [f'key={API_KEY}']
+    return '&'.join(parts)
+
+
 def sign_url(input_url=None, secret=None):
     """ Sign a request URL with a URL signing secret.
       Usage:
