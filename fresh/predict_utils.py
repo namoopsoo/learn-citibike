@@ -8,6 +8,7 @@ import fresh.preproc.v2 as pv2
 
 def full_predict(bundle, record):
     inputdf = pd.DataFrame.from_records([record])
+    stationsdf = bundle['stations_bundle']['stationsdf']
     
     X = fu.prepare_data(inputdf, stationsdf, labelled=False)
     

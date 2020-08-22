@@ -23,6 +23,7 @@ import fresh.predict_utils as fpu
 from io import StringIO
 
 bundle_loc = '/opt/program/artifacts/2020-08-19T144654Z/all_bundle.joblib'
+bundle_loc = '/opt/program/artifacts/2020-08-19T144654Z/all_bundle_with_stationsdf.joblib'
 print('bundle_loc', bundle_loc)
 
 bundle = fpu.load_bundle(bundle_loc)
