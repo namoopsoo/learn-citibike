@@ -23,12 +23,13 @@ jupyter notebook --ip 0.0.0.0 --port 8889 --no-browser --allow-root
 
 #### Adding in model serving too
 * on port `8080`
-* again, make sure `pwd` is the repo root. 
+* again, make sure `pwd` is the repo root.
 ```
 my_local_data_directory=/Users/me/blah/blah/blah/data/citibike
 docker run -p 8889:8889 -p 8080:8080 -i -t -v $(pwd):/opt/program \
             -v ${my_local_data_directory}:/opt/data \
             -v   ~/Downloads:/opt/downloads \
+            -v  $(pwd)/artifacts/2020-08-19T144654Z:/opt/ml \
             citibike-learn:latest \
             serve
 
