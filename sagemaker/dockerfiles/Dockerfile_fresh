@@ -48,7 +48,7 @@ ENV PYTHONUNBUFFERED=TRUE
 ENV PYTHONDONTWRITEBYTECODE=TRUE
 
 
-ENV PATH="/opt/program:${PATH}"
+ENV PATH="/opt/program:/opt/server:${PATH}"
 
 # Set up the program in the image
 
