@@ -47,3 +47,8 @@ def call_sagemaker(record):
 
     return r.json()
 
+def map_probabilities():
+    le = bundle['proc_bundle']['bundle']['proc_bundle']['le']
+    print(le.classes_.shape)
+    le.classes_ # 54
+
