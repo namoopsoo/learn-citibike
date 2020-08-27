@@ -59,3 +59,12 @@ def df_to_s3(bucket_name, df, s3fn, index=False):
     df.to_csv(s, index=index)
     write_s3_file(bucket_name, s3fn, content=s.getvalue())
 
+
+def copy_s3_to_local(s3uri, local_loc, force=False):
+    if not force:
+        assert not os.exists(local_loc)
+
+    (bucket_name, s3_filename) = s3uri_to_parts(s3uri)
+    blah = read_s3_file(bucket_name, s3_filename)
+    with open(local_loc, 'wb') as fd:
+        fd.write(blah)

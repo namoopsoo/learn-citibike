@@ -1,9 +1,17 @@
 import os
+import joblib
 import fresh.map as fm
-
+import fresh.s3utils as fs3
+import fresh.predict_utils as fpu
 
 import requests
+LOCAL_DIR_SAFE = os.getenv('LOCAL_DIR')
 LOCAL_URL = 'http://127.0.0.1:8080/invocations'
+BUNDLE_LOC_S3 = (
+        f"s3://{os.getenv('MODEL_LOC_BUCKET')}/"
+        'bikelearn/artifacts/2020-08-19T144654Z/allbundle_with_stationsdf.joblib'
+        )
+https://console.aws.amazon.com/s3/buckets/my-sagemaker-blah/
 
 def entry(event, context):
 
@@ -47,8 +55,20 @@ def call_sagemaker(record):
 
     return r.json()
 
-def map_probabilities():
+def map_probabilities(bundle, prob_vec, k=5):
+    # so lambda downloads bundle from s3 live perhaps
     le = bundle['proc_bundle']['bundle']['proc_bundle']['le']
-    print(le.classes_.shape)
+    classes = le.classes_.shape
     le.classes_ # 54
+
+    top_k = sorted(list(zip(le.classes_, prob_vec)), key=lambda x:x[1], reverse=True)[:k] 
+    return top_k
+
+
+def fetch_bundle()
+    s3uri = BUNDLE_LOC_S3
+    local_loc = f'{LOCAL_DIR_SAFE}/blah.joblib'
+    fs3.copy_s3_to_local(s3uri, local_loc, force=False)
+
+    return load_bundle(local_loc)
 
