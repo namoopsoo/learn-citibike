@@ -19,17 +19,27 @@ def make_s3_resource():
         return f()
 
 
-def write_s3_file(bucket_name, s3_filename, content):
+def write_s3_file(bucket_name, s3fn, content):
     s3conn = make_s3_resource()
-    s3conn.Object(bucket_name, s3_filename).put(
+    s3conn.Object(bucket_name, s3fn).put(
             Body=content)
 
 
-def read_s3_file(bucket_name, s3_filename):
+def read_s3_file(bucket_name, s3fn):
     s3conn = make_s3_resource()
     # try:
-    return s3conn.Object(bucket_name, s3_filename).get()["Body"].read()
+    return s3conn.Object(bucket_name, s3fn).get()["Body"].read()
     # except botocore.exceptions.ClientError as e:
+
+
+def list_files(bucket_name, prefix):
+    s3conn = make_s3_resource()
+    my_bucket = s3conn.Bucket(bucket_name)
+    out_vec = []
+    for x in my_bucket.objects.filter(Prefix=prefix):
+        out_vec.append(x)
+    return out_vec
+
 
 
 def s3uri_to_parts(s3uri):
@@ -37,18 +47,18 @@ def s3uri_to_parts(s3uri):
     return parts[2], '/'.join(parts[3:])
 
 
-def s3_csv_to_df(bucket_name, s3_filename):
-    blah = read_s3_file(bucket_name, s3_filename)
+def s3_csv_to_df(bucket_name, s3fn):
+    blah = read_s3_file(bucket_name, s3fn)
     foo = StringIO(blah.decode("utf-8"))
     return pd.read_csv(foo)
 
 
-def big_s3_csv_to_df(bucket_name, s3_filename_prefix, suffixes):
-    filenames = [s3_filename_prefix + suff
+def big_s3_csv_to_df(bucket_name, s3fn_prefix, suffixes):
+    filenames = [s3fn_prefix + suff
             for suff in suffixes]
     # return filenames
-    parts = [read_s3_file(bucket_name, s3_filename) 
-            for s3_filename in filenames ]
+    parts = [read_s3_file(bucket_name, s3fn) 
+            for s3fn in filenames ]
     blah = reduce(lambda x, y: x+y, parts)
     foo = StringIO(blah.decode("utf-8"))
     return pd.read_csv(foo)
@@ -62,9 +72,9 @@ def df_to_s3(bucket_name, df, s3fn, index=False):
 
 def copy_s3_to_local(s3uri, local_loc, force=False):
     if not force:
-        assert not os.exists(local_loc)
+        assert not os.path.exists(local_loc)
 
-    (bucket_name, s3_filename) = s3uri_to_parts(s3uri)
-    blah = read_s3_file(bucket_name, s3_filename)
+    (bucket_name, s3fn) = s3uri_to_parts(s3uri)
+    blah = read_s3_file(bucket_name, s3fn)
     with open(local_loc, 'wb') as fd:
         fd.write(blah)

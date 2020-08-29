@@ -5,13 +5,12 @@ import fresh.s3utils as fs3
 import fresh.predict_utils as fpu
 
 import requests
-LOCAL_DIR_SAFE = os.getenv('LOCAL_DIR')
+LOCAL_DIR_SAFE = os.getenv('LOCAL_DIR_SAFE')
 LOCAL_URL = 'http://127.0.0.1:8080/invocations'
 BUNDLE_LOC_S3 = (
         f"s3://{os.getenv('MODEL_LOC_BUCKET')}/"
-        'bikelearn/artifacts/2020-08-19T144654Z/allbundle_with_stationsdf.joblib'
+        'bikelearn/artifacts/2020-08-19T144654Z/all_bundle_with_stationsdf_except_xgb.joblib'
         )
-https://console.aws.amazon.com/s3/buckets/my-sagemaker-blah/
 
 def entry(event, context):
 
@@ -27,8 +26,8 @@ def entry(event, context):
 
     # call sagemaker endpoint
     out = call_sagemaker(record)
-
-
+    return out
+    print(out)
     # Translate top 5 results to locations (latlng)
     # and send to google api..
 
@@ -55,6 +54,7 @@ def call_sagemaker(record):
 
     return r.json()
 
+
 def map_probabilities(bundle, prob_vec, k=5):
     # so lambda downloads bundle from s3 live perhaps
     le = bundle['proc_bundle']['bundle']['proc_bundle']['le']
@@ -65,10 +65,10 @@ def map_probabilities(bundle, prob_vec, k=5):
     return top_k
 
 
-def fetch_bundle()
+def fetch_bundle():
     s3uri = BUNDLE_LOC_S3
     local_loc = f'{LOCAL_DIR_SAFE}/blah.joblib'
-    fs3.copy_s3_to_local(s3uri, local_loc, force=False)
+    fs3.copy_s3_to_local(s3uri, local_loc, force=True)
 
-    return load_bundle(local_loc)
+    return fpu.load_bundle(local_loc)
 

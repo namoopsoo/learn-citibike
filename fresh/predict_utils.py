@@ -2,7 +2,12 @@ import joblib
 import os
 import pandas as pd
 import numpy as np
-import xgboost as xgb
+
+try:
+    import xgboost as xgb
+except Exception:
+    pass
+
 from io import StringIO
 
 import fresh.utils as fu
