@@ -1,4 +1,5 @@
 import os
+import random
 import hashlib 
 import hmac 
 import base64 
@@ -28,7 +29,7 @@ def make_img_tag(url):
     
 def make_url_from_locations(locations):
     colors = ['blue', 'green', 'red']
-    location_parts = [f'markers=color:{colors[i]}%7Clabel:{i}%7C{x["latlng"]}' 
+    location_parts = [f'markers=color:blue%7Clabel:{i}%7C{x["latlng"]}' 
             for i, x in enumerate(locations)]
 
 
@@ -75,4 +76,20 @@ def sign_url(input_url=None, secret=None):
 
     # Return signed URL
     return original_url + "&signature=" + encoded_signature.decode()
+
+
+def grab_final_thing(locations):
+    # locations = [{'latlng': '40.6924182926,-73.989494741'}]
+    url = make_url_from_locations(locations)
+    secret = os.environ['GOOGLE_CLIENT_SECRET']
+    url = sign_url(url, secret=secret)
+
+    url = escape_url(url)
+    img = make_img_tag(url)
+
+    outfile = f'tempmap_{random.randint(int(1e4), int(1e5))}.html'
+    print('writing <img> to ', outfile)
+
+    with open(outfile, 'w') as fd:
+        fd.write(img)
 

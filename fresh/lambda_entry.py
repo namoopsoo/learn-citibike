@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 import joblib
 import fresh.map as fm
 import fresh.s3utils as fs3
@@ -26,8 +27,12 @@ def entry(event, context):
 
     # call sagemaker endpoint
     out = call_sagemaker(record)
-    return out
-    print(out)
+    bundle = fetch_bundle()
+
+    probs = map_probabilities(bundle, prob_vec=out['result'][0], k=5)
+
+    blah_get_map(bundle, probs)
+
     # Translate top 5 results to locations (latlng)
     # and send to google api..
 
@@ -63,6 +68,17 @@ def map_probabilities(bundle, prob_vec, k=5):
 
     top_k = sorted(list(zip(le.classes_, prob_vec)), key=lambda x:x[1], reverse=True)[:k] 
     return top_k
+
+
+def blah_get_map(bundle, probs):
+    stationsdf = bundle['stations_bundle']['stationsdf']
+    df = pd.DataFrame(probs, columns=['neighborhood', 'prob'])
+
+    locations = df.merge(
+            stationsdf, on='neighborhood'
+            ).drop_duplicates(subset='neighborhood')[['latlng', 'neighborhood']
+                    ].to_dict(orient='records')
+    fm.grab_final_thing(locations)
 
 
 def fetch_bundle():
