@@ -1,6 +1,6 @@
 import os
+import pickle
 import pandas as pd
-import joblib
 import fresh.map as fm
 import fresh.s3utils as fs3
 import fresh.predict_utils as fpu
@@ -10,7 +10,7 @@ LOCAL_DIR_SAFE = os.getenv('LOCAL_DIR_SAFE')
 LOCAL_URL = 'http://127.0.0.1:8080/invocations'
 BUNDLE_LOC_S3 = (
         f"s3://{os.getenv('MODEL_LOC_BUCKET')}/"
-        'bikelearn/artifacts/2020-08-19T144654Z/all_bundle_with_stationsdf_except_xgb.joblib'
+        'bikelearn/artifacts/2020-08-19T144654Z/all_bundle_with_stationsdf_except_xgb.pkl'
         )
 
 def entry(event, context):
@@ -31,7 +31,8 @@ def entry(event, context):
 
     probs = map_probabilities(bundle, prob_vec=out['result'][0], k=5)
 
-    blah_get_map(bundle, probs)
+    out = blah_get_map(bundle, probs)
+    return {'map_html': out, 'probabilities': probs}
 
     # Translate top 5 results to locations (latlng)
     # and send to google api..
@@ -78,13 +79,10 @@ def blah_get_map(bundle, probs):
             stationsdf, on='neighborhood'
             ).drop_duplicates(subset='neighborhood')[['latlng', 'neighborhood']
                     ].to_dict(orient='records')
-    fm.grab_final_thing(locations)
+    out = fm.grab_final_thing(locations)
+    return out
 
 
 def fetch_bundle():
-    s3uri = BUNDLE_LOC_S3
-    local_loc = f'{LOCAL_DIR_SAFE}/blah.joblib'
-    fs3.copy_s3_to_local(s3uri, local_loc, force=True)
-
-    return fpu.load_bundle(local_loc)
-
+    bundle = pickle.loads(fs3.read_s3_file(s3uri=BUNDLE_LOC_S3))
+    return bundle

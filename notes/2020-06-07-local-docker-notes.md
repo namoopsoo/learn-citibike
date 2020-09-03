@@ -8,9 +8,17 @@ docker build -f sagemaker/dockerfiles/Dockerfile_fresh -t citibike-learn .
 ```
 
 * Run it, using my local data dir, `/Users/me/blah/blah/blah/data/citibike` where I have csv files kindly provided on the citibik data website.
+* Storing that in my local environmental variables in a bash script, `somevars.sh`
+
+```
+# somevars.sh
+export MY_LOCAL_DATA_DIRECTORY=/Users/me/blah/blah/blah/data/citibike
+```
+
 * Make sure `pwd` is the root of the repo.
 ```
-my_local_data_directory=/Users/me/blah/blah/blah/data/citibike
+source somevars.sh
+my_local_data_directory=${MY_LOCAL_DATA_DIRECTORY}
 docker run -p 8889:8889 -i -t -v $(pwd):/opt/program \
             -v ${my_local_data_directory}:/opt/data \
             citibike-learn:latest
@@ -25,7 +33,7 @@ jupyter notebook --ip 0.0.0.0 --port 8889 --no-browser --allow-root
 * on port `8080`
 * again, make sure `pwd` is the repo root.
 ```
-my_local_data_directory=/Users/me/blah/blah/blah/data/citibike
+my_local_data_directory=${MY_LOCAL_DATA_DIRECTORY}
 docker run -p 8889:8889 -p 8080:8080 -i -t -v $(pwd):/opt/program \
             -v ${my_local_data_directory}:/opt/data \
             -v   ~/Downloads:/opt/downloads \

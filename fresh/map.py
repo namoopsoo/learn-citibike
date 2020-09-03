@@ -78,7 +78,7 @@ def sign_url(input_url=None, secret=None):
     return original_url + "&signature=" + encoded_signature.decode()
 
 
-def grab_final_thing(locations):
+def grab_final_thing(locations, debug=False):
     # locations = [{'latlng': '40.6924182926,-73.989494741'}]
     url = make_url_from_locations(locations)
     secret = os.environ['GOOGLE_CLIENT_SECRET']
@@ -87,9 +87,12 @@ def grab_final_thing(locations):
     url = escape_url(url)
     img = make_img_tag(url)
 
-    outfile = f'tempmap_{random.randint(int(1e4), int(1e5))}.html'
-    print('writing <img> to ', outfile)
+    if debug:
+        outfile = f'tempmap_{random.randint(int(1e4), int(1e5))}.html'
+        print('writing <img> to ', outfile)
 
-    with open(outfile, 'w') as fd:
-        fd.write(img)
+        with open(outfile, 'w') as fd:
+            fd.write(img)
 
+    return img
+        

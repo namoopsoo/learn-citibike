@@ -25,7 +25,9 @@ def write_s3_file(bucket_name, s3fn, content):
             Body=content)
 
 
-def read_s3_file(bucket_name, s3fn):
+def read_s3_file(bucket_name=None, s3fn=None, s3uri=None):
+    if s3uri is not None:
+        bucket_name, s3fn = s3uri_to_parts(s3uri)
     s3conn = make_s3_resource()
     # try:
     return s3conn.Object(bucket_name, s3fn).get()["Body"].read()
