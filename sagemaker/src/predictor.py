@@ -79,7 +79,7 @@ app = flask.Flask(__name__)
 def ping():
     """Determine if the container is working and healthy. In this sample container, we declare
     it healthy if we can load the model successfully."""
-    record = make_canned_record()
+    record = fpu.make_canned_record()
     out = fpu.full_predict(bundle, record)
     print('predict out', out)
     health = True
