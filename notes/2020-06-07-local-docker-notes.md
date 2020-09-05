@@ -52,6 +52,13 @@ requests.post('http://127.0.0.1:8080/invocations', data='blah,flarg')
 
 ```
 
+#### Build docker with make...
+
+```
+bash make.sh build
+. somevars.sh
+bash make.sh push 0.7 # where 0.7 is the ECR tag I'm up to . 
+```
 
 #### Other note
 

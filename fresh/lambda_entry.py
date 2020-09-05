@@ -1,10 +1,12 @@
 import os
 import pickle
+import botocore
+import boto3
 import pandas as pd
 import fresh.map as fm
 import fresh.s3utils as fs3
 import fresh.predict_utils as fpu
-
+ 
 import requests
 LOCAL_DIR_SAFE = os.getenv('LOCAL_DIR_SAFE')
 LOCAL_URL = 'http://127.0.0.1:8080/invocations'
@@ -39,12 +41,6 @@ def entry(event, context):
 
 
 def call_sagemaker(record):
-
-
-    url = LOCAL_URL
-    headers = {'Content-Type': 'text/csv'}
-    # tripduration,starttime,stoptime,start station id,start station name,start station latitude,start station longitude,end station id,end station name,end station latitude,end station longitude,bikeid,usertype,birth year,gender\n
-
     header = ['starttime',
             'start station name',
             'usertype',
@@ -54,11 +50,39 @@ def call_sagemaker(record):
 
     csvdata = ','.join([str(record[k]) for k in header])
 
-    r = requests.post(url, data=csvdata, headers=headers)
-    assert r.status_code/100 == 2, \
-            'got this instead, r.status_code ' + str(r.status_code)
+    if os.getenv('IN_LAMBDA'):
+        client = boto3.client('sagemaker-runtime',
+                #aws_access_key_id=key_id,
+                #aws_secret_access_key=secret_key,
+                region_name='us-east-1')
+        #
+        try:
+            endpoint = os.getenv('SAGEMAKER_ENDPOINT')
+            response = client.invoke_endpoint(
+                    EndpointName=endpoint,
+                    # Body=b'bytes'|file,
+                    Body=csvdata,
+                    ContentType='text/csv',
+                    Accept='string',
+                    # CustomAttributes='string'
+                    )
+            what = response['Body'].read()
+            return {'output': what}
+        except botocore.exceptions.ClientError as e:
+            error = {'error_detail': str(e.message), 'error': 'client error'}
+            return error
+                
+    else:
+        url = LOCAL_URL
+        headers = {'Content-Type': 'text/csv'}
+        # tripduration,starttime,stoptime,start station id,start station name,start station latitude,start station longitude,end station id,end station name,end station latitude,end station longitude,bikeid,usertype,birth year,gender\n
 
-    return r.json()
+
+        r = requests.post(url, data=csvdata, headers=headers)
+        assert r.status_code/100 == 2, \
+                'got this instead, r.status_code ' + str(r.status_code)
+
+        return r.json()
 
 
 def map_probabilities(bundle, prob_vec, k=5):

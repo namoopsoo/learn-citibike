@@ -3,6 +3,13 @@
 
 import requests
 LOCAL_URL = 'http://127.0.0.1:8080/invocations'
+LOCAL_PING_URL = 'http://127.0.0.1:8080/ping'
+
+def test_docker_ping():
+    url = LOCAL_PING_URL
+    r = requests.get(url)
+    assert r.status_code/100 == 2, \
+            'got this instead, r.status_code ' + str(r.status_code)
 
 def test_docker_duh():
     url = LOCAL_URL

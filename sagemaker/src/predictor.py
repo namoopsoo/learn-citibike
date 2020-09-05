@@ -80,6 +80,7 @@ def ping():
     """Determine if the container is working and healthy. In this sample container, we declare
     it healthy if we can load the model successfully."""
     record = fpu.make_canned_record()
+    bundle = ScoringService.get_model()
     out = fpu.full_predict(bundle, record)
     print('predict out', out)
     health = True
@@ -109,7 +110,7 @@ def transformation():
         return flask.Response(response=result, status=200, mimetype=mimetype)
 
 
-    print ('DEBUG, hmm, not text/csv or application/json')
+    print('DEBUG, hmm, not text/csv or application/json')
     return flask.Response(response='This predictor only supports CSV data',
             status=415, mimetype='text/plain')
 
@@ -121,7 +122,7 @@ def determine_response_type(querystring):
 
 
 def numpy_to_csv(predictions):
-    out = StringIO.StringIO()
+    out = StringIO()
     pd.DataFrame({'results': predictions}).to_csv(out, header=False, index=False)
     result = out.getvalue()
     return result
