@@ -1,5 +1,8 @@
 import numpy as np
-from tqdm import tqdm
+try:
+    from tqdm import tqdm
+except:
+    pass
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from sklearn.datasets import dump_svmlight_file
 import fresh.utils as fu
