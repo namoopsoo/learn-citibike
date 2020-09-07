@@ -1,4 +1,5 @@
 import os
+import json
 import pickle
 import botocore
 import boto3
@@ -67,7 +68,7 @@ def call_sagemaker(record):
                     # CustomAttributes='string'
                     )
             what = response['Body'].read()
-            return {'output': what}
+            return json.loads(what) 
         except botocore.exceptions.ClientError as e:
             error = {'error_detail': str(e.message), 'error': 'client error'}
             return error

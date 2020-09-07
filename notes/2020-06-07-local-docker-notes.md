@@ -57,7 +57,7 @@ requests.post('http://127.0.0.1:8080/invocations', data='blah,flarg')
 ```
 bash make.sh build
 . somevars.sh
-bash make.sh push 0.7 # where 0.7 is the ECR tag I'm up to . 
+bash make.sh push 0.7 # where 0.7 is the ECR tag I'm up to .
 ```
 
 #### Other note
@@ -73,4 +73,3 @@ procbundle = 's3://{mybucket}/bikelearn/artifacts/2020-07-08T143732Z/proc_bundle
 # copy procbundle to the workdir i'm using for the hyperparameter tuning ..
 workdirblah = '/home/ec2-user/SageMaker/learn-citibike/artifacts/2020-07-10T135910Z/work.log'
 ```
-*
