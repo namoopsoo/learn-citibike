@@ -32,7 +32,7 @@ $(document).on('click','.blah-submit-class', function(){
 		'secretAccessKey': $('#auth2').val()};
 
 	console.log('parameters from form: ' + JSON.stringify(parameters));
-	queryMyUrl(parameters, authparameters, 'out-div');
+	queryMyUrl(parameters, authparameters, 'out-div', 'out-div-2');
 
  return false;  //this will prevent the page refresh
 });

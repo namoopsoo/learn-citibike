@@ -21,7 +21,7 @@ def entry(event, context):
     # make input into a record
     record = {}
     record = {
-     'starttime': '2013-07-01 00:00:00',
+     'starttime': '2013-07-01 00:00:00',   # apigateway .. 01/07/2013 00:00:00
      'start station name': 'E 47 St & 2 Ave',
      'usertype': 'Customer',
      'birth year': '1999',

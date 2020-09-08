@@ -385,7 +385,7 @@ testFillMissingDates = function() {
 
 }
 
-queryMyUrl = function(parameters, authparams, output_id) {
+queryMyUrl = function(parameters, authparams, output_id, output_id_2) {
 
 
 	// url = 'https://rmuxqpksz2.execute-api.us-east-1.amazonaws.com/default/myBikelearnSageLambda?start_station=Forsyth+St+%26+Broome+St&start_time=10%2F8%2F2015+18%3A04%3A57&rider_gender=2&rider_type=Subscriber&birth_year=1973'
@@ -403,6 +403,8 @@ queryMyUrl = function(parameters, authparams, output_id) {
 			console.log('end response for ' + output_id);
 
 			$('#' + output_id).text(JSON.stringify(response));
+
+			$('#' + output_id_2).text(JSON.stringify(response['map_html']));
 
 		},
 		error: function(response) {
