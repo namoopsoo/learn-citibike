@@ -404,7 +404,8 @@ queryMyUrl = function(parameters, authparams, output_id, output_id_2) {
 
 			$('#' + output_id).text(JSON.stringify(response));
 
-			$('#' + output_id_2).text(JSON.stringify(response['map_html']));
+			//$('#' + output_id_2).text(response['map_html']);
+			document.getElementById(output_id_2).innerHTML=response['map_html'];
 
 		},
 		error: function(response) {
@@ -413,6 +414,7 @@ queryMyUrl = function(parameters, authparams, output_id, output_id_2) {
 			console.log('response len ' + response.length);
 
 			$('#' + output_id).text(JSON.stringify(response));
+
 		}
 	});
 
