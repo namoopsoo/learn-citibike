@@ -523,19 +523,48 @@ querySummaryWithParams = function(parameters, chart_id) {
 	});
 }
 
-authParametersFromCognito = function() {
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function asyncsleep() {
+  console.log('Taking a break...');
+  await sleep(2000);
+  console.log('Two seconds later, showing sleep in a loop...');
+
+  await sleep(2000);
+}
+
+
+
+authParametersFromCognito = function(callback, callback_params) {
 	// Initialize the Amazon Cognito credentials provider
 	AWS.config.region = 'us-east-1'; 
 	AWS.config.credentials = new AWS.CognitoIdentityCredentials({
 				IdentityPoolId: 'us-east-1:ef218443-9093-4480-8a26-47ed7bdeff24'
 			});
-	console.log('creds');
-	console.log(AWS.config.credentials);
 
-	return {
-		'accessKeyId': AWS.config.credentials.secretAccessKey,
-		'secretAccessKey': AWS.config.credentials.secretAccessKey,
-		// save for later...
-		// 'sessionToken': AWS.config.credentials.sessionToken
-	}
+	//console.log('start wait');
+	//await sleep(2000);
+	//console.log('end wait');
+
+	AWS.config.credentials.get(function(err) {
+		if (err) {
+			console.log("Error: "+err);
+			return;
+		}
+		console.log("Cognito Identity Id: " + AWS.config.credentials.identityId);
+
+		authparameters = {
+			'accessKeyId': AWS.config.credentials.accessKeyId,
+			'secretAccessKey': AWS.config.credentials.secretAccessKey,
+			// save for later...
+			// 'sessionToken': AWS.config.credentials.sessionToken
+		}
+		//
+		console.log('parameters from form: ' + JSON.stringify(callback_params));
+		callback(callback_params, authparameters, 'out-div', 'out-div-2');
+		});
+
+
 }

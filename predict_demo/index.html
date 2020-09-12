@@ -31,21 +31,18 @@ $(document).on('click','.blah-submit-class', function(){
 //	var authparameters = {
 //		'accessKeyId': $('#auth1').val(),
 //		'secretAccessKey': $('#auth2').val()};
-	var authparameters = authParametersFromCognito();
+
+	authParametersFromCognito(
+			queryMyUrl,
+			parameters);
+
 	console.log('Going to try params from authParametersFromCognito()' 
 				+ JSON.stringify(authparameters));
 
-	console.log('parameters from form: ' + JSON.stringify(parameters));
+	//console.log('parameters from form: ' + JSON.stringify(parameters));
 	//queryMyUrl(parameters, authparameters, 'out-div', 'out-div-2');
 
 	// new query approach 
-	var apigateway = new AWS.APIGateway({apiVersion: '2015-07-09',
-										 params: {restApiId: 'rmuxqpksz2',
-												 stageName: 'default'}});
-
-
-	// base_url = 'https://rmuxqpksz2.execute-api.us-east-1.amazonaws.com/default/myBikelearnSageLambda'
-
 
 
  return false;  //this will prevent the page refresh
@@ -60,7 +57,7 @@ $(document).on('click','.blah-submit-class', function(){
 	 birth year: 1993
 	-->
 
-	  <form >
+	  <form  action="#0">
 		  Start station:
 		  <input type="text" id="startStation"
 		  value="" placeholder='Forsyth St & Broome St'
@@ -97,7 +94,7 @@ $(document).on('click','.blah-submit-class', function(){
 		  <input type="text" id="auth2"
 		  value="" />  <br/>
 
-		  <input type="submit" class="blah-submit-class" />
+		  <input type="submit" class="blah-submit-class"   />
 	  </form>
 	  <div id='out-div'> </div>
 	  <div id='out-div-2'> </div>
