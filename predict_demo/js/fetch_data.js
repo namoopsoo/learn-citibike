@@ -521,7 +521,21 @@ querySummaryWithParams = function(parameters, chart_id) {
 			console.log( 'error: ' + response ); // server response
 		}
 	});
-
-
 }
 
+authParametersFromCognito = function() {
+	// Initialize the Amazon Cognito credentials provider
+	AWS.config.region = 'us-east-1'; 
+	AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+				IdentityPoolId: 'us-east-1:ef218443-9093-4480-8a26-47ed7bdeff24'
+			});
+	console.log('creds');
+	console.log(AWS.config.credentials);
+
+	return {
+		'accessKeyId': AWS.config.credentials.secretAccessKey,
+		'secretAccessKey': AWS.config.credentials.secretAccessKey,
+		// save for later...
+		// 'sessionToken': AWS.config.credentials.sessionToken
+	}
+}

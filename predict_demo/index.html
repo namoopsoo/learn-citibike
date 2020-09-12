@@ -7,6 +7,7 @@
 	  <script src="//d3js.org/d3.v3.min.js"></script>
 	  -->
 	  <script src="js/jquery-3.2.0.min.js"></script>
+      <script src="https://sdk.amazonaws.com/js/aws-sdk-2.410.0.min.js"></script>
 	  <script src="js/fetch_data.js"></script>
 	<script>
 
@@ -27,12 +28,25 @@ $(document).on('click','.blah-submit-class', function(){
 		'rider_type': $('#riderType').val(),
 		'birth_year': $('#birthYear').val()}
 
-	var authparameters = {
-		'accessKeyId': $('#auth1').val(),
-		'secretAccessKey': $('#auth2').val()};
+//	var authparameters = {
+//		'accessKeyId': $('#auth1').val(),
+//		'secretAccessKey': $('#auth2').val()};
+	var authparameters = authParametersFromCognito();
+	console.log('Going to try params from authParametersFromCognito()' 
+				+ JSON.stringify(authparameters));
 
 	console.log('parameters from form: ' + JSON.stringify(parameters));
-	queryMyUrl(parameters, authparameters, 'out-div', 'out-div-2');
+	//queryMyUrl(parameters, authparameters, 'out-div', 'out-div-2');
+
+	// new query approach 
+	var apigateway = new AWS.APIGateway({apiVersion: '2015-07-09',
+										 params: {restApiId: 'rmuxqpksz2',
+												 stageName: 'default'}});
+
+
+	// base_url = 'https://rmuxqpksz2.execute-api.us-east-1.amazonaws.com/default/myBikelearnSageLambda'
+
+
 
  return false;  //this will prevent the page refresh
 });

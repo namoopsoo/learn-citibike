@@ -19,10 +19,16 @@ def make_s3_resource():
         return f()
 
 
-def write_s3_file(bucket_name, s3fn, content):
+def write_s3_file(bucket_name, s3fn, content, content_type=None):
     s3conn = make_s3_resource()
-    s3conn.Object(bucket_name, s3fn).put(
+    put = partial(
+            s3conn.Object(bucket_name, s3fn).put, 
             Body=content)
+
+    if content_type:
+        put(ContentType=content_type)
+    else:
+        put()
 
 
 def read_s3_file(bucket_name=None, s3fn=None, s3uri=None):
