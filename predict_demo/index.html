@@ -28,21 +28,20 @@ $(document).on('click','.blah-submit-class', function(){
 		'rider_type': $('#riderType').val(),
 		'birth_year': $('#birthYear').val()}
 
-//	var authparameters = {
-//		'accessKeyId': $('#auth1').val(),
-//		'secretAccessKey': $('#auth2').val()};
+	var authparameters = {
+		'accessKeyId': $('#auth1').val(),
+		'secretAccessKey': $('#auth2').val()};
 
 	authParametersFromCognito(
 			queryMyUrl,
 			parameters);
 
-	console.log('Going to try params from authParametersFromCognito()' 
-				+ JSON.stringify(authparameters));
+	//console.log('Going to try params from authParametersFromCognito()' 
+	//			+ JSON.stringify(authparameters));
 
 	//console.log('parameters from form: ' + JSON.stringify(parameters));
 	//queryMyUrl(parameters, authparameters, 'out-div', 'out-div-2');
 
-	// new query approach 
 
 
  return false;  //this will prevent the page refresh
@@ -57,7 +56,8 @@ $(document).on('click','.blah-submit-class', function(){
 	 birth year: 1993
 	-->
 
-	  <form  action="#0">
+	<form  action="#0">
+	<!-- <form > -->
 		  Start station:
 		  <input type="text" id="startStation"
 		  value="" placeholder='Forsyth St & Broome St'
