@@ -434,6 +434,8 @@ prepareAuthenticatedAPIRequest = function(parameters,
 	var signer = new awsSignWeb.AwsSigner(config);
 	var full_uri = base_url + makeSortedParamString(parameters); 
 	//console.log("full_uri: " + full_uri);
+	console.log('using this config for signing ')
+	console.log(config)
 
 	var request = {
 		method: 'GET',
@@ -559,7 +561,7 @@ authParametersFromCognito = function(callback, callback_params) {
 			'accessKeyId': AWS.config.credentials.accessKeyId,
 			'secretAccessKey': AWS.config.credentials.secretAccessKey,
 			// save for later...
-			// 'sessionToken': AWS.config.credentials.sessionToken
+			'sessionToken': AWS.config.credentials.sessionToken
 		}
 		//
 		console.log('parameters from form: ' + JSON.stringify(callback_params));
