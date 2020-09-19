@@ -394,6 +394,10 @@ queryMyUrl = function(parameters, authparams, output_id, output_id_2) {
 	var goodstuff = prepareAuthenticatedAPIRequest(parameters,
 												authparams,
 												base_url);
+	console.log('good stuff');
+	console.log(goodstuff);
+	return 'end early';
+
 	$.get({
 		url: goodstuff['full_uri'],
 		headers: goodstuff['headers'],
