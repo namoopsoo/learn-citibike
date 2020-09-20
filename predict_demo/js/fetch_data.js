@@ -567,6 +567,7 @@ authParametersFromCognito = function(callback, callback_params) {
 			// save for later...
 			'sessionToken': AWS.config.credentials.sessionToken
 		}
+		console.log('authparameters', authparameters);
 		//
 		console.log('parameters from form: ' + JSON.stringify(callback_params));
 		callback(callback_params, authparameters, 'out-div', 'out-div-2');

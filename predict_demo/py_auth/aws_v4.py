@@ -1,11 +1,11 @@
 import sys
+import re
 import base64
 import datetime
 import hashlib
 import hmac
 import requests
 import json
-import urlparse
 import urllib
 
 # This file is derived from the example here
@@ -25,7 +25,7 @@ def getSignatureKey(key, date_stamp, regionName, serviceName):
 
 def make_query_string(request_dict):
     keys = sorted(request_dict.keys())
-    return [f'{k}={request_dict[k]}' for k in keys]
+    return '&'.join([f'{k}={request_dict[k]}' for k in keys])
 
 
 def create_v4_headers(access_key, secret_key, method, 
@@ -51,7 +51,10 @@ def create_v4_headers(access_key, secret_key, method,
     # Step 4: Create the canonical headers. Header names must be trimmed
     # and lowercase, and sorted in code point order from low to high.
     # Note that there is a trailing \n.
-    canonical_headers = 'content-type:' + content_type + '\n' + 'host:' + host + '\n' + 'x-amz-date:' + amz_date + '\n'
+    if method == 'POST':
+        canonical_headers = 'content-type:' + content_type + '\n' + 'host:' + host + '\n' + 'x-amz-date:' + amz_date + '\n'
+    elif method == 'GET':
+        canonical_headers = 'host:' + host + '\n' + 'x-amz-date:' + amz_date + '\n'
 
     # Step 5: Create the list of signed headers. This lists the headers
     # in the canonical_headers list, delimited with ";" and in alpha order.
@@ -59,7 +62,10 @@ def create_v4_headers(access_key, secret_key, method,
     # signed_headers include those that you want to be included in the
     # hash of the request. "Host" and "x-amz-date" are always required.
     # For DynamoDB, content-type and x-amz-target are also required.
-    signed_headers = 'content-type;host;x-amz-date'
+    if method == 'POST':
+        signed_headers = 'content-type;host;x-amz-date'
+    elif method == 'GET':
+        signed_headers = 'host;x-amz-date'
 
     #
     # Match the algorithm to the hashing algorithm you use, either SHA-1 or
@@ -83,11 +89,11 @@ def create_v4_headers(access_key, secret_key, method,
         # parameters are in the query string. Query string values must
         # be URL-encoded (space=%20). The parameters must be sorted by name.
         canonical_querystring = make_query_string(request_dict) # encode to 
-        canonical_querystring += f'&X-Amz-Algorithm={algorithm}'
-        canonical_querystring += '&X-Amz-Credential=' + urllib.parse.quote_plus(access_key + '/' + credential_scope)
-        canonical_querystring += '&X-Amz-Date=' + amz_date
-        canonical_querystring += '&X-Amz-Expires=30'
-        canonical_querystring += '&X-Amz-SignedHeaders=' + signed_headers
+#         canonical_querystring += f'&X-Amz-Algorithm={algorithm}'
+#         canonical_querystring += '&X-Amz-Credential=' + urllib.parse.quote_plus(access_key + '/' + credential_scope)
+#         canonical_querystring += '&X-Amz-Date=' + amz_date
+#         canonical_querystring += '&X-Amz-Expires=30'
+#         canonical_querystring += '&X-Amz-SignedHeaders=' + signed_headers
 
         # empty string ("").
         payload_hash = hashlib.sha256(('').encode('utf-8')).hexdigest()
@@ -96,7 +102,7 @@ def create_v4_headers(access_key, secret_key, method,
     canonical_request = (method + '\n' + canonical_uri + '\n' 
                          + canonical_querystring + '\n' + canonical_headers + '\n' 
                          + signed_headers + '\n' + payload_hash)
-
+    print('canonical_request, (aka Canonical String)', canonical_request)
 
     # ************* TASK 2: CREATE THE STRING TO SIGN*************
     string_to_sign = (algorithm + '\n' +  amz_date + '\n' 
@@ -119,11 +125,10 @@ def create_v4_headers(access_key, secret_key, method,
 
 
 def create_api_gateway_auth(url, request_dict, region, access_key, secret_key):
-    parts = urlparse.urlsplit(url)
+    parts = urllib.parse.urlsplit(url)
     host, path = parts.netloc, parts.path
     method = 'POST'
     service = 'execute-api'
-    
     content_type = 'application/x-amz-json-1.0'
 
     amz_date, authorization_header = create_v4_headers(
@@ -142,3 +147,44 @@ def create_api_gateway_auth(url, request_dict, region, access_key, secret_key):
                'Authorization': authorization_header}
     return headers
 
+
+def GET_create_api_gateway_auth(url, request_dict, region, access_key, secret_key):
+    parts = urllib.parse.urlsplit(url)
+    host, path = parts.netloc, parts.path
+    method = 'GET'
+
+    service = 'execute-api'
+    content_type = 'application/x-amz-json-1.0'
+
+    amz_date, authorization_header = create_v4_headers(
+            access_key=access_key,
+            secret_key=secret_key,
+            method=method,
+            path=path,
+            region=region,
+            service=service,
+            host=host,
+            request_dict=request_dict,
+            content_type=content_type)
+
+    headers = {# 'Content-Type': content_type, # XXX hmm
+               'X-Amz-Date': amz_date,
+               'Authorization': authorization_header}
+    return headers
+
+
+def js_to_python(raw):
+    m = re.search(
+            (r'\sAccept: "(?P<accept>[^"]*)"\s'
+            r'Authorization: "(?P<auth>[^"]*)"\sx-amz-date: "(?P<date>[^"]*)"'), raw); m.groupdict()
+    headers = {}
+
+    headers = {
+    'Accept': m['accept'],
+    'Authorization': m['auth'],
+    'x-amz-date': m['date']
+    }
+    return headers
+    # r = requests.get(url=url,
+    # headers=headers)
+    # return r
