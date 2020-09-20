@@ -23,9 +23,14 @@ def getSignatureKey(key, date_stamp, regionName, serviceName):
     return kSigning
 
 
+def make_query_string(request_dict):
+    keys = sorted(request_dict.keys())
+    return [f'{k}={request_dict[k]}' for k in keys]
+
+
 def create_v4_headers(access_key, secret_key, method, 
                       path, region, service, host, 
-                      request_parameters, content_type):
+                      request_dict, content_type):
     assert method in ['POST', 'GET']
 
     # Create a date for headers and the credential string
@@ -70,11 +75,16 @@ def create_v4_headers(access_key, secret_key, method,
 
         # Step 6: Create payload hash. In this example, the payload (body of
         # the request) contains the request parameters.
+
+        request_parameters = json.dumps(request_dict)
         payload_hash = hashlib.sha256(request_parameters.encode('utf-8')).hexdigest()
     elif method == 'GET':
-        canonical_querystring = make_query_string(request_parameters) # encode to 
+        # Step 4: Create the canonical query string. In this example, request
+        # parameters are in the query string. Query string values must
+        # be URL-encoded (space=%20). The parameters must be sorted by name.
+        canonical_querystring = make_query_string(request_dict) # encode to 
         canonical_querystring += f'&X-Amz-Algorithm={algorithm}'
-        canonical_querystring += '&X-Amz-Credential=' + urllib.parse.quote(access_key + '/' + credential_scope)
+        canonical_querystring += '&X-Amz-Credential=' + urllib.parse.quote_plus(access_key + '/' + credential_scope)
         canonical_querystring += '&X-Amz-Date=' + amz_date
         canonical_querystring += '&X-Amz-Expires=30'
         canonical_querystring += '&X-Amz-SignedHeaders=' + signed_headers
@@ -114,7 +124,6 @@ def create_api_gateway_auth(url, request_dict, region, access_key, secret_key):
     method = 'POST'
     service = 'execute-api'
     
-    request_parameters = json.dumps(request_dict)
     content_type = 'application/x-amz-json-1.0'
 
     amz_date, authorization_header = create_v4_headers(
@@ -125,7 +134,7 @@ def create_api_gateway_auth(url, request_dict, region, access_key, secret_key):
             region=region,
             service=service,
             host=host,
-            request_parameters=request_parameters,
+            request_dict=request_dict,
             content_type=content_type)
 
     headers = {'Content-Type': content_type,
