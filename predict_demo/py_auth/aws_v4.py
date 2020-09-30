@@ -30,7 +30,8 @@ def make_query_string(request_dict):
 
 def create_v4_headers(access_key, secret_key, method, 
                       path, region, service, host, 
-                      request_dict, content_type):
+                      request_dict, content_type,
+                      session_token=None):
     assert method in ['POST', 'GET']
 
     # Create a date for headers and the credential string
@@ -56,6 +57,10 @@ def create_v4_headers(access_key, secret_key, method,
     elif method == 'GET':
         canonical_headers = 'host:' + host + '\n' + 'x-amz-date:' + amz_date + '\n'
 
+        if session_token is not None:
+            canonical_headers += 'x-amz-security-token' + session_token + '\n'
+
+
     # Step 5: Create the list of signed headers. This lists the headers
     # in the canonical_headers list, delimited with ";" and in alpha order.
     # Note: The request can include any headers; canonical_headers and
@@ -66,6 +71,9 @@ def create_v4_headers(access_key, secret_key, method,
         signed_headers = 'content-type;host;x-amz-date'
     elif method == 'GET':
         signed_headers = 'host;x-amz-date'
+
+        if session_token is not None:
+            signed_headers += ';x-amz-security-token'
 
     #
     # Match the algorithm to the hashing algorithm you use, either SHA-1 or
@@ -85,6 +93,10 @@ def create_v4_headers(access_key, secret_key, method,
         request_parameters = json.dumps(request_dict)
         payload_hash = hashlib.sha256(request_parameters.encode('utf-8')).hexdigest()
     elif method == 'GET':
+
+        # NOTE experimenting with session token
+        # if session_token is not None:
+
         # Step 4: Create the canonical query string. In this example, request
         # parameters are in the query string. Query string values must
         # be URL-encoded (space=%20). The parameters must be sorted by name.
@@ -148,7 +160,7 @@ def create_api_gateway_auth(url, request_dict, region, access_key, secret_key):
     return headers
 
 
-def GET_create_api_gateway_auth(url, request_dict, region, access_key, secret_key):
+def GET_create_api_gateway_auth(url, request_dict, region, access_key, secret_key, session_token=None):
     parts = urllib.parse.urlsplit(url)
     host, path = parts.netloc, parts.path
     method = 'GET'
@@ -159,6 +171,7 @@ def GET_create_api_gateway_auth(url, request_dict, region, access_key, secret_ke
     amz_date, authorization_header = create_v4_headers(
             access_key=access_key,
             secret_key=secret_key,
+            session_token=session_token,
             method=method,
             path=path,
             region=region,
@@ -170,6 +183,9 @@ def GET_create_api_gateway_auth(url, request_dict, region, access_key, secret_ke
     headers = {# 'Content-Type': content_type, # XXX hmm
                'X-Amz-Date': amz_date,
                'Authorization': authorization_header}
+
+    if session_token is not None:
+        headers['X-Amz-Security-Token'] = session_token
     return headers
 
 
