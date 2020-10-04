@@ -58,7 +58,7 @@ def create_v4_headers(access_key, secret_key, method,
         canonical_headers = 'host:' + host + '\n' + 'x-amz-date:' + amz_date + '\n'
 
         if session_token is not None:
-            canonical_headers += 'x-amz-security-token' + session_token + '\n'
+            canonical_headers += 'x-amz-security-token:' + session_token + '\n'
 
 
     # Step 5: Create the list of signed headers. This lists the headers
@@ -93,10 +93,6 @@ def create_v4_headers(access_key, secret_key, method,
         request_parameters = json.dumps(request_dict)
         payload_hash = hashlib.sha256(request_parameters.encode('utf-8')).hexdigest()
     elif method == 'GET':
-
-        # NOTE experimenting with session token
-        # if session_token is not None:
-
         # Step 4: Create the canonical query string. In this example, request
         # parameters are in the query string. Query string values must
         # be URL-encoded (space=%20). The parameters must be sorted by name.
@@ -111,15 +107,17 @@ def create_v4_headers(access_key, secret_key, method,
         payload_hash = hashlib.sha256(('').encode('utf-8')).hexdigest()
         
     # Step 7: Combine elements to create canonical request
-    canonical_request = (method + '\n' + canonical_uri + '\n' 
+    canonical_string = (method + '\n' + canonical_uri + '\n' 
                          + canonical_querystring + '\n' + canonical_headers + '\n' 
                          + signed_headers + '\n' + payload_hash)
-    print('canonical_request, (aka Canonical String)', canonical_request)
+    print('canonical_string, (aka Canonical String)', canonical_string)
 
     # ************* TASK 2: CREATE THE STRING TO SIGN*************
     string_to_sign = (algorithm + '\n' +  amz_date + '\n' 
                       +  credential_scope + '\n' 
-                      +  hashlib.sha256(canonical_request.encode('utf-8')).hexdigest())
+                      +  hashlib.sha256(canonical_string.encode('utf-8')).hexdigest())
+
+    print('string to sign', string_to_sign)
 
     # ************* TASK 3: CALCULATE THE SIGNATURE *************
     # Create the signing key using the function defined above.
@@ -133,7 +131,7 @@ def create_v4_headers(access_key, secret_key, method,
     # Put the signature information in a header named Authorization.
     authorization_header = algorithm + ' ' + 'Credential=' + access_key + '/' + credential_scope + ', ' +  'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + signature
 
-    return amz_date, authorization_header
+    return amz_date, authorization_header, canonical_string, string_to_sign 
 
 
 def create_api_gateway_auth(url, request_dict, region, access_key, secret_key):
@@ -143,7 +141,7 @@ def create_api_gateway_auth(url, request_dict, region, access_key, secret_key):
     service = 'execute-api'
     content_type = 'application/x-amz-json-1.0'
 
-    amz_date, authorization_header = create_v4_headers(
+    amz_date, authorization_header, canonical_string, string_to_sign = create_v4_headers(
             access_key=access_key,
             secret_key=secret_key,
             method=method,
@@ -168,7 +166,7 @@ def GET_create_api_gateway_auth(url, request_dict, region, access_key, secret_ke
     service = 'execute-api'
     content_type = 'application/x-amz-json-1.0'
 
-    amz_date, authorization_header = create_v4_headers(
+    amz_date, authorization_header, canonical_string, string_to_sign = create_v4_headers(
             access_key=access_key,
             secret_key=secret_key,
             session_token=session_token,
@@ -186,7 +184,7 @@ def GET_create_api_gateway_auth(url, request_dict, region, access_key, secret_ke
 
     if session_token is not None:
         headers['X-Amz-Security-Token'] = session_token
-    return headers
+    return headers, canonical_string, string_to_sign
 
 
 def js_to_python(raw):

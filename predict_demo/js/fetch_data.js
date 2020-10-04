@@ -396,7 +396,6 @@ queryMyUrl = function(parameters, authparams, output_id, output_id_2) {
 												base_url);
 	console.log('good stuff');
 	console.log(goodstuff);
-	return 'end early';
 
 	$.get({
 		url: goodstuff['full_uri'],
@@ -453,7 +452,11 @@ prepareAuthenticatedAPIRequest = function(parameters,
 	var headers = {
 			'Authorization': signed.Authorization,
 			'Accept': signed.Accept,
-			'x-amz-date': signed['x-amz-date']}
+			'x-amz-date': signed['x-amz-date']};
+
+	if ('sessionToken' in authparams){
+		headers['X-Amz-Security-Token'] = authparams['sessionToken'];
+	}
 
 	return {
 		base_url: base_url,
