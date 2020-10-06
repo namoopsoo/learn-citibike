@@ -17,17 +17,19 @@ BUNDLE_LOC_S3 = (
         )
 
 def entry(event, context):
-
+    print('DEBUG', event)
     # make input into a record
-    record = event['params']['querystring']
-    record = {}
+    input_record = event['params']['querystring']
+
+    # {'birth_year': '', 'rider_gender': '', 'rider_type': '', 'start_station': '', 'start_time': ''}
     record = {
-     'starttime': '2013-07-01 00:00:00',   # apigateway .. 01/07/2013 00:00:00
-     'start station name': 'E 47 St & 2 Ave',
-     'usertype': 'Customer',
-     'birth year': '1999',
-     'gender': 0
+     'starttime': input_record['start_time'], #'2013-07-01 00:00:00',   # apigateway .. 01/07/2013 00:00:00
+     'start station name': input_record['start_station'], #'E 47 St & 2 Ave',
+     'usertype': input_record['rider_type'], # 'Customer',
+     'birth year': input_record['birth_year'], #'1999',
+     'gender': input_record['rider_gender'], #0
      }
+    print('DEBUG, new record', record)
 
     # call sagemaker endpoint
     out = call_sagemaker(record)
