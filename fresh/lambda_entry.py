@@ -23,8 +23,8 @@ def entry(event, context):
 
     # {'birth_year': '', 'rider_gender': '', 'rider_type': '', 'start_station': '', 'start_time': ''}
     record = {
-     'starttime': input_record['start_time'], #'2013-07-01 00:00:00',   # apigateway .. 01/07/2013 00:00:00
-     'start station name': input_record['start_station'], #'E 47 St & 2 Ave',
+     'starttime': input_record['start_time'].replace('+', ' '), #'2013-07-01 00:00:00',   # apigateway .. 01/07/2013 00:00:00
+     'start station name': input_record['start_station'].replace('+', ' '), #'E 47 St & 2 Ave',
      'usertype': input_record['rider_type'], # 'Customer',
      'birth year': input_record['birth_year'], #'1999',
      'gender': input_record['rider_gender'], #0
