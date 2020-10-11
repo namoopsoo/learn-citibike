@@ -17,6 +17,19 @@ prefix = '/opt/ml/'
 model_path = os.path.join(prefix, 'model')
 
 def full_predict(bundle, record):
+    X_transformed = X_from_record(bundle, record)
+    print(X_transformed)
+    dtrain = xgb.DMatrix(X_transformed)
+    
+    model = bundle['model_bundle']['bundle']['xgb_model']
+    
+    y_prob_vec = model.predict(dtrain)
+    predictions = np.argmax(y_prob_vec, axis=1)
+
+    return y_prob_vec, predictions
+
+
+def X_from_record(bundle, record):
     inputdf = pd.DataFrame.from_records([record])
     stationsdf = bundle['stations_bundle']['stationsdf']
     
@@ -32,15 +45,8 @@ def full_predict(bundle, record):
         #workdir=workdir,
         #dataset_name='input'
     )
-    print(X_transformed)
-    dtrain = xgb.DMatrix(X_transformed)
-    
-    model = bundle['model_bundle']['bundle']['xgb_model']
-    
-    y_prob_vec = model.predict(dtrain)
-    predictions = np.argmax(y_prob_vec, axis=1)
+    return X_transformed
 
-    return y_prob_vec, predictions
 
 def load_bundle(loc):
     # Need a whole func here, because of this weird OneHotEncoder error,
