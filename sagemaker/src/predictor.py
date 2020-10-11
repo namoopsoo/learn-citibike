@@ -67,7 +67,7 @@ class ScoringService(object):
         print('DEBUG, csvdata[:1000], {}'.format(csvdata[:1000]))
 
         df = fpu.hydrate(csvdata)
-        out = fpu.full_predict(bundle, record=dict(df.iloc[0]))
+        out = fpu.full_predict_v2(bundle, record=dict(df.iloc[0]))
         #out = predict_or_validation(bundle, csvdata)
         print(f'DEBUG, out, {out}')
         return out
@@ -81,7 +81,7 @@ def ping():
     it healthy if we can load the model successfully."""
     record = fpu.make_canned_record()
     bundle = ScoringService.get_model()
-    out = fpu.full_predict(bundle, record)
+    out = fpu.full_predict_v2(bundle, record)
     print('predict out', out)
     health = True
     status = 200 if health else 500
