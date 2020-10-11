@@ -3,6 +3,7 @@ from math import cos, pi, fabs, sqrt
 from decimal import Decimal
 import numpy as np
 
+from copy import deepcopy
 import datetime
 
 import settings as s
@@ -208,4 +209,17 @@ def latlng_box_area(box):
             point_2_lat)
 
     return d_betw_longitude_degrees * d_betw_latitude_degrees 
+
+
+def print_bundle(bundle):
+    acopy = deepcopy(bundle)
+
+    m = acopy['evaluation']['test_metrics']['confusion_matrix']
+    acopy['evaluation']['test_metrics']['confusion_matrix'] = len(m)
+
+    m = acopy['evaluation']['validation_metrics']['confusion_matrix']
+    acopy['evaluation']['validation_metrics']['confusion_matrix'] = len(m)
+
+    # [printable(acopy, key) for key in acopy.keys()]
+    return acopy
 

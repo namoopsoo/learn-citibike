@@ -385,7 +385,7 @@ testFillMissingDates = function() {
 
 }
 
-queryMyUrl = function(parameters, authparams, output_id) {
+queryMyUrl = function(parameters, authparams, output_id, output_id_2) {
 
 
 	// url = 'https://rmuxqpksz2.execute-api.us-east-1.amazonaws.com/default/myBikelearnSageLambda?start_station=Forsyth+St+%26+Broome+St&start_time=10%2F8%2F2015+18%3A04%3A57&rider_gender=2&rider_type=Subscriber&birth_year=1973'
@@ -394,6 +394,9 @@ queryMyUrl = function(parameters, authparams, output_id) {
 	var goodstuff = prepareAuthenticatedAPIRequest(parameters,
 												authparams,
 												base_url);
+	console.log('good stuff');
+	console.log(goodstuff);
+
 	$.get({
 		url: goodstuff['full_uri'],
 		headers: goodstuff['headers'],
@@ -404,6 +407,9 @@ queryMyUrl = function(parameters, authparams, output_id) {
 
 			$('#' + output_id).text(JSON.stringify(response));
 
+			//$('#' + output_id_2).text(response['map_html']);
+			document.getElementById(output_id_2).innerHTML=response['map_html'];
+
 		},
 		error: function(response) {
 			console.log('Crap. error: ' + response + '...');
@@ -411,6 +417,7 @@ queryMyUrl = function(parameters, authparams, output_id) {
 			console.log('response len ' + response.length);
 
 			$('#' + output_id).text(JSON.stringify(response));
+
 		}
 	});
 
@@ -430,6 +437,8 @@ prepareAuthenticatedAPIRequest = function(parameters,
 	var signer = new awsSignWeb.AwsSigner(config);
 	var full_uri = base_url + makeSortedParamString(parameters); 
 	//console.log("full_uri: " + full_uri);
+	console.log('using this config for signing ')
+	console.log(config)
 
 	var request = {
 		method: 'GET',
@@ -443,7 +452,11 @@ prepareAuthenticatedAPIRequest = function(parameters,
 	var headers = {
 			'Authorization': signed.Authorization,
 			'Accept': signed.Accept,
-			'x-amz-date': signed['x-amz-date']}
+			'x-amz-date': signed['x-amz-date']};
+
+	if ('sessionToken' in authparams){
+		headers['X-Amz-Security-Token'] = authparams['sessionToken'];
+	}
 
 	return {
 		base_url: base_url,
@@ -517,7 +530,51 @@ querySummaryWithParams = function(parameters, chart_id) {
 			console.log( 'error: ' + response ); // server response
 		}
 	});
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function asyncsleep() {
+  console.log('Taking a break...');
+  await sleep(2000);
+  console.log('Two seconds later, showing sleep in a loop...');
+
+  await sleep(2000);
+}
+
+
+
+authParametersFromCognito = function(callback, callback_params) {
+	// Initialize the Amazon Cognito credentials provider
+	AWS.config.region = 'us-east-1'; 
+	AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+				IdentityPoolId: 'us-east-1:ef218443-9093-4480-8a26-47ed7bdeff24'
+			});
+
+	//console.log('start wait');
+	//await sleep(2000);
+	//console.log('end wait');
+
+	AWS.config.credentials.get(function(err) {
+		if (err) {
+			console.log("Error: "+err);
+			return;
+		}
+		console.log("Cognito Identity Id: " + AWS.config.credentials.identityId);
+
+		authparameters = {
+			'accessKeyId': AWS.config.credentials.accessKeyId,
+			'secretAccessKey': AWS.config.credentials.secretAccessKey,
+			// save for later...
+			'sessionToken': AWS.config.credentials.sessionToken
+		}
+		console.log('authparameters', authparameters);
+		//
+		console.log('parameters from form: ' + JSON.stringify(callback_params));
+		callback(callback_params, authparameters, 'out-div', 'out-div-2');
+		});
 
 
 }
-

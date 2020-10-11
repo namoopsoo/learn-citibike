@@ -1,4 +1,4 @@
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" >
 	<body>
 	  <script src="js/sha256.js"></script>
 	  <script src="js/hmac-sha256.js"></script>
@@ -7,6 +7,7 @@
 	  <script src="//d3js.org/d3.v3.min.js"></script>
 	  -->
 	  <script src="js/jquery-3.2.0.min.js"></script>
+      <script src="https://sdk.amazonaws.com/js/aws-sdk-2.410.0.min.js"></script>
 	  <script src="js/fetch_data.js"></script>
 	<script>
 
@@ -31,8 +32,17 @@ $(document).on('click','.blah-submit-class', function(){
 		'accessKeyId': $('#auth1').val(),
 		'secretAccessKey': $('#auth2').val()};
 
-	console.log('parameters from form: ' + JSON.stringify(parameters));
-	queryMyUrl(parameters, authparameters, 'out-div');
+	authParametersFromCognito(
+			queryMyUrl,
+			parameters);
+
+	//console.log('Going to try params from authParametersFromCognito()' 
+	//			+ JSON.stringify(authparameters));
+
+	//console.log('parameters from form: ' + JSON.stringify(parameters));
+	//queryMyUrl(parameters, authparameters, 'out-div', 'out-div-2');
+
+
 
  return false;  //this will prevent the page refresh
 });
@@ -46,7 +56,8 @@ $(document).on('click','.blah-submit-class', function(){
 	 birth year: 1993
 	-->
 
-	  <form >
+	<form  action="#0">
+	<!-- <form > -->
 		  Start station:
 		  <input type="text" id="startStation"
 		  value="" placeholder='Forsyth St & Broome St'
@@ -83,7 +94,7 @@ $(document).on('click','.blah-submit-class', function(){
 		  <input type="text" id="auth2"
 		  value="" />  <br/>
 
-		  <input type="submit" class="blah-submit-class" />
+		  <input type="submit" class="blah-submit-class"   />
 	  </form>
 	  <div id='out-div'> </div>
 	  <div id='out-div-2'> </div>
