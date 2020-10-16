@@ -405,7 +405,7 @@ queryMyUrl = function(parameters, authparams, output_id, output_id_2) {
 			console.log(response);
 			console.log('end response for ' + output_id);
 
-			$('#' + output_id).text(JSON.stringify(response));
+			$('#' + output_id).text("Destination neighborhoods top 5 probabilities: " + JSON.stringify(response['probabilities']));
 
 			//$('#' + output_id_2).text(response['map_html']);
 			document.getElementById(output_id_2).innerHTML=response['map_html'];
