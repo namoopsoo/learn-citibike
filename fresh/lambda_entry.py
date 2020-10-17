@@ -43,11 +43,12 @@ def entry(event, context):
     print('DEBUG, new record', record)
 
     # call sagemaker endpoint
-    out = call_sagemaker(record)
     bundle = fetch_bundle()
     start_location = get_start_location(record, bundle)
     if start_location is None:
         return {'error': 'unknown start station'}
+
+    out = call_sagemaker(record)
 
     probs = map_probabilities(bundle, prob_vec=out['result'][0], k=10)
 
@@ -97,7 +98,8 @@ def call_sagemaker(record):
             what = response['Body'].read()
             return json.loads(what)
         except botocore.exceptions.ClientError as e:
-            error = {'error_detail': str(e.message), 'error': 'client error'}
+            error = {'error_detail': repr(e),
+                     'error': e.__class__.__name__}
             return error
 
     else:
