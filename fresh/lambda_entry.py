@@ -46,14 +46,15 @@ def entry(event, context):
     bundle = fetch_bundle()
     start_location = get_start_location(record, bundle)
     if start_location is None:
-        return {'error': 'unknown start station'}
+        raise Exception('unknown start station')
 
     out = call_sagemaker(record)
 
-    probs = map_probabilities(bundle, prob_vec=out['result'][0], k=10)
+    probs = map_probabilities(bundle, prob_vec=out['result'][0], k=9)
 
     out = blah_get_map(bundle, probs, start_location=start_location)
-    return {'map_html': out, 'probabilities': probs}
+    return {'map_html': out, 'probabilities': probs,
+            'start_location': start_location}
 
 
 def get_start_location(record, bundle):
@@ -66,7 +67,7 @@ def get_start_location(record, bundle):
         return None
     else:
         return fu.subset(
-            dict(df.iloc[0]), ['latlng'])
+            dict(df.iloc[0]), ['latlng', 'station_name'])
 
 
 def call_sagemaker(record):
@@ -129,6 +130,8 @@ def blah_get_map(bundle, probs, start_location):
     stationsdf = bundle['stations_bundle']['stationsdf']
     df = pd.DataFrame(probs, columns=['neighborhood', 'prob'])
 
+    # FIXME these are actually station latlng not center of neighborhoods
+    #   maybe i can even highlight regions in google api? 
     locations = df.merge(
             stationsdf, on='neighborhood'
             ).drop_duplicates(subset='neighborhood')[['latlng', 'neighborhood']

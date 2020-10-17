@@ -60,6 +60,20 @@ def s3_lambda_zip_push():
     return s3fn
 
 
+def api_gateway_hmm():
+     apiClient = boto3.client('apigateway', awsregion)
+     api_response=apiClient.update_integration
+     (
+       restApiId=os.getenv('REST_API_ID'),  #,apiName,
+       resourceId='myBikelearnSageLambda', # '/api/v1/hub',
+       httpMethod='GET',
+       integrationHttpMethod='GET',
+       type='AWS',
+       uri=(f'''arn:aws:lambda:us-east-1:{os.getenv('AWS_ACCOUNT_ID')}:'''
+            f'''function:{os.getenv('BIKELEARN_LAMBDA')}'''),
+      )
+
+
 if __name__ == '__main__':
     what = sys.argv[1]
     print('deploying', what)
