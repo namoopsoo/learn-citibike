@@ -1,10 +1,11 @@
-import os
 import boto3
+import os
+import sys
 import fresh.s3utils as fs3
 import fresh.utils as fu
 
 
-def deploy():
+def deploy_html():
     deployables = ['index.html', 'js/fetch_data.js']
 
     deploy_bucket = os.getenv('S3_DEPLOY_BUCKET')
@@ -33,7 +34,7 @@ def deploy_lambda():
     client = boto3.client('lambda',
             region_name='us-east-1'
             )
-    client.update_function_code(
+    out = client.update_function_code(
         FunctionName=os.getenv('BIKELEARN_LAMBDA'),
         # ZipFile=b'bytes',
         S3Bucket=os.getenv('S3_LAMBDA_ARTIFACTS_BUCKET'),
@@ -43,6 +44,8 @@ def deploy_lambda():
         DryRun=False,
         # RevisionId=last_revision_id
     )
+    print(fu.subset(out, ['Version', 'LastModified', 'LastUpdateStatus', 'State']))
+    return out
 
 
 def s3_lambda_zip_push():
@@ -58,5 +61,9 @@ def s3_lambda_zip_push():
 
 
 if __name__ == '__main__':
-    print('deploying')
-    deploy()
+    what = sys.argv[1]
+    print('deploying', what)
+    if what == 'lambda':
+        deploy_lambda()
+    elif what == 'html':
+        deploy_html()
