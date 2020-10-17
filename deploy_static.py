@@ -62,8 +62,7 @@ def s3_lambda_zip_push():
 
 def api_gateway_hmm():
      apiClient = boto3.client('apigateway', awsregion)
-     api_response=apiClient.update_integration
-     (
+     api_response=apiClient.update_integration(
        restApiId=os.getenv('REST_API_ID'),  #,apiName,
        resourceId='myBikelearnSageLambda', # '/api/v1/hub',
        httpMethod='GET',
