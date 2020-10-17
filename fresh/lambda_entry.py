@@ -7,7 +7,8 @@ import pandas as pd
 import fresh.map as fm
 import fresh.s3utils as fs3
 import fresh.predict_utils as fpu
- 
+import fresh.utils as fu
+
 import requests
 LOCAL_DIR_SAFE = os.getenv('LOCAL_DIR_SAFE')
 LOCAL_URL = 'http://127.0.0.1:8080/invocations'
@@ -44,14 +45,27 @@ def entry(event, context):
     # call sagemaker endpoint
     out = call_sagemaker(record)
     bundle = fetch_bundle()
+    start_location = get_start_location(record, bundle)
+    if start_location is None:
+        return {'error': 'unknown start station'}
 
-    probs = map_probabilities(bundle, prob_vec=out['result'][0], k=5)
+    probs = map_probabilities(bundle, prob_vec=out['result'][0], k=10)
 
-    out = blah_get_map(bundle, probs)
+    out = blah_get_map(bundle, probs, start_location=start_location)
     return {'map_html': out, 'probabilities': probs}
 
-    # Translate top 5 results to locations (latlng)
-    # and send to google api..
+
+def get_start_location(record, bundle):
+    # Validate input
+    # Make the start the first location. TODO protect against bad station.
+    stationsdf = bundle['stations_bundle']['stationsdf']
+    df = stationsdf[stationsdf['station_name'] 
+                    == record['start station name']]
+    if df.empty:
+        return None
+    else:
+        return fu.subset(
+            dict(df.iloc[0]), ['latlng'])
 
 
 def call_sagemaker(record):
@@ -81,11 +95,11 @@ def call_sagemaker(record):
                     # CustomAttributes='string'
                     )
             what = response['Body'].read()
-            return json.loads(what) 
+            return json.loads(what)
         except botocore.exceptions.ClientError as e:
             error = {'error_detail': str(e.message), 'error': 'client error'}
             return error
-                
+
     else:
         url = LOCAL_URL
         headers = {'Content-Type': 'text/csv'}
@@ -105,11 +119,11 @@ def map_probabilities(bundle, prob_vec, k=5):
     classes = le.classes_.shape
     le.classes_ # 54
 
-    top_k = sorted(list(zip(le.classes_, prob_vec)), key=lambda x:x[1], reverse=True)[:k] 
+    top_k = sorted(list(zip(le.classes_, prob_vec)), key=lambda x: x[1], reverse=True)[:k] 
     return top_k
 
 
-def blah_get_map(bundle, probs):
+def blah_get_map(bundle, probs, start_location):
     stationsdf = bundle['stations_bundle']['stationsdf']
     df = pd.DataFrame(probs, columns=['neighborhood', 'prob'])
 
@@ -117,7 +131,8 @@ def blah_get_map(bundle, probs):
             stationsdf, on='neighborhood'
             ).drop_duplicates(subset='neighborhood')[['latlng', 'neighborhood']
                     ].to_dict(orient='records')
-    out = fm.grab_final_thing(locations)
+
+    out = fm.grab_final_thing([start_location] + locations)
     return out
 
 

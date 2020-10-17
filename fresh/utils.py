@@ -261,3 +261,5 @@ def assess_balance(arr):
     # and something w.r.t. rmse...
 
 
+def subset(d, keys):
+    return {k:v for (k,v) in d.items() if k in keys}
