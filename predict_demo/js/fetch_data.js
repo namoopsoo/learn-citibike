@@ -66,6 +66,16 @@ formatDateString = function(d) {
 	return yyyy + '-' + mm + '-' + dd;
 }
 
+
+formatDateTimeString = function(d) {
+	date_string = formatDateString(d);
+
+	var hh = d.getHours();
+	var mm = d.getMinutes(); 
+
+	return date_string + ' ' + hh + ':' + mm + ':00';
+}
+
 copyDate = function(d) {
 	x = new Date(JSON.parse(JSON.stringify(d)));
 	return x
@@ -578,3 +588,4 @@ authParametersFromCognito = function(callback, callback_params) {
 
 
 }
+

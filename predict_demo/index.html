@@ -47,6 +47,12 @@ $(document).on('click','.blah-submit-class', function(){
  return false;  //this will prevent the page refresh
 });
 
+window.addEventListener("load", function(){
+	var now = new Date();
+	document.getElementById('startTime').value = formatDateTimeString(now);
+		});
+
+
 	</script>
 	<!-- 
 	 17:
@@ -84,14 +90,6 @@ $(document).on('click','.blah-submit-class', function(){
 
 		  Birth year:
 		  <input type="text" id="birthYear"
-		  value="" />  <br/>
-
-		  Auth1:
-		  <input type="text" id="auth1"
-		  value="" />  <br/>
-
-		  Auth2:
-		  <input type="text" id="auth2"
 		  value="" />  <br/>
 
 		  <input type="submit" class="blah-submit-class"   />
