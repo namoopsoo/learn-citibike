@@ -69,9 +69,9 @@ def entry(event, context):
     probs = map_probabilities(bundle,
                               prob_vec=[round(x, 2)
                                         for x in out['result'][0]], k=9)
-
     out = blah_get_map(bundle, probs, start_location=start_location)
-    final_out = {'map_html': out, 'probabilities': probs,
+    numbered_probs = list(zip(range(1, 10), *zip(*probs)))
+    final_out = {'map_html': out, 'probabilities': numbered_probs,
             'start_location': start_location}
     print('DEBUG, final_out', final_out)
     return final_out
