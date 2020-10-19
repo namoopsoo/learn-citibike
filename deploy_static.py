@@ -6,7 +6,7 @@ import fresh.utils as fu
 
 
 def deploy_html():
-    deployables = ['index.html', 'js/fetch_data.js', 'startStation.html']
+    deployables = ['index.html', 'js/fetch_data.js']
 
     deploy_bucket = os.getenv('S3_DEPLOY_BUCKET')
     assert deploy_bucket

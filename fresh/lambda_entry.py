@@ -45,16 +45,20 @@ def entry(event, context):
     # call sagemaker endpoint
     bundle = fetch_bundle()
     start_location = get_start_location(record, bundle)
+    print('DEBUG, start_location', start_location)
     if start_location is None:
         raise Exception('unknown start station')
 
     out = call_sagemaker(record)
+    print('DEBUG, call_sagemaker out', out)
 
     probs = map_probabilities(bundle, prob_vec=out['result'][0], k=9)
 
     out = blah_get_map(bundle, probs, start_location=start_location)
-    return {'map_html': out, 'probabilities': probs,
+    final_out = {'map_html': out, 'probabilities': probs,
             'start_location': start_location}
+    print('DEBUG, final_out', final_out)
+    return final_out
 
 
 def get_start_location(record, bundle):
