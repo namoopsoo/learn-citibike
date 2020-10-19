@@ -78,6 +78,37 @@ def api_gateway_hmm_update_lambda_version(version):
     return response
 
 
+def add_permission(version):
+    '''
+    $ aws lambda add-permission --function-name LambdaFunctionOverHttps \
+--statement-id apigateway-test-2 --action lambda:InvokeFunction \
+--principal apigateway.amazonaws.com \
+--source-arn "arn:aws:execute-api:$REGION:$ACCOUNT:$API/*/POST/DynamoDBManager"
+{
+    "Statement": "{\"Sid\":\"apigateway-test-2\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"apigateway.amazonaws.com\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-east-2:123456789012:function:LambdaFunctionOverHttps\",\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:execute-api:us-east-2:123456789012:mnh1yprki7/*/POST/DynamoDBManager\"}}}"
+}
+    '''
+    region = 'us-east-1'
+    source_arn = (f"arn:aws:execute-api:{region}:{os.getenv('AWS_ACCOUNT_ID')}"
+                   f":{os.getenv('REST_API_ID')}/default/GET/myBikelearnSageLambda")
+    print('DEBUG', source_arn)
+    client = boto3.client('lambda', 
+                           region_name='us-east-1')
+    response = client.add_permission(
+        FunctionName=os.getenv("BIKELEARN_LAMBDA"),
+        StatementId='blah-statement-2', # TODO randomize
+        Action='lambda:InvokeFunction',
+        Principal='apigateway.amazonaws.com',
+        SourceArn=source_arn,
+        SourceAccount=os.getenv('AWS_ACCOUNT_ID'),
+        # EventSourceToken='string', # NOTE Alexa?
+        Qualifier=f'{version}',
+        # RevisionId='string'
+    )
+    return response
+
+
+
 def deploy_api(description):
     client = boto3.client('apigateway', 
                            region_name='us-east-1')
