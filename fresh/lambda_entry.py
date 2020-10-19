@@ -19,6 +19,20 @@ BUNDLE_LOC_S3 = (
 
 def entry(event, context):
     '''
+    Example of proper event:
+    {
+      "params": {
+        "path": {},
+        "querystring": {
+          "birth_year": "1973",
+          "rider_gender": "2",
+          "rider_type": "Subscriber",
+          "start_station": "W+26+St+&+10+Ave",
+          "start_time": "2020-10-19+13:56:00"
+        }
+      }
+    }
+    # And after quick mappin, a record is created...      
     record = {
      'starttime': '2013-07-01 00:00:00',
      'start station name': 'E 47 St & 2 Ave',

@@ -61,25 +61,33 @@ def s3_lambda_zip_push():
 
 
 def api_gateway_hmm_update_lambda_version(version):
-     client = boto3.client('apigateway', 
-                              region_name='us-east-1')
-     patch_uri = [{
+    client = boto3.client('apigateway', 
+                           region_name='us-east-1')
+    patch_uri = [{
         'path': '/uri',
-        'value': # (f'''arn:aws:lambda:us-east-1:{os.getenv('AWS_ACCOUNT_ID')}:'''
-                 # f'''function:{os.getenv('BIKELEARN_LAMBDA')}'''
-                 # f':{version}'),
-           f'''arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:{os.getenv('AWS_ACCOUNT_ID')}:function:myBikelearnSageLambda:{version}/invocations''',
+        'value': f'''arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:{os.getenv('AWS_ACCOUNT_ID')}:function:myBikelearnSageLambda:{version}/invocations''',
         'op': 'replace'
         }]
-     print('patch_uri', patch_uri)
-     response = client.update_integration(
-             restApiId=os.getenv('REST_API_ID'),  #,apiName,
-             resourceId='tsgjxn', # '/api/v1/hub',
+    print('patch_uri', patch_uri)
+    response = client.update_integration(
+             restApiId=os.getenv('REST_API_ID'),
+             resourceId='tsgjxn',
              httpMethod='GET',
              patchOperations=patch_uri,
-            )
-     return response
+             )
+    return response
 
+
+def deploy_api(description):
+    client = boto3.client('apigateway', 
+                           region_name='us-east-1')
+    response = client.create_deployment(
+            restApiId=os.getenv('REST_API_ID'),
+            stageName='default',
+            # stageDescription='string',
+            description=description,
+            )
+    return response
 
 if __name__ == '__main__':
     what = sys.argv[1]
