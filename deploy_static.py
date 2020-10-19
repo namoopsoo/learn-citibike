@@ -65,14 +65,16 @@ def api_gateway_hmm_update_lambda_version(version):
                               region_name='us-east-1')
      patch_uri = [{
         'path': '/uri',
-        'value': (f'''arn:aws:lambda:us-east-1:{os.getenv('AWS_ACCOUNT_ID')}:'''
-                  f'''function:{os.getenv('BIKELEARN_LAMBDA')}'''
-                  f':{version}'),
+        'value': # (f'''arn:aws:lambda:us-east-1:{os.getenv('AWS_ACCOUNT_ID')}:'''
+                 # f'''function:{os.getenv('BIKELEARN_LAMBDA')}'''
+                 # f':{version}'),
+           f'''arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:{os.getenv('AWS_ACCOUNT_ID')}:function:myBikelearnSageLambda:{version}/invocations''',
         'op': 'replace'
-    }]
+        }]
+     print('patch_uri', patch_uri)
      response = client.update_integration(
              restApiId=os.getenv('REST_API_ID'),  #,apiName,
-             resourceId='/myBikelearnSageLambda', # '/api/v1/hub',
+             resourceId='tsgjxn', # '/api/v1/hub',
              httpMethod='GET',
              patchOperations=patch_uri,
             )
