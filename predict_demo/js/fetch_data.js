@@ -416,7 +416,7 @@ queryMyUrl = function(parameters, authparams, output_id, output_id_2) {
 			console.log(response);
 			console.log('end response for ' + output_id);
 
-			$('#' + output_id).text("0: starting location " + JSON.stringify(response['start_location']) + "<br/><br/>And 1-9: Destination neighborhoods top 9 probabilities: " + JSON.stringify(response['probabilities']));
+			document.getElementById(output_id).innerHTML = "0: starting location " + JSON.stringify(response['start_location']) + "<br/><br/>And 1-9: Destination neighborhoods top 9 probabilities: " + JSON.stringify(response['probabilities']);
 
 			//$('#' + output_id_2).text(response['map_html']);
 			document.getElementById(output_id_2).innerHTML=response['map_html'];

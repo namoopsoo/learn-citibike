@@ -52,7 +52,9 @@ def entry(event, context):
     out = call_sagemaker(record)
     print('DEBUG, call_sagemaker out', out)
 
-    probs = map_probabilities(bundle, prob_vec=out['result'][0], k=9)
+    probs = map_probabilities(bundle,
+                              prob_vec=[round(x, 2)
+                                        for x in out['result'][0]], k=9)
 
     out = blah_get_map(bundle, probs, start_location=start_location)
     final_out = {'map_html': out, 'probabilities': probs,
@@ -63,7 +65,7 @@ def entry(event, context):
 
 def get_start_location(record, bundle):
     # Validate input
-    # Make the start the first location. TODO protect against bad station.
+    # Make the start the first location.
     stationsdf = bundle['stations_bundle']['stationsdf']
     df = stationsdf[stationsdf['station_name'] 
                     == record['start station name']]

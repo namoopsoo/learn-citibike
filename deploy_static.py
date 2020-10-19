@@ -60,17 +60,23 @@ def s3_lambda_zip_push():
     return s3fn
 
 
-def api_gateway_hmm():
-     apiClient = boto3.client('apigateway', awsregion)
-     api_response=apiClient.update_integration(
-       restApiId=os.getenv('REST_API_ID'),  #,apiName,
-       resourceId='myBikelearnSageLambda', # '/api/v1/hub',
-       httpMethod='GET',
-       integrationHttpMethod='GET',
-       type='AWS',
-       uri=(f'''arn:aws:lambda:us-east-1:{os.getenv('AWS_ACCOUNT_ID')}:'''
-            f'''function:{os.getenv('BIKELEARN_LAMBDA')}'''),
-      )
+def api_gateway_hmm_update_lambda_version(version):
+     client = boto3.client('apigateway', 
+                              region_name='us-east-1')
+     patch_uri = [{
+        'path': '/uri',
+        'value': (f'''arn:aws:lambda:us-east-1:{os.getenv('AWS_ACCOUNT_ID')}:'''
+                  f'''function:{os.getenv('BIKELEARN_LAMBDA')}'''
+                  f':{version}'),
+        'op': 'replace'
+    }]
+     response = client.update_integration(
+             restApiId=os.getenv('REST_API_ID'),  #,apiName,
+             resourceId='/myBikelearnSageLambda', # '/api/v1/hub',
+             httpMethod='GET',
+             patchOperations=patch_uri,
+            )
+     return response
 
 
 if __name__ == '__main__':
