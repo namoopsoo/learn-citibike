@@ -44,3 +44,20 @@ s3uri = (f's3://{mybucket}/'
 bucket, s3fn = fs3.s3uri_to_parts(s3uri)
 data = fs3.read_s3_file(bucket, s3fn)
 ```
+
+
+#### Build/Run docker image...
+* I have [docker notes here](notes/2020-06-07-local-docker-notes.md) but I might move them here for convenience.
+
+
+#### Deploy html
+* Put my html to S3 static website bucket
+
+```
+make deploy_html
+```
+
+#### build a new revision of the lambda
+```
+make lambda
+```
