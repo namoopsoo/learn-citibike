@@ -10,6 +10,7 @@ RUN apt-get -y update && apt-get install -y --no-install-recommends \
          bzip2 \
          ca-certificates \
          vim \
+         graphviz \
     && rm -rf /var/lib/apt/lists/*
 
 
@@ -34,6 +35,7 @@ RUN pip install matplotlib
 RUN pip install ipython
 RUN pip install tqdm
 
+RUN pip install graphviz
 
 # change for default serve behavior.
 WORKDIR /opt/server

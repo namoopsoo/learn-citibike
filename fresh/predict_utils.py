@@ -152,3 +152,16 @@ def widen_df_with_other_cols(df, all_columns):
     for col in new_cols:
         df[col] = np.nan
     return df
+
+
+def extract_model_id_from_bundle(bundle):
+    '''
+    Return a unique identifier based on the dir of the model and filename
+    if they were stored on the bundle.
+
+    Example filename: 
+    '/opt/program/artifacts/2020-07-10T135910Z/1187_bundle_with_metrics.joblib'
+    '''
+    if bundle['model_bundle'].get('original_filename'):
+        parts = bundle['model_bundle']['original_filename'].split('/')
+        return f"{parts[4]}_{parts[5].split('_')[0]}"

@@ -18,7 +18,6 @@ export MY_LOCAL_DATA_DIRECTORY=/Users/me/blah/blah/blah/data/citibike
 * Make sure `pwd` is the root of the repo.
 ```
 source somevars.sh
-my_local_data_directory=${MY_LOCAL_DATA_DIRECTORY}
 docker run -p 8889:8889 -i -t -v $(pwd):/opt/program \
             -v ${MY_LOCAL_DATA_DIRECTORY}:/opt/data \
             citibike-learn:latest
@@ -32,19 +31,16 @@ jupyter notebook --ip 0.0.0.0 --port 8889 --no-browser --allow-root
 #### Adding in model serving too
 * on port `8080`
 * again, make sure `pwd` is the repo root.
-```
-#my_local_data_directory=${MY_LOCAL_DATA_DIRECTORY}
+```bash
 docker run -p 8889:8889 -p 8080:8080 -i -t -v $(pwd):/opt/program \
             -v ${MY_LOCAL_DATA_DIRECTORY}:/opt/data \
             -v   ~/Downloads:/opt/downloads \
             -v  $(pwd)/artifacts/2020-08-19T144654Z:/opt/ml \
             citibike-learn:latest \
             serve
-
-
 ```
 
-* Then from laptop shell can tesst predict
+* Then from laptop shell can test predict
 
 ```python
 import requests
@@ -54,7 +50,7 @@ requests.post('http://127.0.0.1:8080/invocations', data='blah,flarg')
 
 #### Build docker with make...
 
-```
+```bash
 bash make.sh build
 . somevars.sh
 bash make.sh push 0.7 # where 0.7 is the ECR tag I'm up to .

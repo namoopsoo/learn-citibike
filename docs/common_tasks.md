@@ -32,6 +32,28 @@ balanced_acc = balanced_accuracy_score(actuals, predictions)
 
 ```
 
+#### Mapping XGboost model features to names
+* Also [this note](https://github.com/namoopsoo/learn-citibike/blob/master/notes/2020-07-26-feature-importances.md) has the basics around pulling together feature names and xgboost generic features (i.e. `f0, f1, ...`)
+* Given a joblib bundle w/ an xgboost model,
+
+```python
+bundle_loc = f'bundle_with_metrics.joblib'
+bundle = joblib.load(bundle_loc)
+model = bundle['xgb_model']
+```
+
+The generic feature names are available with
+
+```python
+model.feature_names[:5]
+# ['f0', 'f1', 'f2', 'f3', 'f4']
+```
+
+
+
+#### Plotting an xgboost model's trees
+* notebook WIP on this `2020-10-21-look-at-model-plot.ipynb`  
+
 #### From s3
 
 ```python

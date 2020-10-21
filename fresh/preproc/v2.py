@@ -94,3 +94,17 @@ def to_libsvm(X, y, outfile):
     with open(outfile, 'ab') as fd:
         dump_svmlight_file(X, y, fd)
 
+
+def make_feature_map(proc_bundle):
+    onehot = proc_bundle['proc_bundle']['enc'].categories
+    usertypes = proc_bundle['proc_bundle']['usertype_le'].classes_
+    feature_names = ([f'start_neighborhood={x}' for x in onehot[0]] 
+                    + [f'gender={x}' for x in onehot[1]]
+                    + [f'time_of_day={x}' for x in onehot[2]]
+                    + ['usertype']
+                    + ['weekday']) 
+
+
+    feature_map = {f'f{i}': feature_names[i] for i in range(len(feature_names))}
+    return feature_map
+
