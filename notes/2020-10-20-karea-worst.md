@@ -1,8 +1,9 @@
 
 
-#### Extending notes on karea, what is the worst karea possible
-* Earlier notes https://github.com/namoopsoo/learn-citibike/blob/master/notes/2020-07-04-aws.md
-* I was wondering since I had also written out how to calculate the theoretical worst logloss, I should consider the worst karea too.
+#### Extending notes on k-area
+* Earlier notes on this metric are [here](https://github.com/namoopsoo/learn-citibike/blob/master/notes/2020-07-04-aws.md#beginnings-of-a-more-granular-metric-for-multi-class-models)
+* The genesis was basically that logloss doesn't care about the rank a model gives to each class probability.
+* This metric is an idea of how to capture roughly how early in the output probabilities does a multi-class model capture the correct answer.
 * The *k-area* metric is a number from 0 to (num_classes-1)/num_classes , which is the area under the curve of the "cumulative rank accuracy" , based on the rank of the correct predictions in a model's multi-class probabilities.
 * A
 
