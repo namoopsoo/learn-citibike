@@ -39,7 +39,7 @@ _plot(topk)
 
 ```
 
-<img src="notes/2020-10-20-karea-worst__files/2020-10-21T165705Z_cumulative_accuracy.png" width="50%">
+<img src="2020-10-20-karea-worst__files/2020-10-21T165705Z_cumulative_accuracy.png" width="50%">
 
 ```python
 # Slightly better than worst...
