@@ -54,7 +54,7 @@ _plot(topk)
 # ([1, 3, 3, 3, 2], 0.15000000000000002)                  
 
 ```
-<img src="notes/2020-10-20-karea-worst__files/2020-10-21T173626Z_cumulative_accuracy.png" width="50%">
+<img src="2020-10-20-karea-worst__files/2020-10-21T173626Z_cumulative_accuracy.png" width="50%">
 
 * in the middle...
 
@@ -69,7 +69,7 @@ correct_kth, topk, karea = fm.kth_area(y_test, y_prob, num_classes=4)
 _plot(topk)
 # ([2, 2, 3, 0, 2], 0.30000000000000004)
 ```
-<img src="notes/2020-10-20-karea-worst__files/2020-10-21T173730Z_cumulative_accuracy.png" width="50%">
+<img src="2020-10-20-karea-worst__files/2020-10-21T173730Z_cumulative_accuracy.png" width="50%">
 
 * near perfect
 ```python
@@ -84,7 +84,7 @@ _plot(topk)
 
 # ([0, 0, 0, 0, 1], 0.7)
 ```
-<img src="notes/2020-10-20-karea-worst__files/2020-10-21T173805Z_cumulative_accuracy.png" width="50%">
+<img src="2020-10-20-karea-worst__files/2020-10-21T173805Z_cumulative_accuracy.png" width="50%">
 
 * perfect
 ```python
@@ -99,4 +99,4 @@ _plot(topk)
 # ([0, 0, 0, 0, 0], 0.75)
 ```
 
-<img src="notes/2020-10-20-karea-worst__files/2020-10-21T173826Z_cumulative_accuracy.png" width="50%">
+<img src="2020-10-20-karea-worst__files/2020-10-21T173826Z_cumulative_accuracy.png" width="50%">
