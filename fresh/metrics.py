@@ -10,11 +10,12 @@ def kth_correct(x, y, num_classes):
 def kth_area(y_test, y_prob,
             num_classes):
     '''
-    The k-area metric takes the probabilities from a multi-class model,
-    and for each example, ranks the probabilities and for each finds 
+    The k-area metric: Take the probabilities from a multi-class model,
+    and for each example, rank the probabilities and for each find
     the rank k the model gives to the correct class.
-    And 
-
+    Then create an array from 1 through num_classes, with the "cumulative accuracy"
+    for each position.
+    The sum of this array can range from 0.0 to (num_classes-1)/num_classes
 
     y_prob: probabilities from a multi-class model
     y_test: correct labels
@@ -32,11 +33,13 @@ def kth_area(y_test, y_prob,
         lambda k, counts, size: sum([counts[i]/size for i in range(k)]))
     
     # k-Accuracy after considering each of k=0, 1,... (size-1) predictions.
-    topk = np.array([cumulative_correct_kth(k, correct_kth_counts, size)
+    topk = np.array([cumulative_correct_kth(k, 
+                        correct_kth_counts, size)/num_classes
             for k in range(num_classes)])
     print('topk', topk)
 
-    area = (topk/num_classes).sum()
-    return correct_kth, area
+    # area = (topk/num_classes).sum()
+    karea = topk.sum()
+    return correct_kth, topk, karea
 
 
