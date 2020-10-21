@@ -277,13 +277,219 @@ df = pd.DataFrame.from_records([{'name': feature_map.get(k), 'f': k, 'fscore': v
 
 
 ```python
-df.sort_values(by='fscore', ascending=False).iloc[:20].to_markdown()
+df.sort_values(by='fscore', ascending=False).iloc[:30]
 ```
 
 
 
 
-    "|    | name                                  | f   |   fscore |\n|---:|:--------------------------------------|:----|---------:|\n|  9 | weekday                               | f84 |    12812 |\n| 10 | gender=1                              | f76 |     8973 |\n|  2 | time_of_day=3                         | f81 |     8377 |\n|  8 | gender=0                              | f75 |     7969 |\n| 11 | time_of_day=1                         | f79 |     7064 |\n| 26 | time_of_day=2                         | f80 |     6594 |\n|  7 | time_of_day=0                         | f78 |     6302 |\n| 17 | gender=2                              | f77 |     5509 |\n|  3 | time_of_day=4                         | f82 |     4854 |\n| 40 | start_neighborhood=Chelsea            | f12 |     1199 |\n| 37 | start_neighborhood=Midtown East       | f46 |     1058 |\n| 36 | start_neighborhood=Midtown West       | f47 |      947 |\n| 30 | start_neighborhood=Downtown Brooklyn  | f18 |      910 |\n| 41 | start_neighborhood=Hell's Kitchen     | f33 |      877 |\n| 21 | start_neighborhood=Fort Greene        | f25 |      865 |\n| 14 | start_neighborhood=Financial District | f23 |      860 |\n| 23 | start_neighborhood=Brooklyn Heights   | f7  |      834 |\n| 49 | start_neighborhood=Kips Bay           | f36 |      821 |\n| 13 | start_neighborhood=Tribeca            | f64 |      813 |\n| 28 | start_neighborhood=Lower East Side    | f42 |      786 |"
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>f</th>
+      <th>fscore</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>9</th>
+      <td>weekday</td>
+      <td>f84</td>
+      <td>12812</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>gender=1</td>
+      <td>f76</td>
+      <td>8973</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>time_of_day=3</td>
+      <td>f81</td>
+      <td>8377</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>gender=0</td>
+      <td>f75</td>
+      <td>7969</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>time_of_day=1</td>
+      <td>f79</td>
+      <td>7064</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>time_of_day=2</td>
+      <td>f80</td>
+      <td>6594</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>time_of_day=0</td>
+      <td>f78</td>
+      <td>6302</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>gender=2</td>
+      <td>f77</td>
+      <td>5509</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>time_of_day=4</td>
+      <td>f82</td>
+      <td>4854</td>
+    </tr>
+    <tr>
+      <th>40</th>
+      <td>start_neighborhood=Chelsea</td>
+      <td>f12</td>
+      <td>1199</td>
+    </tr>
+    <tr>
+      <th>37</th>
+      <td>start_neighborhood=Midtown East</td>
+      <td>f46</td>
+      <td>1058</td>
+    </tr>
+    <tr>
+      <th>36</th>
+      <td>start_neighborhood=Midtown West</td>
+      <td>f47</td>
+      <td>947</td>
+    </tr>
+    <tr>
+      <th>30</th>
+      <td>start_neighborhood=Downtown Brooklyn</td>
+      <td>f18</td>
+      <td>910</td>
+    </tr>
+    <tr>
+      <th>41</th>
+      <td>start_neighborhood=Hell's Kitchen</td>
+      <td>f33</td>
+      <td>877</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>start_neighborhood=Fort Greene</td>
+      <td>f25</td>
+      <td>865</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>start_neighborhood=Financial District</td>
+      <td>f23</td>
+      <td>860</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>start_neighborhood=Brooklyn Heights</td>
+      <td>f7</td>
+      <td>834</td>
+    </tr>
+    <tr>
+      <th>49</th>
+      <td>start_neighborhood=Kips Bay</td>
+      <td>f36</td>
+      <td>821</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>start_neighborhood=Tribeca</td>
+      <td>f64</td>
+      <td>813</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>start_neighborhood=Lower East Side</td>
+      <td>f42</td>
+      <td>786</td>
+    </tr>
+    <tr>
+      <th>38</th>
+      <td>start_neighborhood=Theater District</td>
+      <td>f63</td>
+      <td>745</td>
+    </tr>
+    <tr>
+      <th>39</th>
+      <td>start_neighborhood=Midtown</td>
+      <td>f45</td>
+      <td>736</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>start_neighborhood=Greenwich Village</td>
+      <td>f32</td>
+      <td>733</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>start_neighborhood=Clinton Hill</td>
+      <td>f15</td>
+      <td>703</td>
+    </tr>
+    <tr>
+      <th>33</th>
+      <td>start_neighborhood=Chinatown</td>
+      <td>f13</td>
+      <td>695</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>start_neighborhood=Williamsburg</td>
+      <td>f73</td>
+      <td>683</td>
+    </tr>
+    <tr>
+      <th>48</th>
+      <td>start_neighborhood=Murray Hill</td>
+      <td>f48</td>
+      <td>681</td>
+    </tr>
+    <tr>
+      <th>31</th>
+      <td>start_neighborhood=Dumbo</td>
+      <td>f19</td>
+      <td>680</td>
+    </tr>
+    <tr>
+      <th>44</th>
+      <td>start_neighborhood=Civic Center</td>
+      <td>f14</td>
+      <td>660</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>start_neighborhood=Battery Park City</td>
+      <td>f1</td>
+      <td>649</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 
 
