@@ -2,6 +2,7 @@ import joblib
 import os
 import pandas as pd
 import numpy as np
+from sklearn.datasets import dump_svmlight_file
 
 try:
     import xgboost as xgb
@@ -17,6 +18,38 @@ prefix = '/opt/ml/'
 model_path = os.path.join(prefix, 'model')
 
 def full_predict(bundle, record):
+    X_transformed = X_from_record(bundle, record)
+    print(X_transformed)
+    dmatrix = xgb.DMatrix(X_transformed)
+    
+    model = bundle['model_bundle']['bundle']['xgb_model']
+    
+    y_prob_vec = model.predict(dmatrix)
+    predictions = np.argmax(y_prob_vec, axis=1)
+
+    return y_prob_vec, predictions
+
+
+def full_predict_v2(bundle, record):
+    # fork of full_predict with the libsvm hack!
+    X_transformed = X_from_record(bundle, record)
+    print(X_transformed)
+
+    # dump to a temp location
+    temp_loc = '/opt/server/hmmmm.libsvm'
+    yblah = np.ones(shape=(1,))
+    dump_svmlight_file(X_transformed, yblah, f=temp_loc)
+    dmatrix = xgb.DMatrix(f'{temp_loc}?format=libsvm')
+
+    model = bundle['model_bundle']['bundle']['xgb_model']
+    
+    y_prob_vec = model.predict(dmatrix)
+    predictions = np.argmax(y_prob_vec, axis=1)
+
+    return y_prob_vec, predictions
+
+
+def X_from_record(bundle, record):
     inputdf = pd.DataFrame.from_records([record])
     stationsdf = bundle['stations_bundle']['stationsdf']
     
@@ -32,15 +65,8 @@ def full_predict(bundle, record):
         #workdir=workdir,
         #dataset_name='input'
     )
-    print(X_transformed)
-    dtrain = xgb.DMatrix(X_transformed)
-    
-    model = bundle['model_bundle']['bundle']['xgb_model']
-    
-    y_prob_vec = model.predict(dtrain)
-    predictions = np.argmax(y_prob_vec, axis=1)
+    return X_transformed
 
-    return y_prob_vec, predictions
 
 def load_bundle(loc):
     # Need a whole func here, because of this weird OneHotEncoder error,

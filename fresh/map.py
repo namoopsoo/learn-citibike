@@ -34,11 +34,14 @@ def make_url_from_locations(locations):
 
 
     API_KEY = os.getenv('GOOGLE_GEO_API_KEY')
-    parts = ['https://maps.googleapis.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY',
-                'zoom=13',
-                'size=600x300',
+    base = 'https://maps.googleapis.com/maps/api/staticmap' 
+    # former_center = 'Brooklyn+Bridge,New+York,NY' 
+    width, height = 600, 600
+    parts = [# f'center={locations[0]["latlng"]}',
+                # 'zoom=13',
+                f'size={width}x{height}',
                 'maptype=roadmap'] + location_parts + [f'key={API_KEY}']
-    return '&'.join(parts)
+    return base + '?' + '&'.join(parts)
 
 
 def sign_url(input_url=None, secret=None):
@@ -88,7 +91,8 @@ def grab_final_thing(locations, debug=False):
     img = make_img_tag(url)
 
     if debug:
-        outfile = f'tempmap_{random.randint(int(1e4), int(1e5))}.html'
+        temp_dir = os.getenv('GOOGLE_MAP_TEMPDIR')
+        outfile = f'{(temp_dir + "/") if temp_dir else ""}tempmap_{random.randint(int(1e4), int(1e5))}.html'
         print('writing <img> to ', outfile)
 
         with open(outfile, 'w') as fd:

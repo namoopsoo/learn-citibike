@@ -14,7 +14,7 @@ from sklearn.metrics import log_loss, accuracy_score, balanced_accuracy_score
 artifacts_dir = 'some_artifacts_dir'
 data_dir = 'my_local_dir'
 test_loc = f'{datadir}/test.libsvm'
-dtest = xgb.DMatrix(f'{train_loc}?format=libsvm')
+dtest = xgb.DMatrix(f'{test_loc}?format=libsvm')
 actuals = dtest.get_label()
 
 # If an xgb model is in a bundle like so..
@@ -30,4 +30,34 @@ logloss = log_loss(actuals, y_prob_vec, labels=list(range(54)))
 acc = accuracy_score(actuals, predictions)
 balanced_acc = balanced_accuracy_score(actuals, predictions)
 
+```
+
+#### From s3
+
+```python
+import fresh.s3utils as fs3
+mybucket = os.getenv('MY_BUCKET')
+
+s3uri = (f's3://{mybucket}/'
+         'blah/blah/file.csv'
+         )
+bucket, s3fn = fs3.s3uri_to_parts(s3uri)
+data = fs3.read_s3_file(bucket, s3fn)
+```
+
+
+#### Build/Run docker image...
+* I have [docker notes here](notes/2020-06-07-local-docker-notes.md) but I might move them here for convenience.
+
+
+#### Deploy html
+* Put my html to S3 static website bucket
+
+```
+make deploy_html
+```
+
+#### build a new revision of the lambda
+```
+make lambda
 ```

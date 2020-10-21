@@ -40,18 +40,14 @@ echo "Building with DOCKER_TAG=${DOCKER_TAG}"
 #
 
 echo 'Doing docker tag'
-docker tag ${DOCKER_IMAGE}:latest ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${DOCKER_IMAGE}:${DOCKER_TAG}
-
-docker tag ${DOCKER_IMAGE}:latest ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${DOCKER_IMAGE}:latest
 docker tag ${DOCKER_IMAGE}:latest ${DOCKER_IMAGE}:${DOCKER_TAG}
+docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${DOCKER_IMAGE}:${DOCKER_TAG}
 
 echo 'Doing login'
 $(aws --profile adminuser ecr get-login --no-include-email --region us-east-1)
 
-echo 'Doing docker push'
-docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${DOCKER_IMAGE}:latest
+echo "Doing docker push of ${DOCKER_IMAGE}:${DOCKER_TAG}"
 docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${DOCKER_IMAGE}:${DOCKER_TAG}
-
 
 # ... Run some integration tests too locally? 
 # docker run -p 8080:8080 -v $(pwd)/local_test/test_dir:/opt/ml \

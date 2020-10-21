@@ -10,7 +10,8 @@ except:
 
 
 def make_s3_resource():
-    access_key, secret = os.getenv('MY_ACCESS_KEY_ID'), os.getenv('MY_SECRET_ACCESS_KEY')
+    #access_key, secret = os.getenv('MY_ACCESS_KEY_ID'), os.getenv('MY_SECRET_ACCESS_KEY')
+    access_key = None
     f = partial(boto3.resource, 's3',
             region_name='us-east-1')
     if access_key:

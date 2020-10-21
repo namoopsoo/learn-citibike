@@ -7,7 +7,8 @@ import pandas as pd
 import fresh.map as fm
 import fresh.s3utils as fs3
 import fresh.predict_utils as fpu
- 
+import fresh.utils as fu
+
 import requests
 LOCAL_DIR_SAFE = os.getenv('LOCAL_DIR_SAFE')
 LOCAL_URL = 'http://127.0.0.1:8080/invocations'
@@ -17,6 +18,29 @@ BUNDLE_LOC_S3 = (
         )
 
 def entry(event, context):
+    '''
+    Example of proper event:
+    {
+      "params": {
+        "path": {},
+        "querystring": {
+          "birth_year": "1973",
+          "rider_gender": "2",
+          "rider_type": "Subscriber",
+          "start_station": "W+26+St+&+10+Ave",
+          "start_time": "2020-10-19+13:56:00"
+        }
+      }
+    }
+    # And after quick mappin, a record is created...      
+    record = {
+     'starttime': '2013-07-01 00:00:00',
+     'start station name': 'E 47 St & 2 Ave',
+     'usertype': 'Customer',
+     'birth year': '1999',
+     'gender': 0
+     }
+    '''
     print('DEBUG', event)
     # make input into a record
     input_record = event['params']['querystring']
@@ -29,19 +53,41 @@ def entry(event, context):
      'birth year': input_record['birth_year'], #'1999',
      'gender': input_record['rider_gender'], #0
      }
+
     print('DEBUG, new record', record)
 
     # call sagemaker endpoint
-    out = call_sagemaker(record)
     bundle = fetch_bundle()
+    start_location = get_start_location(record, bundle)
+    print('DEBUG, start_location', start_location)
+    if start_location is None:
+        raise Exception('unknown start station')
 
-    probs = map_probabilities(bundle, prob_vec=out['result'][0], k=5)
+    out = call_sagemaker(record)
+    print('DEBUG, call_sagemaker out', out)
 
-    out = blah_get_map(bundle, probs)
-    return {'map_html': out, 'probabilities': probs}
+    probs = map_probabilities(bundle,
+                              prob_vec=[round(x, 2)
+                                        for x in out['result'][0]], k=9)
+    out = blah_get_map(bundle, probs, start_location=start_location)
+    numbered_probs = list(zip(range(1, 10), *zip(*probs)))
+    final_out = {'map_html': out, 'probabilities': numbered_probs,
+            'start_location': start_location}
+    print('DEBUG, final_out', final_out)
+    return final_out
 
-    # Translate top 5 results to locations (latlng)
-    # and send to google api..
+
+def get_start_location(record, bundle):
+    # Validate input
+    # Make the start the first location.
+    stationsdf = bundle['stations_bundle']['stationsdf']
+    df = stationsdf[stationsdf['station_name'] 
+                    == record['start station name']]
+    if df.empty:
+        return None
+    else:
+        return fu.subset(
+            dict(df.iloc[0]), ['latlng', 'station_name'])
 
 
 def call_sagemaker(record):
@@ -71,11 +117,12 @@ def call_sagemaker(record):
                     # CustomAttributes='string'
                     )
             what = response['Body'].read()
-            return json.loads(what) 
+            return json.loads(what)
         except botocore.exceptions.ClientError as e:
-            error = {'error_detail': str(e.message), 'error': 'client error'}
+            error = {'error_detail': repr(e),
+                     'error': e.__class__.__name__}
             return error
-                
+
     else:
         url = LOCAL_URL
         headers = {'Content-Type': 'text/csv'}
@@ -95,19 +142,22 @@ def map_probabilities(bundle, prob_vec, k=5):
     classes = le.classes_.shape
     le.classes_ # 54
 
-    top_k = sorted(list(zip(le.classes_, prob_vec)), key=lambda x:x[1], reverse=True)[:k] 
+    top_k = sorted(list(zip(le.classes_, prob_vec)), key=lambda x: x[1], reverse=True)[:k] 
     return top_k
 
 
-def blah_get_map(bundle, probs):
+def blah_get_map(bundle, probs, start_location):
     stationsdf = bundle['stations_bundle']['stationsdf']
     df = pd.DataFrame(probs, columns=['neighborhood', 'prob'])
 
+    # FIXME these are actually station latlng not center of neighborhoods
+    #   maybe i can even highlight regions in google api? 
     locations = df.merge(
             stationsdf, on='neighborhood'
             ).drop_duplicates(subset='neighborhood')[['latlng', 'neighborhood']
                     ].to_dict(orient='records')
-    out = fm.grab_final_thing(locations)
+
+    out = fm.grab_final_thing([start_location] + locations)
     return out
 
 

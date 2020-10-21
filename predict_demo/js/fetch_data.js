@@ -66,6 +66,16 @@ formatDateString = function(d) {
 	return yyyy + '-' + mm + '-' + dd;
 }
 
+
+formatDateTimeString = function(d) {
+	date_string = formatDateString(d);
+
+	var hh = d.getHours();
+	var mm = d.getMinutes(); 
+
+	return date_string + ' ' + hh + ':' + mm + ':00';
+}
+
 copyDate = function(d) {
 	x = new Date(JSON.parse(JSON.stringify(d)));
 	return x
@@ -389,6 +399,7 @@ queryMyUrl = function(parameters, authparams, output_id, output_id_2) {
 
 
 	// url = 'https://rmuxqpksz2.execute-api.us-east-1.amazonaws.com/default/myBikelearnSageLambda?start_station=Forsyth+St+%26+Broome+St&start_time=10%2F8%2F2015+18%3A04%3A57&rider_gender=2&rider_type=Subscriber&birth_year=1973'
+	//base_url = 'https://rmuxqpksz2.execute-api.us-east-1.amazonaws.com/default/destinations'
 	base_url = 'https://rmuxqpksz2.execute-api.us-east-1.amazonaws.com/default/myBikelearnSageLambda'
 	
 	var goodstuff = prepareAuthenticatedAPIRequest(parameters,
@@ -405,7 +416,7 @@ queryMyUrl = function(parameters, authparams, output_id, output_id_2) {
 			console.log(response);
 			console.log('end response for ' + output_id);
 
-			$('#' + output_id).text(JSON.stringify(response));
+			document.getElementById(output_id).innerHTML = "0: starting location " + JSON.stringify(response['start_location']) + "<br/><br/>And 1-9: Destination neighborhoods top 9 probabilities: " + JSON.stringify(response['probabilities']);
 
 			//$('#' + output_id_2).text(response['map_html']);
 			document.getElementById(output_id_2).innerHTML=response['map_html'];
@@ -578,3 +589,4 @@ authParametersFromCognito = function(callback, callback_params) {
 
 
 }
+
