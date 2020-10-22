@@ -10,7 +10,7 @@ import fresh.utils as fu
 # dataset v2: start neighborhod and gender
 #   and weeday|weekend
 #   and customer|subscriber
-#   and birth year one hot..
+#   and birth year one hot..(actually no... somehow I forgot!)
 
 def preprocess(X, y=None, neighborhoods=None, proc_bundle=None, workdir=None, dataset_name=None):
     '''
