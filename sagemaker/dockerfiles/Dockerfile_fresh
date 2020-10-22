@@ -29,7 +29,7 @@ RUN wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86
 rm Miniconda3-latest-Linux-x86_64.sh
 ENV PATH /opt/conda/bin:$PATH
 
-RUN conda install python=3.7 numpy scipy scikit-learn pandas py-xgboost-cpu
+RUN conda install python=3.7 numpy scipy scikit-learn=0.22.1 pandas py-xgboost-cpu # 0.22.1 sklearn!
 RUN pip install ipdb flask gevent gunicorn jupyter 
 RUN pip install matplotlib
 RUN pip install ipython

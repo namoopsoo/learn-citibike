@@ -1,4 +1,10 @@
 
+### Summary
+- Here I took a look at xgboost feature mapping again as a refresher, 
+- Also getting feature fscores
+- as well as plotting individual trees with graphviz
+- And I experienced some difficulty after building a new Docker image w/ graphviz, because the scikit learn version got updated and loading a bundle stopped working normally. But going back to the original docker image with the original scikitlearn version restored bundle loading and prediction. 
+
 
 ```python
 import matplotlib.pyplot as plt
@@ -6,17 +12,18 @@ import matplotlib.pyplot as plt
 
 
 ```python
+from importlib import reload
+import pandas as pd
+```
+
+
+```python
+import fresh.preproc.v2 as pv2
 import fresh.predict_utils as fpu
 bundle = fpu.load_bundle_in_docker()
 ```
 
     Loading from bundle_loc /opt/ml/model/all_bundle_with_stationsdf.joblib
-
-
-    /opt/conda/lib/python3.7/site-packages/sklearn/base.py:334: UserWarning: Trying to unpickle estimator OneHotEncoder from version 0.22.1 when using version 0.23.2. This might lead to breaking code or invalid results. Use at your own risk.
-      UserWarning)
-    /opt/conda/lib/python3.7/site-packages/sklearn/base.py:334: UserWarning: Trying to unpickle estimator LabelEncoder from version 0.22.1 when using version 0.23.2. This might lead to breaking code or invalid results. Use at your own risk.
-      UserWarning)
 
 
 
@@ -28,6 +35,8 @@ from xgboost import plot_tree
 ```python
 model = bundle['model_bundle']['bundle']['xgb_model']
 ```
+
+#### Looking for a quick model id candidate
 
 
 ```python
@@ -45,6 +54,8 @@ model_id
 
 
 
+#### plotting a tree from xgboost with graphviz
+
 
 ```python
 # fig = plt.figure(figsize=(50,50))
@@ -58,7 +69,7 @@ plt.savefig(
 ```
 
 
-![png](2020-10-21-look-at-model-plot_files/2020-10-21-look-at-model-plot_5_0.png)
+![png](2020-10-21-look-at-model-plot_files/2020-10-21-look-at-model-plot_9_0.png)
 
 
 
@@ -68,19 +79,6 @@ plt.savefig(f"/opt/downloads/model_id_{fpu.extract_model_id_from_bundle(bundle)}
 
 
     <Figure size 432x288 with 0 Axes>
-
-
-
-```python
-import fresh.predict_utils as fpu
-reload(fpu)
-```
-
-
-
-
-    <module 'fresh.predict_utils' from '/opt/program/fresh/predict_utils.py'>
-
 
 
 
@@ -95,48 +93,7 @@ fpu.extract_model_id_from_bundle(bundle)
 
 
 
-
-```python
-help(plot_tree)
-```
-
-    Help on function plot_tree in module xgboost.plotting:
-    
-    plot_tree(booster, fmap='', num_trees=0, rankdir='UT', ax=None, **kwargs)
-        Plot specified tree.
-        
-        Parameters
-        ----------
-        booster : Booster, XGBModel
-            Booster or XGBModel instance
-        fmap: str (optional)
-           The name of feature map file
-        num_trees : int, default 0
-            Specify the ordinal number of target tree
-        rankdir : str, default "UT"
-            Passed to graphiz via graph_attr
-        ax : matplotlib Axes, default None
-            Target axes instance. If None, new figure and axes will be created.
-        kwargs :
-            Other keywords passed to to_graphviz
-        
-        Returns
-        -------
-        ax : matplotlib Axes
-    
-
-
-
-```python
-bundle['proc_bundle']['bundle']['proc_bundle'].keys()
-```
-
-
-
-
-    dict_keys(['enc', 'usertype_le', 'le'])
-
-
+#### feature map
 
 
 ```python
@@ -146,11 +103,6 @@ print(model.feature_names[:5])
 
     ['f0', 'f1', 'f2', 'f3', 'f4']
 
-
-
-```python
-import fresh.preproc.v2 as pv2
-```
 
 
 ```python
@@ -249,23 +201,7 @@ feature_map
 
 
 
-
-```python
-from importlib import reload
-import pandas as pd
-```
-
-
-```python
-reload(pv2)
-```
-
-
-
-
-    <module 'fresh.preproc.v2' from '/opt/program/fresh/preproc/v2.py'>
-
-
+#### Rank features by Fscore
 
 
 ```python
@@ -493,7 +429,209 @@ df.sort_values(by='fscore', ascending=False).iloc[:30]
 
 
 
-|    | name                                  | f   |   fscore |\n|---:|:--------------------------------------|:----|---------:|\n|  9 | weekday                               | f84 |    12812 |\n| 10 | gender=1                              | f76 |     8973 |\n|  2 | time_of_day=3                         | f81 |     8377 |\n|  8 | gender=0                              | f75 |     7969 |\n| 11 | time_of_day=1                         | f79 |     7064 |\n| 26 | time_of_day=2                         | f80 |     6594 |\n|  7 | time_of_day=0                         | f78 |     6302 |\n| 17 | gender=2                              | f77 |     5509 |\n|  3 | time_of_day=4                         | f82 |     4854 |\n| 40 | start_neighborhood=Chelsea            | f12 |     1199 |\n| 37 | start_neighborhood=Midtown East       | f46 |     1058 |\n| 36 | start_neighborhood=Midtown West       | f47 |      947 |\n| 30 | start_neighborhood=Downtown Brooklyn  | f18 |      910 |\n| 41 | start_neighborhood=Hell's Kitchen     | f33 |      877 |\n| 21 | start_neighborhood=Fort Greene        | f25 |      865 |\n| 14 | start_neighborhood=Financial District | f23 |      860 |\n| 23 | start_neighborhood=Brooklyn Heights   | f7  |      834 |\n| 49 | start_neighborhood=Kips Bay           | f36 |      821 |\n| 13 | start_neighborhood=Tribeca            | f64 |      813 |\n| 28 | start_neighborhood=Lower East Side    | f42 |      786 |
+#### Access to predict methods of individual trees
+
+
+```python
+dump_list = model.get_dump()
+num_t=len(dump_list)
+```
+
+
+```python
+num_t
+```
+
+
+
+
+    5400
+
+
+
+
+```python
+import numpy as np; from numpy import float32, array
+
+```
+
+
+```python
+blahvec = [array([-0.19117647], dtype=float32), array([-0.17493302], dtype=float32), array([-0.1632322], dtype=float32), array([-0.15528071], dtype=float32), array([-0.14764059], dtype=float32), array([-0.134592], dtype=float32), array([-0.10049492], dtype=float32), array([-0.1302135], dtype=float32), array([-0.1268928], dtype=float32), array([-0.11612129], dtype=float32), array([-0.08275878], dtype=float32), array([-0.1172291], dtype=float32), array([-0.11398101], dtype=float32), array([-0.1115346], dtype=float32), array([-0.11064661], dtype=float32), array([-0.07345426], dtype=float32), array([-0.10717297], dtype=float32), array([-0.10513449], dtype=float32), array([-0.10398841], dtype=float32), array([-0.10136986], dtype=float32), array([-0.06175613], dtype=float32), array([-0.0963707], dtype=float32), array([-0.07870603], dtype=float32), array([-0.09415579], dtype=float32), array([-0.09520769], dtype=float32), array([-0.09691024], dtype=float32), array([-0.08932781], dtype=float32), array([0.04739833], dtype=float32), array([-0.09100223], dtype=float32), array([-0.07952356], dtype=float32), array([-0.05331874], dtype=float32), array([-0.08192921], dtype=float32), array([-0.07854772], dtype=float32), array([-0.08773494], dtype=float32), array([0.04309559], dtype=float32), array([-0.08494949], dtype=float32), array([-0.0410471], dtype=float32), array([-0.08940816], dtype=float32), array([-0.09339404], dtype=float32), array([-0.01659751], dtype=float32), array([-0.06599617], dtype=float32), array([0.02654409], dtype=float32), array([-0.08834934], dtype=float32), array([0.02391124], dtype=float32), array([-0.08487129], dtype=float32), array([-0.08129168], dtype=float32), array([-0.04954338], dtype=float32), array([-0.07444715], dtype=float32), array([-0.04855251], dtype=float32), array([-0.07878494], dtype=float32), array([-0.04307795], dtype=float32), array([-0.07436275], dtype=float32), array([-0.05560017], dtype=float32), array([-0.01397228], dtype=float32), array([-0.07300758], dtype=float32), array([-0.06667089], dtype=float32), array([-0.00923872], dtype=float32), array([-0.04245901], dtype=float32), array([-0.06061077], dtype=float32), array([-0.01046324], dtype=float32), array([-0.03374958], dtype=float32), array([-0.05404854], dtype=float32), array([-0.06557703], dtype=float32), array([-0.05135775], dtype=float32), array([0.03413153], dtype=float32), array([-0.03066111], dtype=float32), array([-0.05308104], dtype=float32), array([-0.0292182], dtype=float32), array([0.03178072], dtype=float32), array([-0.05284214], dtype=float32), array([-0.00391817], dtype=float32), array([-0.03907442], dtype=float32), array([-0.05048847], dtype=float32), array([-0.04551744], dtype=float32), array([-0.04168606], dtype=float32), array([-0.02567053], dtype=float32), array([-0.01324797], dtype=float32), array([-0.05392694], dtype=float32), array([-0.04365301], dtype=float32), array([-0.03963995], dtype=float32), array([-0.04544497], dtype=float32), array([-0.01181078], dtype=float32), array([-0.04806614], dtype=float32), array([-0.03913403], dtype=float32), array([0.00593662], dtype=float32), array([-0.00613165], dtype=float32), array([-0.03568554], dtype=float32), array([-0.03988504], dtype=float32), array([-0.03771305], dtype=float32), array([-0.00819349], dtype=float32), array([-0.04160738], dtype=float32), array([-0.03248644], dtype=float32), array([-0.00781107], dtype=float32), array([-0.02349615], dtype=float32), array([-0.03252411], dtype=float32), array([-0.03434181], dtype=float32), array([-0.01068497], dtype=float32), array([0.00462055], dtype=float32), array([-0.02988434], dtype=float32), array([-0.03110838], dtype=float32)]
+```
+
+
+```python
+len(blahvec)
+
+```
+
+
+
+
+    100
+
+
+
+
+```python
+! conda install --yes scikit-learn=0.22.1 
+# ! conda install --help
+```
+
+    Collecting package metadata (current_repodata.json): done
+    Solving environment: failed with initial frozen solve. Retrying with flexible solve.
+    Collecting package metadata (repodata.json): done
+    Solving environment: done
+    
+    ## Package Plan ##
+    
+      environment location: /opt/conda
+    
+      added / updated specs:
+        - scikit-learn=0.22.1
+    
+    
+    The following packages will be downloaded:
+    
+        package                    |            build
+        ---------------------------|-----------------
+        scikit-learn-0.22.1        |   py37hd81dba3_0         5.2 MB
+        ------------------------------------------------------------
+                                               Total:         5.2 MB
+    
+    The following packages will be DOWNGRADED:
+    
+      scikit-learn                        0.23.2-py37h0573a6f_0 --> 0.22.1-py37hd81dba3_0
+    
+    
+    
+    Downloading and Extracting Packages
+    scikit-learn-0.22.1  | 5.2 MB    | ##################################### | 100% 
+    Preparing transaction: done
+    Verifying transaction: done
+    Executing transaction: done
+
+
+
+```python
+'''
+# oops needed to downgrade this
+/opt/conda/lib/python3.7/site-packages/sklearn/base.py:334: UserWarning: Trying to unpickle estimator OneHotEncoder from version 0.22.1 when using version 0.23.2. This might lead to breaking code or invalid results. Use at your own risk.
+  UserWarning)
+/opt/conda/lib/python3.7/site-packages/sklearn/base.py:334: UserWarning: Trying to unpickle estimator LabelEncoder from version 0.22.1 when using version 0.23.2. This might lead to breaking code or invalid results. Use at your own risk.
+  UserWarning)
+'''
+bundle = fpu.load_bundle_in_docker()
+```
+
+    Loading from bundle_loc /opt/ml/model/all_bundle_with_stationsdf.joblib
+
+
+    /opt/conda/lib/python3.7/site-packages/sklearn/base.py:334: UserWarning: Trying to unpickle estimator OneHotEncoder from version 0.22.1 when using version 0.23.2. This might lead to breaking code or invalid results. Use at your own risk.
+      UserWarning)
+    /opt/conda/lib/python3.7/site-packages/sklearn/base.py:334: UserWarning: Trying to unpickle estimator LabelEncoder from version 0.22.1 when using version 0.23.2. This might lead to breaking code or invalid results. Use at your own risk.
+      UserWarning)
+
+
+
+```python
+# bundle = fpu.load_bundle_in_docker()
+import sklearn
+print(sklearn.__version__)
+from importlib import reload
+reload(sklearn)
+print(sklearn.__version__)
+```
+
+    0.23.2
+    0.22.1
+
+
+
+```python
+bundle = fpu.load_bundle_in_docker()
+```
+
+    Loading from bundle_loc /opt/ml/model/all_bundle_with_stationsdf.joblib
+
+
+
+```python
+reload(fpu)
+```
+
+
+
+
+    <module 'fresh.predict_utils' from '/opt/program/fresh/predict_utils.py'>
+
+
+
+
+```python
+
+
+record = {
+     'starttime': '2013-07-01 00:00:00',
+     'start station name': 'E 47 St & 2 Ave',
+     'usertype': 'Customer',
+     'birth year': '1999',
+     'gender': 0
+     }
+# X_test = xgb.DMatrix()
+a, b = fpu.full_predict_v2(bundle, record)
+```
+
+      0%|          | 0/1 [00:00<?, ?it/s]
+
+    ['start_neighborhood', 'gender', 'time_of_day', 'usertype', 'weekday']
+    [['Midtown East' 0 4 'Customer' 1]]
+    [[0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+      0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+      0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+      0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+      0.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 0.0 0.0 1.0 0 1]]
+    [02:51:44] 1x85 matrix with 4 entries loaded from /opt/server/hmmmm.libsvm?format=libsvm
+
+
+    
+
+
+
+```python
+a, b
+```
+
+
+
+
+    (array([[0.01845511, 0.0112169 , 0.00608919, 0.00358758, 0.02280447,
+             0.00894809, 0.00416442, 0.01859882, 0.0227448 , 0.01681302,
+             0.0115949 , 0.00805871, 0.00163983, 0.01053979, 0.00618187,
+             0.01423946, 0.01279947, 0.01256619, 0.01246874, 0.00309547,
+             0.02578371, 0.02672892, 0.01732285, 0.03873935, 0.00959205,
+             0.04965306, 0.01366295, 0.02828944, 0.00437104, 0.02245426,
+             0.00961021, 0.00906411, 0.03759988, 0.13236406, 0.04010247,
+             0.05108095, 0.00328353, 0.0088856 , 0.01417809, 0.00381548,
+             0.00600353, 0.01121624, 0.00846388, 0.02701668, 0.01104608,
+             0.04947915, 0.01212523, 0.01051854, 0.00749311, 0.03515568,
+             0.01406138, 0.00103403, 0.01931338, 0.01388424]], dtype=float32),
+     array([33]))
+
+
+
+
+```python
+a.sum()
+```
+
+
+
+
+    0.99999994
+
+
 
 
 ```python
