@@ -83,6 +83,31 @@ def time_of_day_feature(df):
     df['time_of_day'] = df['starttime'].map(lambda x: hours.get(x[11:13]))
 
 
+def time_of_day_v2_feature(df):
+    # notebooks/2020-10-22-features-v3.ipynb
+    # 0: 6-10, 1: 11-15, 2: 16-20, 3: 21-00, 00-5
+    pass
+
+
+def age_feature(df):
+    assert 'start_dt' in df.columns.tolist()
+
+    # from notebooks/2020-10-22-features-v3.ipynb
+    quantiles = [93., 44., 35., 29., 16.]
+
+    df['birth'] = df['birth year'].map(
+            lambda x: datetime.datetime(
+                int(x['birth year']), 1, 1, 
+                tzinfo=pytz.timezone('US/Eastern')) 
+            if (x != '\\N' and int(x) > 1913)
+            else pd.NaT)
+    df['age'] = df.apply(lambda x: 
+
+            (x['start_dt'] - x['birth']).days/365.
+            , axis=1)
+
+
+
 def get_partitions(vec, slice_size, keep_remainder=True):
     size = _size(vec) 
     assert slice_size > 0

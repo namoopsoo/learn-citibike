@@ -1,5 +1,16 @@
 
 
+#### Loading data
+
+```python
+datadir = '/opt/data'
+localdir = '/opt/program'
+tripsdf = pd.read_csv(f'{datadir}/2013-07 - Citi Bike trip data.csv')
+stationsdf = pd.read_csv(f'{localdir}/datas/stations/stations-2018-12-04-c.csv',
+                        index_col=0)
+
+```
+
 
 #### Validating model predictions
 * As [used here](https://github.com/namoopsoo/learn-citibike/blob/2020-revisit/notes/2020-07-16-local.md#i-would-like-to-get-the-train-acc-too-to-better-understand-the-overunder-aka-the-overfittingunderfitting)
@@ -155,7 +166,7 @@ df.sort_values(by='fscore', ascending=False).iloc[:30]
 
 #### Plotting an xgboost model's trees
 * As per my notes [here](https://github.com/namoopsoo/learn-citibike/blob/master/notes/2020-10-21-look-at-model-plot.md)
-* `fmap` is another parameter available to the below `plot_tree` but I have not tried it out yet. 
+* `fmap` is another parameter available to the below `plot_tree` but I have not tried it out yet.
 ```python
 from xgboost import plot_tree
 import matplotlib.pyplot as plt
@@ -182,7 +193,7 @@ data = fs3.read_s3_file(bucket, s3fn)
 
 
 #### Build/Run docker image...
-* I have [docker notes here](notes/2020-06-07-local-docker-notes.md) but I might move them here for convenience.
+* I have [docker notes here](/notes/2020-06-07-local-docker-notes.md) but I might move them here for convenience.
 
 
 #### Deploy html
