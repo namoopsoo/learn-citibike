@@ -3,6 +3,7 @@ from collections import Counter
 import pytz
 import subprocess
 import math
+import pandas as pd
 import pytz
 import os
 import numpy as np
@@ -90,22 +91,21 @@ def time_of_day_v2_feature(df):
 
 
 def age_feature(df):
-    assert 'start_dt' in df.columns.tolist()
-
     # from notebooks/2020-10-22-features-v3.ipynb
-    quantiles = [93., 44., 35., 29., 16.]
-
+    assert 'start_dt' in df.columns.tolist()
+    quantiles = [16., 29., 35., 44., 93.]
     df['birth'] = df['birth year'].map(
             lambda x: datetime.datetime(
-                int(x['birth year']), 1, 1, 
+                int(x), 1, 1, 
                 tzinfo=pytz.timezone('US/Eastern')) 
             if (x != '\\N' and int(x) > 1913)
             else pd.NaT)
     df['age'] = df.apply(lambda x: 
+            (x['start_dt'] - x['birth']).days/365.,
+            axis=1)
 
-            (x['start_dt'] - x['birth']).days/365.
-            , axis=1)
-
+    df['age_bin'] = pd.cut(df['age'], bins=quantiles,
+                           labels=[0, 1, 2, 3])
 
 
 def get_partitions(vec, slice_size, keep_remainder=True):
