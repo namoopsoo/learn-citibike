@@ -301,10 +301,7 @@ print(fu.get_my_memory())
 print(fu.get_my_memory())
 X_train, X_test, y_train, y_test, Xids_train, Xids_test = train_test_split(X, y, Xids)
 print(fu.get_my_memory())
-# delete variables now
 
-# and do preprocess
-# pv2.preprocess()
 ```
 
     {'pmem': '23.4', 'rss': '0.456 GiB'}
@@ -370,26 +367,71 @@ joblib.dump({'notebook': '2020-10-23-quick-new-v3-proc-bundle',
 
 
 
+#### Preprocess
+Oh oops.. I tried to do pv2.preproces but got error 
+
+```
+ValueError: Found unknown categories [72, 79, 82, 83, ..., 540, 545, 546,..., 2023] in column 1 during transform
+```
+Because oops since I changed around X, I have to do some slicing so it matches what is expected!! 
+
 
 ```python
+# Make X look like what pv2 expects...
+# ['start_neighborhood', 'gender', 'time_of_day', 'usertype', 'weekday']
+# [['Midtown East' 0 4 'Customer' 1]]
 
-    
-Xids = tripsdf.iloc[:10].apply(lambda x: f'{_starttime_clean_2(x.starttime)}_{x.bikeid}', axis=1)
+# Now we have this:
+# X_train[0] # array(['Union Square', 497, 1, 3, 'Subscriber', 1, 2.0], dtype=object)
+
+print(X_train[:5, [0, 2, 3, 4, 5]])
+print('before remapping', X_train.shape)
+X_train = X_train[:, [0, 2, 3, 4, 5]]
+X_test = X_test[:, [0, 2, 3, 4, 5]]
+print('after remapping', X_train.shape)
 ```
+
+    [['Union Square' 1 3 'Subscriber' 1]
+     ['Battery Park City' 0 3 'Customer' 0]
+     ['West Village' 1 1 'Subscriber' 1]
+     ['Chelsea' 1 1 'Subscriber' 1]
+     ['Ukrainian Village' 1 4 'Subscriber' 1]]
+    before remapping (316281, 7)
+    after remapping (316281, 5)
+
 
 
 ```python
-import h5py
+%%time
+# Try to do preprocess again!
+# Hopefully kernel will not die like yesterday 
+#   in 2020-10-22-features-v3.ipynb
+
+print(fu.get_my_memory())
+proc_bundle = bundle['proc_bundle']['bundle']['proc_bundle']
+neighborhoods = bundle['neighborhoods_bundle']['neighborhoods']
+print(fu.get_my_memory())
+
+print('Creating new train/test using existing proc bundle')
+train_loc = pv2.preprocess(
+        X_train, y_train, neighborhoods, proc_bundle=proc_bundle,
+        workdir=workdir,
+        dataset_name='train')
+print(train_loc)
+
+test_loc = pv2.preprocess(
+        X_test, y_test, neighborhoods, proc_bundle=proc_bundle,
+        workdir=workdir,
+        dataset_name='test')
+print('Done ', test_loc)
+
+print(fu.get_my_memory())
+
 ```
 
+      0%|          | 0/1 [00:00<?, ?it/s]
 
-    ---------------------------------------------------------------------------
-
-    ModuleNotFoundError                       Traceback (most recent call last)
-
-    <ipython-input-7-c9f0b8c65221> in <module>
-    ----> 1 import h5py
-    
-
-    ModuleNotFoundError: No module named 'h5py'
+    {'pmem': '26.8', 'rss': '0.522 GiB'}
+    {'pmem': '26.8', 'rss': '0.522 GiB'}
+    Creating new train/test using existing proc bundle
 
