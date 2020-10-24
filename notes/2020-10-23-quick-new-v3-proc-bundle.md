@@ -435,3 +435,18 @@ print(fu.get_my_memory())
     {'pmem': '26.8', 'rss': '0.522 GiB'}
     Creating new train/test using existing proc bundle
 
+
+    100%|██████████| 1/1 [00:59<00:00, 59.87s/it]
+      0%|          | 0/1 [00:00<?, ?it/s]
+
+    /opt/program/artifacts/2020-10-24T185245Z/train.libsvm
+
+
+    100%|██████████| 1/1 [00:08<00:00,  8.93s/it]
+
+
+    Done  /opt/program/artifacts/2020-10-24T185245Z/test.libsvm
+    {'pmem': '17.9', 'rss': '0.348 GiB'}
+    CPU times: user 40.5 s, sys: 9.02 s, total: 49.5 s
+    Wall time: 1min 11s
+
