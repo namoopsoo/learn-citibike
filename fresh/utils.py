@@ -29,16 +29,17 @@ def make_work_dir(localdir):
     os.mkdir(workdir)
     return workdir
 
+
 def prepare_data(tripsdf, stationsdf, labelled):
-    
     if labelled:
-        cols = ['start station name', 'end station name', 'gender',
-                   'starttime', 'usertype']
+        cols = ['start station name', 'start station id', 'end station name', 'gender',
+                'starttime', 'bikeid', 'usertype', 'birth year']
     else:
-        cols = ['start station name', 'gender', 'starttime', 'usertype']
+        cols = ['start station name', 'start station id', 'gender', 'starttime',
+                'bikeid', 'usertype', 'birth year']
     # Step 1, merge w/ stationsdf to get neighborhood data
     mdf = tripsdf[cols
-            ].merge(stationsdf[['station_name', 'neighborhood']], 
+            ].merge(stationsdf[['station_name', 'neighborhood']],
                     left_on='start station name',
                     right_on='station_name'
                    ).rename(columns={'neighborhood': 'start_neighborhood'}
@@ -46,17 +47,30 @@ def prepare_data(tripsdf, stationsdf, labelled):
     if labelled:
         mdf = mdf.merge(stationsdf[['station_name', 'neighborhood']],
                                   left_on='end station name',
-                                   right_on='station_name'
+                                  right_on='station_name'
                                   ).rename(columns={'neighborhood': 'end_neighborhood'})
     prepare_weekday_feature(mdf)
     time_of_day_feature(mdf)
-    
-    X = mdf[['start_neighborhood', 'gender', 'time_of_day', 'usertype', 'weekday', ]].values
+    mdf = age_feature(mdf)
+
+    Xids = make_ids(mdf)
+
+    features = ['start_neighborhood', 'start station id', 
+             'gender', 'time_of_day', 'usertype', 'weekday', 
+             'age_bin']
+
+    X = mdf[features].values
     if labelled:
         y = np.array(mdf['end_neighborhood'].tolist())
-        return X, y
+        return Xids, features, X, y
     else:
-        return X
+        return Xids, features, X
+
+
+def make_ids(df):
+    Xids = df.apply(lambda x:
+                    f'{_starttime_clean_2(x.starttime)}_{x.bikeid}', axis=1)
+    return Xids.to_numpy()
 
 
 def neighborhoods_from_stations(stationsdf):
@@ -106,6 +120,8 @@ def age_feature(df):
 
     df['age_bin'] = pd.cut(df['age'], bins=quantiles,
                            labels=[0, 1, 2, 3])
+
+    return df.drop(labels=['birth', 'age', 'birth year'], axis=1)
 
 
 def get_partitions(vec, slice_size, keep_remainder=True):
@@ -231,7 +247,7 @@ def get_proportions(y):
     return {k: v/size for (k, v) in dict(Counter(y)).items()}
 
 
-def balance_dataset(X, y, shrinkage=1.0):
+def balance_dataset(X, y, Xids, shrinkage=1.0):
     '''
     X, y, neighborhoods = fu.prepare_data(tripsdf, stationsdf)
     X, y = balance_dataset(X, y)
@@ -244,10 +260,10 @@ def balance_dataset(X, y, shrinkage=1.0):
     newprops = rebalance_proportions(np.array([dd[k] for k in classes]))
     new_class_weights = {k: newprops[i] for (i, k) in enumerate(classes)}
 
-    return re_sample(X, y, new_class_weights, shrinkage=shrinkage)
+    return re_sample(X, y, Xids, new_class_weights, shrinkage=shrinkage)
 
 
-def re_sample(X, y, new_class_weights, shrinkage=None):
+def re_sample(X, y, Xids, new_class_weights, shrinkage=None):
     size = y.shape[0]
     counts = dict(Counter(y))
 
@@ -259,12 +275,12 @@ def re_sample(X, y, new_class_weights, shrinkage=None):
 
     indices = np.random.choice(range(size), replace=False, p=weights, size=new_size)
 
-    return X[indices], y[indices]
+    return X[indices], y[indices], Xids[indices]
 
 
 def balance_dataset_v2(X, y, shrinkage=1.0):
     '''
-    X, y, neighborhoods = fu.prepare_data(tripsdf, stationsdf)
+    X, y = fu.prepare_data(tripsdf, stationsdf)
     X, y = balance_dataset(X, y)
     '''
     # NOTE , copy pasta of balance_dataset, perhaps can refactor this...
@@ -288,3 +304,14 @@ def assess_balance(arr):
 
 def subset(d, keys):
     return {k:v for (k,v) in d.items() if k in keys}
+
+
+def _starttime_clean_1(x):
+    return datetime.datetime.strptime(x, 
+                                     '%Y-%m-%d %H:%M:%S'
+                                    ).strftime('%Y-%m-%dT%H%M%S')
+
+
+def _starttime_clean_2(x):
+    parts = x.split(' ')
+    return f'{parts[0]}T{"".join(parts[1].split(":"))}'
