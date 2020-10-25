@@ -42,6 +42,12 @@ acc = accuracy_score(actuals, predictions)
 balanced_acc = balanced_accuracy_score(actuals, predictions)
 
 ```
+K area metric too
+
+```python
+import fresh.metrics as fm
+correct_kth, topk, karea = fm.kth_area(actuals, y_prob_vec, num_classes=54)
+```
 
 #### Mapping XGboost model features to names
 * Also [this note](https://github.com/namoopsoo/learn-citibike/blob/master/notes/2020-07-26-feature-importances.md) has the basics around pulling together feature names and xgboost generic features (i.e. `f0, f1, ...`)
