@@ -102,11 +102,6 @@ def call_sagemaker(record):
             'gender']
 
     if os.getenv('IN_LAMBDA'):
-        client = boto3.client('sagemaker-runtime',
-                #aws_access_key_id=key_id,
-                #aws_secret_access_key=secret_key,
-                region_name='us-east-1')
-        #
         try:
             return _call_inner(record, header)
         except botocore.exceptions.ClientError as e:
@@ -139,6 +134,9 @@ def _call_inner(record, header):
     print('DEBUG call_sagemaker, csvdata, ', csvdata)
 
     endpoint = os.getenv('SAGEMAKER_ENDPOINT')
+    client = boto3.client('sagemaker-runtime',
+            region_name='us-east-1')
+    #
     response = client.invoke_endpoint(
             EndpointName=endpoint,
             # Body=b'bytes'|file,
