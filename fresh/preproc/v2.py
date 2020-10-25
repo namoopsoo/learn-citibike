@@ -19,6 +19,9 @@ build new encoders and use that for preprocessing.
 
 If given (workdir, dataset_name), write the result there.
 
+Expecting:
+X: ['start_neighborhood', 'gender', 'time_of_day', 'usertype', 'weekday']
+[['Midtown East' 0 4 'Customer' 1]]
     '''
     num_rows = X.shape[0]
     if proc_bundle:
