@@ -15,7 +15,6 @@ Knobs:
       s3_loc: "bikelearn/artifacts/2020-08-19T144654Z/model.tar.gz"
       s3_full: "s3://{bucket}/bikelearn/artifacts/2020-08-19T144654Z/model.tar.gz"
 
-329345173166.dkr.ecr.us-east-1.amazonaws.com/citibike-learn:0.9
         
   bucket:
     name: "my-sagemaker-blah"
