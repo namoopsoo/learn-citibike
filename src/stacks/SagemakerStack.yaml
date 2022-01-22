@@ -1,0 +1,61 @@
+
+Description: "Awesome Sagemaker Bike Stack"
+Parameters:
+  ModelS3Url:
+    Type: String
+    Description: location in s3 with model artifact tar gz
+  DockerImageArn:
+    Type: String
+    Description: arn of docker image to use for the Sagemaker model
+  MyEndpointName:
+    Type: String
+    Description: name for Sagemaker endpoint
+  MyModelName:
+    Type: String
+    Description: name for Sagemaker model 
+
+Resources:
+  AwesomeEndpoint:
+    Type: "AWS::SageMaker::Endpoint"
+    DeletionPolicy: Delete
+    Properties:
+      EndpointName: !Ref MyEndpointName
+      EndpointConfigName:
+        !GetAtt AwesomeEndpointConfig.EndpointConfigName
+
+  AwesomeEndpointConfig:
+    Type: "AWS::SageMaker::EndpointConfig"
+    DeletionPolicy: Delete
+    Properties:
+      ProductionVariants:
+        - InitialInstanceCount: 1
+          InitialVariantWeight: 1.0
+          InstanceType: ml.t2.medium
+          ModelName: !GetAtt AmazingModel.ModelName
+          VariantName: !GetAtt AmazingModel.ModelName
+
+  AmazingModel:
+    Type: AWS::SageMaker::Model
+    DeletionPolicy: Delete
+    Properties:
+      EnableNetworkIsolation: false
+      ExecutionRoleArn: !GetAtt MySagemakerExecutionRole.Arn
+      ModelName: !Ref MyModelName
+      PrimaryContainer:
+        Image: !Ref DockerImageArn
+        Mode: "SingleModel"
+        ModelDataUrl: !Ref ModelS3Url
+
+
+  MySagemakerExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: sagemaker.amazonaws.com
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
