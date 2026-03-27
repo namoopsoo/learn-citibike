@@ -1,7 +1,7 @@
 requests
 hiredis==0.2.0
 redis==2.10.6
-ipython==7.16.3
+ipython==8.10.0
 ipdb==0.10.3
 numpy==1.21.0
 pandas==0.20.3
